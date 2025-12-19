@@ -60,23 +60,142 @@ To launch the application in a native iOS environment via Xcode, follow these st
 
 2. Open `android` folder in Android Studio
 
+3. Upgrade Lynx dependencies to `3.5.1`
+
+Note: For Lynx `3.4.1` which is the default version in the template, we're noticing issues related to Custom Native Element codegen - especially missing classes for prop setters. Therefore we're recommending to upgrade to `3.5.1` version which was tested and works reliably.
+
+```diff
+diff --git a/android/app/build.gradle.kts b/android/app/build.gradle.kts
+index 8ad136b..bcd9de8 100644
+--- a/android/app/build.gradle.kts
++++ b/android/app/build.gradle.kts
+@@ -85,13 +85,13 @@ dependencies {
+     implementation("com.squareup.retrofit2:retrofit:2.7.0")
+ 
+     // lynx dependencies
+-    implementation("org.lynxsdk.lynx:lynx:3.4.1")
+-    implementation("org.lynxsdk.lynx:lynx-jssdk:3.4.1")
+-    implementation("org.lynxsdk.lynx:lynx-trace:3.4.1")
++    implementation("org.lynxsdk.lynx:lynx:3.5.1")
++    implementation("org.lynxsdk.lynx:lynx-jssdk:3.5.1")
++    implementation("org.lynxsdk.lynx:lynx-trace:3.5.1")
+     implementation("org.lynxsdk.lynx:primjs:2.14.1")
+ 
+     // integrating image-service
+-    implementation("org.lynxsdk.lynx:lynx-service-image:3.4.1")
++    implementation("org.lynxsdk.lynx:lynx-service-image:3.5.1")
+ 
+     // image-service dependencies, if not added, images cannot be loaded; if the host APP needs to use other image libraries, you can customize the image-service and remove this dependency
+     implementation("com.facebook.fresco:fresco:2.3.0")
+@@ -101,18 +101,18 @@ dependencies {
+     implementation("com.facebook.fresco:animated-base:2.3.0")
+ 
+     // integrating log-service
+-    implementation("org.lynxsdk.lynx:lynx-service-log:3.4.1")
++    implementation("org.lynxsdk.lynx:lynx-service-log:3.5.1")
+ 
+     // integrating http-service
+-    implementation("org.lynxsdk.lynx:lynx-service-http:3.4.1")
++    implementation("org.lynxsdk.lynx:lynx-service-http:3.5.1")
+ 
+     implementation("com.squareup.okhttp3:okhttp:4.9.0")
+ 
+     // add devtool's dependencies
+-    implementation ("org.lynxsdk.lynx:lynx-devtool:3.4.1")
+-    implementation ("org.lynxsdk.lynx:lynx-service-devtool:3.4.1")
++    implementation ("org.lynxsdk.lynx:lynx-devtool:3.5.1")
++    implementation ("org.lynxsdk.lynx:lynx-service-devtool:3.5.1")
+ 
+     // add xelement's dependencies
+-    implementation ("org.lynxsdk.lynx:xelement:3.4.1")
+-    implementation ("org.lynxsdk.lynx:xelement-input:3.4.1")
++    implementation ("org.lynxsdk.lynx:xelement:3.5.1")
++    implementation ("org.lynxsdk.lynx:xelement-input:3.5.1")
+ }
+\ No newline at end of file
+```
+
+4. Apply workarounds for `kapt`
+
+`kapt` (Kotlin Annotation Processing Tool) is Kotlin's equivalent of Java's annotation processing API. It is used to run annotation processors that generate code or perform checks at compile time.
+
+Since Kotlin doesn't natively support Java's annotation processing, `kapt` acts as a bridge to support these processors in Kotlin code.
+
+To use annotation processors for generating native elements code for Lynx, you need to enable `kapt` in your Gradle setup.
+
+Add the kapt plugin to your module-level `build.gradle.kts` file (located at `android/app/build.gradle.kts`). Then, within the `dependencies` block, include the annotation processor dependencies:
 
 
+```kotlin
+plugins {
+    ...
+    id("kotlin-kapt")
+}
+...
+dependencies {
+    ...
+    kapt("org.lynxsdk.lynx:lynx-processor:3.5.1")
+    compileOnly("org.lynxsdk.lynx:lynx-processor:3.5.1")
+    annotationProcessor("org.lynxsdk.lynx:lynx-processor:3.5.1")
+}
+```
 
+When building the app, you may encounter the following error:
 
+```
+> Task :app:kaptGenerateStubsDebugKotlin FAILED
+e: java.lang.IllegalAccessError: superclass access check failed: class org.jetbrains.kotlin.kapt3.base.javac.KaptJavaCompiler (in unnamed module @0x50f2d58) cannot access class com.sun.tools.javac.main.JavaCompiler (in module jdk.compiler) because module jdk.compiler does not export com.sun.tools.javac.main to unnamed module @0x50f2d58
+	at java.base/java.lang.ClassLoader.defineClass1(Native Method)
+...
 
+FAILURE: Build failed with an exception.
 
+* What went wrong:
+Execution failed for task ':app:kaptGenerateStubsDebugKotlin'.
+> A failure occurred while executing org.jetbrains.kotlin.compilerRunner.GradleCompilerRunnerWithWorkers$GradleKotlinCompilerWorkAction
+   > Internal compiler error. See log for more details
 
+* Try:
+> Run with --info or --debug option to get more log output.
+> Run with --scan to get full insights.
+> Get more help at https://help.gradle.org.
 
+...
+
+BUILD FAILED in 5s
+30 actionable tasks: 13 executed, 17 up-to-date
+```
+
+This is a known issue that occurs because Java 17 (or newer versions) introduced stronger module boundaries. The internal classes used by `kapt` are not exported by default in Java modules. This results in an `IllegalAccessError`.
+
+`kapt` tries to interact with internal compiler APIs, but due to restrictions, it fails unless explicitly allowed through JVM startup options.
+
+To fix this, you need to add additional JVM arguments to `gradle.properties` to manually export these internal compiler packages by bypassing module boundaries:
+
+```properties
+org.gradle.jvmargs=-Xmx2048m -Dfile.encoding=UTF-8 \
+  --add-exports=jdk.compiler/com.sun.tools.javac.api=ALL-UNNAMED \
+  --add-exports=jdk.compiler/com.sun.tools.javac.file=ALL-UNNAMED \
+  --add-exports=jdk.compiler/com.sun.tools.javac.parser=ALL-UNNAMED \
+  --add-exports=jdk.compiler/com.sun.tools.javac.tree=ALL-UNNAMED \
+  --add-exports=jdk.compiler/com.sun.tools.javac.util=ALL-UNNAMED \
+  --add-exports=jdk.compiler/com.sun.tools.javac.main=ALL-UNNAMED \
+  --add-opens=jdk.compiler/com.sun.tools.javac.main=ALL-UNNAMED
+
+kapt.use.worker.api=false
+```
+
+Lynx `v3.5.1` has a compatibility issue with `kapt` and the Kotlin compiler on certain setups. To successfully build your project, you need to apply a workaround or patch in some of the Android source files.
+
+For example, [this commit](https://github.com/software-mansion/lynx-screens/blob/5f88f53de3bf54f0f4c74cea9a9dcffca9d852ee/android/app/src/main/java/com/lynxscreens/providers/GenericResourceFetcher.kt) provides a fix in the GenericResourceFetcher from CLI which is outdated after upgrading dependencies earlier.
+
+5. Launch the application
 
 ## Custom Native Element development
 
 This section explains how to create and register a custom native element for a Lynx-based application. We'll walk through implementing a simple native `View` extension.
 
-
-
-
-
+### Integration with LynxProcessor Module
 
 
 
