@@ -178,8 +178,6 @@ You can also pre-bundle the application and embed it into your Xcode project:
 
 - Then update your Swift code to load the embedded bundle instead of fetching it from the dev server:
 
-  Apply the following diff, which creates the Custom Bundle Loader
-
 ```diff
 diff --git a/apple/LynxScreens/SceneDelegate.swift b/apple/LynxScreens/SceneDelegate.swift
 index 209ccc2..b9ce178 100644
