@@ -1,20 +1,23 @@
 PODS:
-  - BaseDevtool (3.4.1):
-    - BaseDevtool/framework (= 3.4.1)
-  - BaseDevtool/framework (3.4.1):
-    - DebugRouter (>= 5.0.11)
-    - Lynx (= 3.4.1)
-  - DebugRouter (5.0.13-rc.1):
-    - DebugRouter/Framework (= 5.0.13-rc.1)
-    - DebugRouter/Native (= 5.0.13-rc.1)
-    - DebugRouter/third_party (= 5.0.13-rc.1)
-  - DebugRouter/Framework (5.0.13-rc.1):
+  - BaseDevtool (3.5.1):
+    - BaseDevtool/framework (= 3.5.1)
+  - BaseDevtool/framework (3.5.1):
+    - DebugRouter (>= 5.0.13)
+    - Lynx (= 3.5.1)
+    - LynxBase (= 3.5.1)
+  - DebugRouter (5.0.13):
+    - DebugRouter/Framework (= 5.0.13)
+    - DebugRouter/MessageTransceiverEnable (= 5.0.13)
+    - DebugRouter/Native (= 5.0.13)
+    - DebugRouter/third_party (= 5.0.13)
+  - DebugRouter/Framework (5.0.13):
     - DebugRouter/Native
-  - DebugRouter/Native (5.0.13-rc.1):
+  - DebugRouter/MessageTransceiverEnable (5.0.13)
+  - DebugRouter/Native (5.0.13):
     - DebugRouter/third_party
-  - DebugRouter/third_party (5.0.13-rc.1):
-    - DebugRouter/third_party/jsoncpp (= 5.0.13-rc.1)
-  - DebugRouter/third_party/jsoncpp (5.0.13-rc.1)
+  - DebugRouter/third_party (5.0.13):
+    - DebugRouter/third_party/jsoncpp (= 5.0.13)
+  - DebugRouter/third_party/jsoncpp (5.0.13)
   - libwebp (1.5.0):
     - libwebp/demux (= 1.5.0)
     - libwebp/mux (= 1.5.0)
@@ -27,70 +30,86 @@ PODS:
   - libwebp/sharpyuv (1.5.0)
   - libwebp/webp (1.5.0):
     - libwebp/sharpyuv
-  - Lynx (3.4.1):
-    - Lynx/Framework (= 3.4.1)
-  - Lynx/Framework (3.4.1):
+  - Lynx (3.5.1):
+    - Lynx/Framework (= 3.5.1)
+  - Lynx/Framework (3.5.1):
     - Lynx/ReleaseResource
+    - LynxBase/Framework
+    - LynxServiceAPI
     - PrimJS/napi/env
     - PrimJS/napi/jsc
     - PrimJS/napi/quickjs
-    - PrimJS/quickjs (= 2.14.0-rc.1)
-  - Lynx/ReleaseResource (3.4.1)
-  - LynxDevtool (3.4.1):
-    - LynxDevtool/Framework (= 3.4.1)
-    - LynxDevtool/LynxCore (= 3.4.1)
-    - LynxDevtool/LynxRecorder (= 3.4.1)
-  - LynxDevtool/Framework (3.4.1):
-    - BaseDevtool (= 3.4.1)
-    - DebugRouter (>= 5.0.11)
-    - Lynx (= 3.4.1)
-    - LynxDevtool/Framework/zlib (= 3.4.1)
+    - PrimJS/quickjs (= 2.15.0-rc.2)
+  - Lynx/ReleaseResource (3.5.1)
+  - LynxBase (3.5.1):
+    - LynxBase/Framework (= 3.5.1)
+  - LynxBase/Framework (3.5.1):
+    - LynxServiceAPI/Core
+  - LynxDevtool (3.5.1):
+    - LynxDevtool/Framework (= 3.5.1)
+    - LynxDevtool/LynxCore (= 3.5.1)
+    - LynxDevtool/LynxRecorder (= 3.5.1)
+  - LynxDevtool/Framework (3.5.1):
+    - BaseDevtool (= 3.5.1)
+    - DebugRouter (>= 5.0.13)
+    - Lynx (= 3.5.1)
+    - LynxBase (= 3.5.1)
+    - LynxDevtool/Framework/zlib (= 3.5.1)
     - LynxDevtool/LynxCore
     - PrimJS/quickjs_debugger
     - PrimJS/quickjs_heapprofiler
     - PrimJS/quickjs_profiler
     - SocketRocket
-  - LynxDevtool/Framework/zlib (3.4.1):
-    - BaseDevtool (= 3.4.1)
-    - DebugRouter (>= 5.0.11)
-    - Lynx (= 3.4.1)
+  - LynxDevtool/Framework/zlib (3.5.1):
+    - BaseDevtool (= 3.5.1)
+    - DebugRouter (>= 5.0.13)
+    - Lynx (= 3.5.1)
+    - LynxBase (= 3.5.1)
     - LynxDevtool/LynxCore
     - PrimJS/quickjs_debugger
     - PrimJS/quickjs_heapprofiler
     - PrimJS/quickjs_profiler
     - SocketRocket
-  - LynxDevtool/LynxCore (3.4.1)
-  - LynxDevtool/LynxRecorder (3.4.1):
+  - LynxDevtool/LynxCore (3.5.1)
+  - LynxDevtool/LynxRecorder (3.5.1):
     - LynxDevtool/Framework
-  - LynxService/Devtool (3.4.1):
-    - Lynx (= 3.4.1)
-    - LynxDevtool (= 3.4.1)
-  - LynxService/Http (3.4.1):
-    - Lynx (= 3.4.1)
-  - LynxService/Image (3.4.1):
-    - Lynx (= 3.4.1)
+  - LynxService/Devtool (3.5.1):
+    - Lynx (= 3.5.1)
+    - LynxDevtool (= 3.5.1)
+    - LynxServiceAPI (= 3.5.1)
+  - LynxService/Http (3.5.1):
+    - Lynx (= 3.5.1)
+    - LynxServiceAPI (= 3.5.1)
+  - LynxService/Image (3.5.1):
+    - Lynx (= 3.5.1)
+    - LynxServiceAPI (= 3.5.1)
     - SDWebImage (= 5.15.5)
     - SDWebImageWebPCoder (= 0.11.0)
-  - LynxService/Log (3.4.1):
-    - Lynx (= 3.4.1)
-  - PrimJS/log (2.14.0-rc.1)
-  - PrimJS/napi/core (2.14.0-rc.1)
-  - PrimJS/napi/env (2.14.0-rc.1):
+  - LynxService/Log (3.5.1):
+    - Lynx (= 3.5.1)
+    - LynxBase (= 3.5.1)
+    - LynxServiceAPI (= 3.5.1)
+  - LynxServiceAPI (3.5.1):
+    - LynxServiceAPI/Core (= 3.5.1)
+  - LynxServiceAPI/Core (3.5.1)
+  - PrimJS/log (2.15.0-rc.2)
+  - PrimJS/napi/core (2.15.0-rc.2)
+  - PrimJS/napi/env (2.15.0-rc.2):
     - PrimJS/napi/core
-  - PrimJS/napi/jsc (2.14.0-rc.1):
+  - PrimJS/napi/jsc (2.15.0-rc.2):
     - PrimJS/log
     - PrimJS/napi/core
     - PrimJS/quickjs
-  - PrimJS/napi/quickjs (2.14.0-rc.1):
+  - PrimJS/napi/quickjs (2.15.0-rc.2):
     - PrimJS/napi/core
     - PrimJS/quickjs
-  - PrimJS/quickjs (2.14.0-rc.1):
+  - PrimJS/quickjs (2.15.0-rc.2):
     - PrimJS/log
-  - PrimJS/quickjs_debugger (2.14.0-rc.1):
+  - PrimJS/quickjs_debugger (2.15.0-rc.2):
     - PrimJS/quickjs
-  - PrimJS/quickjs_heapprofiler (2.14.0-rc.1):
+  - PrimJS/quickjs_heapprofiler (2.15.0-rc.2):
     - PrimJS/quickjs_debugger
-  - PrimJS/quickjs_profiler (2.14.0-rc.1):
+  - PrimJS/quickjs_profiler (2.15.0-rc.2):
     - PrimJS/quickjs_debugger
   - SDWebImage (5.15.5):
     - SDWebImage/Core (= 5.15.5)
@@ -99,28 +118,28 @@ PODS:
     - libwebp (~> 1.0)
     - SDWebImage/Core (~> 5.15)
   - SocketRocket (0.6.0)
-  - XElement (3.4.1):
-    - XElement/Behavior (= 3.4.1)
-    - XElement/Input (= 3.4.1)
-  - XElement/Behavior (3.4.1):
-    - Lynx (= 3.4.1)
+  - XElement (3.5.1):
+    - XElement/Behavior (= 3.5.1)
+    - XElement/Input (= 3.5.1)
+  - XElement/Behavior (3.5.1):
+    - Lynx (= 3.5.1)
     - XElement/Input
-  - XElement/Input (3.4.1):
-    - Lynx (= 3.4.1)
+  - XElement/Input (3.5.1):
+    - Lynx (= 3.5.1)
 
 DEPENDENCIES:
-  - BaseDevtool (= 3.4.1)
-  - DebugRouter (= 5.0.13-rc.1)
-  - Lynx/Framework (= 3.4.1)
-  - LynxDevtool/Framework (= 3.4.1)
-  - LynxDevtool/LynxRecorder (= 3.4.1)
-  - LynxService/Devtool (= 3.4.1)
-  - LynxService/Http (= 3.4.1)
-  - LynxService/Image (= 3.4.1)
-  - LynxService/Log (= 3.4.1)
+  - BaseDevtool (= 3.5.1)
+  - DebugRouter (= 5.0.13)
+  - Lynx/Framework (= 3.5.1)
+  - LynxDevtool/Framework (= 3.5.1)
+  - LynxDevtool/LynxRecorder (= 3.5.1)
+  - LynxService/Devtool (= 3.5.1)
+  - LynxService/Http (= 3.5.1)
+  - LynxService/Image (= 3.5.1)
+  - LynxService/Log (= 3.5.1)
   - SDWebImage (= 5.15.5)
   - SDWebImageWebPCoder (= 0.11.0)
-  - XElement (= 3.4.1)
+  - XElement (= 3.5.1)
 
 SPEC REPOS:
   trunk:
@@ -128,8 +147,10 @@ SPEC REPOS:
     - DebugRouter
     - libwebp
     - Lynx
+    - LynxBase
     - LynxDevtool
     - LynxService
+    - LynxServiceAPI
     - PrimJS
     - SDWebImage
     - SDWebImageWebPCoder
@@ -137,18 +158,20 @@ SPEC REPOS:
     - XElement
 
 SPEC CHECKSUMS:
-  BaseDevtool: c1b668fb9d6a15394355ea0bfb0b595fb597475f
-  DebugRouter: 0996863f781ae7307bb7c0fc2e82854cde39653d
+  BaseDevtool: 84b431cb17a4a7568f94a933846d12ab5dea809a
+  DebugRouter: 886acbbb1ef587265ba3d51ee77e323514b0c063
   libwebp: 02b23773aedb6ff1fd38cec7a77b81414c6842a8
-  Lynx: a05e8800b33ebb2c7b6e9de2c2d2f9a9f015f603
-  LynxDevtool: beb463ba1e76f8eef8f178c0a300f257f0c7756a
-  LynxService: d5ec07214d8255c957c9e34604503502c53d7a60
-  PrimJS: 0254a97a9fddf92d492a69dc8e98e62480bf79ff
+  Lynx: 59646bf6d02c48ffadd4f286af497607c5b18e81
+  LynxBase: c753b4aba59fffe9e8c01a7968c131c3300ead9f
+  LynxDevtool: ca6f3a43aa8f1dcdc5752f812f1efb4ebd1a73ec
+  LynxService: 51046d4f014f4ad657f9215a503cbebd6b252210
+  LynxServiceAPI: d4d55ac151351bc257bb36fad3e5b2937c450bc1
+  PrimJS: 3da1ccc877656b6a4aba0b704bcfd0c2fc1e6ed7
   SDWebImage: fd7e1a22f00303e058058278639bf6196ee431fe
   SDWebImageWebPCoder: 295a6573c512f54ad2dd58098e64e17dcf008499
   SocketRocket: fccef3f9c5cedea1353a9ef6ada904fde10d6608
-  XElement: 68a2c4add841278055fb1907d7e0fa26bbb91663
+  XElement: c047a161608a818251acfe9e66c4b84bfe913700
 
-PODFILE CHECKSUM: da1bea1fa12597b0bbdac4f7526172f8bc244fd6
+PODFILE CHECKSUM: 9cf32d8b83f9bbad0e886875dab9a120e7c1f530
 
 COCOAPODS: 1.16.2
