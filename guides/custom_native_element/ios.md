@@ -227,7 +227,256 @@ index 209ccc2..b9ce178 100644
 
 This method ensures your app runs independently of the packager.
 
-## Custom Native Element development - TBC
+## Custom Native Element development
+
+This section explains how to create and register a custom native element for a Lynx-based application. We'll walk through implementing a simple native `UIView` extension.
+
+### Native Component Implementation
+
+We begin by implementing a custom native `UIView`. This view includes a property for setting the background color based on a hex string.
+
+- header:
+```objective-c
+
+#import <UIKit/UIKit.h>
+
+NS_ASSUME_NONNULL_BEGIN
+
+@interface LynxColorBoxView : UIView
+
+@property (nonatomic, copy) NSString *backgroundColorHex;
+
+@end
+
+NS_ASSUME_NONNULL_END
+```
+
+- implementation:
+```objective-c
+#import "LynxColorBoxView.h"
+
+@implementation LynxColorBoxView
+
+- (void)setBackgroundColorHex:(NSString *)backgroundColorHex {
+    _backgroundColorHex = [backgroundColorHex copy];
+    self.backgroundColor = [self colorFromHexString:_backgroundColorHex];
+}
+
+- (UIColor *)colorFromHexString:(NSString *)hexString {
+    NSString *cleanString = [hexString stringByTrimmingCharactersInSet:
+                             [NSCharacterSet whitespaceAndNewlineCharacterSet]];
+
+    if ([cleanString hasPrefix:@"#"]) {
+        cleanString = [cleanString substringFromIndex:1];
+    }
+
+    if (cleanString.length != 6) {
+        return [UIColor lightGrayColor];
+    }
+
+    unsigned int rgbValue = 0;
+    NSScanner *scanner = [NSScanner scannerWithString:cleanString];
+    [scanner scanHexInt:&rgbValue];
+
+    CGFloat red = ((rgbValue >> 16) & 0xFF) / 255.0;
+    CGFloat green = ((rgbValue >> 8) & 0xFF) / 255.0;
+    CGFloat blue = (rgbValue & 0xFF) / 255.0;
+
+    return [UIColor colorWithRed:red green:green blue:blue alpha:1.0];
+}
+
+@end
+```
+
+### View Manager Implementation
+
+The view manager is responsible for creating the view and mapping properties passed from the JS layer to the native component.
+
+Implementacja managera sklada sie z kilku istotnych wymaganych krokow:
+
+#### Register the Native Component
+
+To register the component with Lynx, you need to use the `LYNX_LAZY_REGISTER_UI` macro and import `LynxComponentRegistry` header.
+
+```objective-c
+#import "LynxColorBoxViewManager.h"
+
+#import <Lynx/LynxComponentRegistry.h>
+
+@implementation LynxColorBoxViewManager
+
+LYNX_LAZY_REGISTER_UI("color-box-view")
+
+// ...
+
+@end
+```
+
+#### Declare Property Setters
+
+To expose properties to JavaScript, use the `LYNX_PROP_SETTER` macro and import `LynxPropsProcessor`. This connects the JS-side prop with the Objective-C.
+
+```objective-c
+// ...
+#import <Lynx/LynxPropsProcessor.h>
+
+@implementation LynxColorBoxViewManager
+
+// ...
+
+LYNX_PROP_SETTER("backgroundColorHex", setBackgroudColorHex, NSString *) {
+    self.view.backgroundColorHex = value;
+}
+
+// ...
+
+@end
+```
+
+#### Override `createView`
+
+This method is called when the view is created in the Element Tree. It should return the instance of your custom view.
+
+```objective-c
+@implementation LynxColorBoxViewManager
+
+// ...
+
+- (UIView *)createView {
+  UIView *colorBoxView = [[LynxColorBoxView alloc] init];
+  return colorBoxView;
+}
+
+// ...
+```
+
+### Final View Manager Code
+
+Putting everything together, the complete view manager implementation looks like this:
+
+```objective-c
+#import <Lynx/LynxUI.h>
+#import "LynxColorBoxView.h"
+
+NS_ASSUME_NONNULL_BEGIN
+
+@interface LynxColorBoxViewManager : LynxUI <LynxColorBoxView *>
+
+@end
+
+NS_ASSUME_NONNULL_END
+```
+
+```objective-c
+#import "LynxColorBoxViewManager.h"
+
+#import <Lynx/LynxComponentRegistry.h>
+#import <Lynx/LynxPropsProcessor.h>
+
+@implementation LynxColorBoxViewManager
+
+LYNX_LAZY_REGISTER_UI("color-box-view")
+
+LYNX_PROP_SETTER("backgroundColorHex", setBackgroudColorHex, NSString *) {
+    self.view.backgroundColorHex = value;
+}
+
+- (UIView *)createView {
+  UIView *colorBoxView = [[LynxColorBoxView alloc] init];
+  return colorBoxView;
+}
+
+@end
+```
+
+### Registering a Custom Native Element for an Application Instance
+
+If AppDelegate/SceneDelegate is implemented in Swift, include the header of your View Manager in the Bridging Header:
+```objective-c
+#import "elements/LynxColorBoxViewManager.h"
+```
+
+Register the native component using the builder object when creating a `LynxView` instance:
+
+```swift
+let lynxView = LynxView { builder in
+  // ...
+  builder.config?.registerUI(LynxColorBoxViewManager.self, withName: "color-box-view")
+}
+```
+
+### Extending IntrinsicElements with a Custom Component
+
+Lynx has a configuration file that allows recognition of symbols registered as native elements.
+
+You need to add the type definition for your custom component in `src/rspeedy-env.d.ts`.
+
+```ts
+declare module "@lynx-js/types" {
+  interface IntrinsicElements extends Lynx.IntrinsicElements {
+    ...,
+    "color-box-view": {
+      className?: string;
+      id?: string;
+      style?: string | Lynx.CSSProperties;
+      backgroundColorHex?: string | undefined;
+    };
+  }
+}
+```
+
+Note: `tsconfig.json` used in this project
+
+```json
+{
+  "compilerOptions": {
+    "jsx": "preserve",
+    "jsxImportSource": "@lynx-js/react",
+
+    "module": "node16",
+    "moduleResolution": "node16",
+
+    "strict": true,
+    "isolatedModules": true,
+    "verbatimModuleSyntax": true,
+
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+  },
+  "exclude": ["dist/"],
+}
+```
+
+### Creating an Instance of the Component in JS
+
+Lynx supports JSX syntax, so using components looks similar to HTML markup.
+
+In any file, e.g. `App.tsx`, you can add the following:
+
+```tsx
+// ...
+import * as Lynx from "@lynx-js/types";
+
+// ...
+export function App(props: { onRender?: () => void }) {
+  return (
+    <view>
+      <view className="Content">
+        <color-box-view 
+          backgroundColorHex="#45ac1f"
+          style={{
+            height: 200,
+            width: 200,
+          }}
+        />
+      </view>
+    </view>
+  );
+}
+// ...
+```
+
+Then, you can launch the application and observe that the Custom Native Element with the green background color is rendered. You can verify that `LynxColorBoxView` is present in the native hierarchy.
 
 ---
 
@@ -236,5 +485,6 @@ This method ensures your app runs independently of the packager.
 - CLI Source Code & Docs: https://github.com/lynx-community/cli/tree/main
 - Official Quick Start Guide: https://lynxjs.org/guide/start/quick-start?ios-simulator-platform=macos-arm64&explorer-platform=ios-simulator
 - Custom Native Element Development: https://lynxjs.org/guide/custom-native-component.html?platform=ios 
+- Example implementation of Custom Native Element for iOS: https://github.com/software-mansion/lynx-screens/commit/8f152dcf6c14849ac2758ce0541e8e8d12b47aca
 
 ---
