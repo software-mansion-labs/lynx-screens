@@ -292,8 +292,6 @@ NS_ASSUME_NONNULL_END
 
 The view manager is responsible for creating the view and mapping properties passed from the JS layer to the native component.
 
-Implementacja managera sklada sie z kilku istotnych wymaganych krokow:
-
 #### Register the Native Component
 
 To register the component with Lynx, you need to use the `LYNX_LAZY_REGISTER_UI` macro and import `LynxComponentRegistry` header.
