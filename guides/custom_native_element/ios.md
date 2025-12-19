@@ -34,7 +34,7 @@ Based on the current knowledge, [Hot Module Replacement (HMR)](https://webpack.j
 | Android   | Download from GitHub Releases https://github.com/lynx-family/lynx/releases/tag/3.5.1 | Follow Building Lynx Explorer for Android https://github.com/lynx-family/lynx/tree/develop/explorer/android |
 | iOS       | (simulator only) Download https://github.com/lynx-family/lynx/releases/latest/download/LynxExplorer-arm64.app.tar.gz and drag unpacked .app to the simulator | Follow Building Lynx Explorer for iOS https://github.com/lynx-family/lynx/tree/develop/explorer/darwin/ios |
 
-## Launching application
+## Launching application via Lynx Explorer
 
 To get started, install the dependencies and start the development server:
 
@@ -47,6 +47,155 @@ Running the development server will open the packager window in the terminal, wh
 
 In the Lynx Explorer app, paste the bundle URL into the "Enter Card URL" field. After submitting, your application should launch immediately.
 
+## Launching application from Xcode
+
+To launch the application in a native iOS environment via Xcode, follow these steps:
+
+1. Install JavaScript dependencies:
+
+   ```bash
+   npm install
+   npm run dev
+   ```
+
+2. Install CocoaPods dependencies:
+
+   ```bash
+   cd apple
+   pod install
+   ```
+
+### Known Issue: Pod Version Conflict
+
+By default, the CLI generates dependencies using Lynx version 3.4.1. However, this version currently causes a CocoaPods resolution error related to pre-release versions:
+
+```
+[!] CocoaPods could not find compatible versions for pod "PrimJS/quickjs_debugger":
+  In snapshot (Podfile.lock):
+    PrimJS/quickjs_debugger (= 2.14.0-rc.1)
+  In Podfile:
+    LynxDevtool/Framework (= 3.4.1) was resolved to 3.4.1, which depends on
+      PrimJS/quickjs_debugger
+There are only pre-release versions available satisfying the following requirements:
+        'PrimJS/quickjs_debugger', '= 2.14.0-rc.1'
+        'PrimJS/quickjs_debugger', '>= 0'
+You should explicitly specify the version in order to install a pre-release version
+```
+
+### Recommended Solution
+
+To resolve this issue, upgrade Lynx dependencies to version `3.5.1` in the `Podfile`. Below is a sample diff showing the necessary changes:
+
+```diff
+diff --git a/apple/Podfile b/apple/Podfile
+index 7996c39..abcf20d 100644
+--- a/apple/Podfile
++++ b/apple/Podfile
+@@ -3,18 +3,18 @@ source 'https://cdn.cocoapods.org/'
+ platform :ios, '10.0'
+ 
+ target 'LynxScreens' do
+-  pod 'Lynx', '3.4.1', :subspecs => [
++  pod 'Lynx', '3.5.1', :subspecs => [
+     'Framework',
+   ]
+ 
+-  pod 'LynxDevtool', '3.4.1', :subspecs => [
++  pod 'LynxDevtool', '3.5.1', :subspecs => [
+     'Framework',
+     'LynxRecorder',
+   ]
+ 
+-  pod 'BaseDevtool', '3.4.1'
++  pod 'BaseDevtool', '3.5.1'
+ 
+-  pod 'LynxService', '3.4.1', :subspecs => [
++  pod 'LynxService', '3.5.1', :subspecs => [
+     'Image',
+     'Log',
+     'Devtool',
+@@ -26,6 +26,6 @@ target 'LynxScreens' do
+   pod 'SDWebImageWebPCoder', '0.11.0'
+ 
+   # XElement
+-  pod 'XElement', '3.4.1'
+-  pod 'DebugRouter', '5.0.13-rc.1'
++  pod 'XElement', '3.5.1'
++  pod 'DebugRouter', '5.0.13'
+ end
+```
+
+After applying the changes, run pod install again:
+
+```bash
+pod install
+```
+
+Now you're ready to build and run the project using Xcode. Open `.xcworkspace` file in XCode and build the application.
+
+### Bundle Not Loading — Troubleshooting
+
+If the application fails to load the Lynx bundle, here are two common approaches to diagnose and resolve the issue:
+
+#### 1. Load via Packager
+
+Ensure the packager is running:
+
+```bash
+npm run dev
+```
+
+By default, Lynx loads the bundle from a local development server when running in Debug mode, using the following logic:
+
+```swift
+#if DEBUG
+    lynxView.loadTemplate(
+      fromURL: "http://localhost:3000/main.lynx.bundle?fullscreen=true",
+      initData: nil
+    )
+#else
+    lynxView.loadTemplate(fromURL: "main.lynx")
+#endif
+```
+
+So when running in Debug mode, you must start the development server. The app will attempt to load the bundle from the specified URL (usually `localhost:3000`).
+
+#### 2. Load via Embedded Resource (Production or Offline)
+
+You can also pre-bundle the application and embed it into your Xcode project:
+
+- The bundle is generated in the `dist/` directory after running:
+
+  ```bash
+  npm run build
+  ```
+
+- In Xcode, open your Target settings → Build Phases → Copy Bundle Resources and add the file:
+
+  ```
+  dist/main.lynx.bundle
+  ```
+
+- Then update your Swift code to load the embedded bundle instead of fetching it from the dev server:
+
+  Change this:
+
+  ```swift
+  lynxView.loadTemplate(
+    fromURL: "http://localhost:3000/main.lynx.bundle?fullscreen=true",
+    initData: nil
+  )
+  ```
+
+  To this:
+
+  ```swift
+  lynxView.loadTemplate(fromURL: "main.lynx")
+  ```
+
+This method ensures your app runs independently of the packager.
+
+
 ## Custom Native Element development - TBC
 
 ---
@@ -55,5 +204,6 @@ In the Lynx Explorer app, paste the bundle URL into the "Enter Card URL" field. 
 
 - CLI Source Code & Docs: https://github.com/lynx-community/cli/tree/main
 - Official Quick Start Guide: https://lynxjs.org/guide/start/quick-start?ios-simulator-platform=macos-arm64&explorer-platform=ios-simulator
+- Custom Native Element Development: https://lynxjs.org/guide/custom-native-component.html?platform=ios 
 
 ---
