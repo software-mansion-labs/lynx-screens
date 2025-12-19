@@ -4,3 +4,5 @@
 #import <Lynx/LynxView.h>
 #import <Lynx/LynxDebugger.h>
 #import <Lynx/LynxModule.h>
+
+#import "elements/LynxColorBoxViewManager.h"
