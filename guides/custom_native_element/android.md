@@ -115,7 +115,7 @@ index 8ad136b..bcd9de8 100644
 \ No newline at end of file
 ```
 
-4. Apply workarounds for `kapt`
+4. Apply workarounds for `kapt` (optional, only for Custom Native Element development)
 
 `kapt` (Kotlin Annotation Processing Tool) is Kotlin's equivalent of Java's annotation processing API. It is used to run annotation processors that generate code or perform checks at compile time.
 
@@ -124,7 +124,6 @@ Since Kotlin doesn't natively support Java's annotation processing, `kapt` acts 
 To use annotation processors for generating native elements code for Lynx, you need to enable `kapt` in your Gradle setup.
 
 Add the kapt plugin to your module-level `build.gradle.kts` file (located at `android/app/build.gradle.kts`). Then, within the `dependencies` block, include the annotation processor dependencies:
-
 
 ```kotlin
 plugins {
@@ -185,11 +184,13 @@ org.gradle.jvmargs=-Xmx2048m -Dfile.encoding=UTF-8 \
 kapt.use.worker.api=false
 ```
 
+5. Apply workarounds for `lynx@3.5.1` compatibility issues
+
 Lynx `v3.5.1` has a compatibility issue with `kapt` and the Kotlin compiler on certain setups. To successfully build your project, you need to apply a workaround or patch in some of the Android source files.
 
 For example, [this commit](https://github.com/software-mansion/lynx-screens/blob/5f88f53de3bf54f0f4c74cea9a9dcffca9d852ee/android/app/src/main/java/com/lynxscreens/providers/GenericResourceFetcher.kt) provides a fix in the GenericResourceFetcher from CLI which is outdated after upgrading dependencies earlier.
 
-5. Launch the application
+6. Launch the application
 
 ## Custom Native Element development
 
@@ -197,8 +198,117 @@ This section explains how to create and register a custom native element for a L
 
 ### Integration with LynxProcessor Module
 
+Add the kapt plugin to your module-level `build.gradle.kts` file (located at `android/app/build.gradle.kts`). Then, within the `dependencies` block, include the annotation processor dependencies:
 
+```kotlin
+plugins {
+    ...
+    id("kotlin-kapt")
+}
+...
+dependencies {
+    ...
+    kapt("org.lynxsdk.lynx:lynx-processor:3.5.1")
+    compileOnly("org.lynxsdk.lynx:lynx-processor:3.5.1")
+    annotationProcessor("org.lynxsdk.lynx:lynx-processor:3.5.1")
+}
+```
 
+**Note:** If any issue occurs, please refer to `Apply workarounds for kapt (optional, only for Custom Native Element development)` section.
+
+### Declaring Custom Element
+
+#### Creating the View Manager Class
+
+The View Manager class is responsible for managing the lifecycle of the custom native view and passing props from the frontend to the native component.
+
+```kotlin
+package com.lynxscreens.elements
+
+import android.view.View
+import com.lynx.tasm.behavior.LynxContext
+import com.lynx.tasm.behavior.ui.LynxUI
+
+class LynxColorBoxViewManager(context: LynxContext) : LynxUI<View>(context) {
+    // ...
+}
+```
+
+#### Creating the Native View Instance
+
+To create a custom native element, you need to implement the `createView` method, which returns a new instance of the native Android View.
+
+```kotlin
+package com.lynxscreens.elements
+
+// ...
+import android.content.Context
+// ...
+
+class LynxColorBoxViewManager(context: LynxContext) : LynxUI<View>(context) {
+    override fun createView(context: Context): View {
+        return View(context)
+    }
+}
+```
+
+#### Handling Prop Updates
+
+To listen for prop changes sent from JS, use the `@LynxProp` annotation. This ensures that your view reacts dynamically to property updates.
+
+```kotlin
+package com.lynxscreens.elements
+
+// ...
+import android.graphics.Color
+// ...
+import com.lynx.tasm.behavior.LynxProp
+// ...
+
+class LynxColorBoxViewManager(context: LynxContext) : LynxUI<View>(context) {
+    // ...
+
+    @LynxProp(name = "backgroundColorHex")
+    fun setBackgroundColorHex(value: String) {
+        try {
+            val color = Color.parseColor(value)
+            mView.setBackgroundColor(color)
+        } catch (e: IllegalArgumentException) {
+        }
+    }
+}
+```
+
+### Registering Custom Element
+
+In this example, we use local element registration via the `viewBuilder` object inside `MainActivity`. Lynx also supports global registration, allowing custom components to be shared across multiple `LynxView` instances.
+
+```kotlin
+package com.lynxscreens
+
+// ...
+import com.lynx.tasm.behavior.Behavior
+import com.lynx.tasm.behavior.LynxContext
+import com.lynx.tasm.behavior.ui.LynxUI
+// ...
+import com.lynxscreens.elements.LynxColorBoxViewManager
+
+class MainActivity : Activity() {
+    private fun buildLynxView(): LynxView {
+        // ...
+
+        viewBuilder.addBehavior(object : Behavior("color-box-view") {
+            override fun createUI(context: LynxContext): LynxColorBoxViewManager {
+                return LynxColorBoxViewManager(context)
+            }
+        })
+
+        // ...
+
+        return viewBuilder.build(this)
+    }
+}
+```
 
 ### Extending IntrinsicElements with a Custom Component
 
@@ -280,6 +390,6 @@ Then, you can launch the application and observe that the Custom Native Element 
 - CLI Source Code & Docs: https://github.com/lynx-community/cli/tree/main
 - Official Quick Start Guide: https://lynxjs.org/guide/start/quick-start?ios-simulator-platform=macos-arm64&explorer-platform=android
 - Custom Native Element Development: https://lynxjs.org/guide/custom-native-component.html?platform=android
-- Example implementation of Custom Native Element for iOS: **TBD**
+- Example implementation of Custom Native Element for android: https://github.com/software-mansion/lynx-screens/commit/9feb6668df5bffb30a923a1a0a663e28a428bc00
 
 ---
