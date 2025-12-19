@@ -1,6 +1,8 @@
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.jetbrains.kotlin.android)
+
+    id("kotlin-kapt")
 }
 
 android {
@@ -115,4 +117,8 @@ dependencies {
     // add xelement's dependencies
     implementation ("org.lynxsdk.lynx:xelement:3.5.1")
     implementation ("org.lynxsdk.lynx:xelement-input:3.5.1")
+
+    kapt("org.lynxsdk.lynx:lynx-processor:3.5.1")
+    compileOnly("org.lynxsdk.lynx:lynx-processor:3.5.1")
+    annotationProcessor("org.lynxsdk.lynx:lynx-processor:3.5.1")
 }
