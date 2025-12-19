@@ -137,7 +137,7 @@ Now you're ready to build and run the project using Xcode. Open `.xcworkspace` f
 
 If the application fails to load the Lynx bundle, here are two common approaches to diagnose and resolve the issue:
 
-#### 1. Load via Packager
+#### 1. Load via Packager (Recommended)
 
 Ensure the packager is running:
 
@@ -160,7 +160,7 @@ By default, Lynx loads the bundle from a local development server when running i
 
 So when running in Debug mode, you must start the development server. The app will attempt to load the bundle from the specified URL (usually `localhost:3000`).
 
-#### 2. Load via Embedded Resource (Production or Offline)
+#### 2. Load via Embedded Resource (Experimental)
 
 You can also pre-bundle the application and embed it into your Xcode project:
 
@@ -178,23 +178,56 @@ You can also pre-bundle the application and embed it into your Xcode project:
 
 - Then update your Swift code to load the embedded bundle instead of fetching it from the dev server:
 
-  Change this:
+  Apply the following diff, which creates the Custom Bundle Loader
 
-  ```swift
-  lynxView.loadTemplate(
-    fromURL: "http://localhost:3000/main.lynx.bundle?fullscreen=true",
-    initData: nil
-  )
-  ```
+```diff
+diff --git a/apple/LynxScreens/SceneDelegate.swift b/apple/LynxScreens/SceneDelegate.swift
+index 209ccc2..b9ce178 100644
+--- a/apple/LynxScreens/SceneDelegate.swift
++++ b/apple/LynxScreens/SceneDelegate.swift
+@@ -13,6 +13,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
+      builder.enableGenericResourceFetcher = .true
+      builder.genericResourceFetcher = GenericResourceFetcher()
+#endif
++     builder.config = LynxConfig(provider: CustomLynxProvider())
+      builder.screenSize = windowScene.screen.bounds.size
+      builder.fontScale = 1.0
+    }
+@@ -27,10 +28,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
+    rootViewController.view = lynxView
+    
+#if DEBUG
+-   lynxView.loadTemplate(
+-     fromURL: "http://localhost:3000/main.lynx.bundle?fullscreen=true",
+-     initData: nil
+-   )
++   lynxView.loadTemplate(fromURL: "main.lynx", initData: nil)
+#else
+    lynxView.loadTemplate(fromURL: "main.lynx")
+#endif
+@@ -39,3 +37,19 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
+  }
+}
 
-  To this:
-
-  ```swift
-  lynxView.loadTemplate(fromURL: "main.lynx")
-  ```
++class CustomLynxProvider: NSObject, LynxTemplateProvider {
++  func loadTemplate(withUrl url: String!, onComplete callback: LynxTemplateLoadBlock!) {
++    if let filePath = Bundle.main.path(forResource: url, ofType: "bundle") {
++      do {
++        let data = try Data(contentsOf: URL(fileURLWithPath: filePath))
++        callback(data, nil)
++      } catch {
++        print("Error reading file: \(error.localizedDescription)")
++        callback(nil, error)
++      }
++    } else {
++      let urlError = NSError(domain: "com.lynx", code: 400, userInfo: [NSLocalizedDescriptionKey: "Invalid URL."])
++      callback(nil, urlError)
++    }
++  }
++}
+```
 
 This method ensures your app runs independently of the packager.
-
 
 ## Custom Native Element development - TBC
 
