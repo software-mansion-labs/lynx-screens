@@ -11,7 +11,7 @@ This document provides an overview of the key concepts and architecture behind t
 - **Host (Platform-Specific):** A native layer specific to the target platform (e.g. Android, iOS) that integrates with LynxCore.
 - **PrimJS:** A JavaScript engine developed by and used within the Lynx ecosystem.
 
-![Infrastructure](lynx_infrastructure.png)
+<img width="1032" height="868" alt="lynx_infrastructure" src="https://github.com/user-attachments/assets/209c6faa-2730-4163-afb9-06662e61d3d7" />
 
 ---
 
@@ -47,7 +47,7 @@ Executed in two possible modes:
 - **Main Thread Rendering:** Renders the frame on the UI Thread directly, allowing synchronous UI updates, but may block the interface for heavier tasks.
 - **Background-driven Rendering:** Initiated from a background thread, with rendering commands passed at some point to the main thread for processing. This can reduce UI Thread load, at the cost of possible added latency for rendering.
 
-![Rendering Process](rendering.png)
+<img width="1462" height="1602" alt="rendering" src="https://github.com/user-attachments/assets/8b0b8fd3-0740-4d65-ad57-64cc620148c5" />
 
 #### 4. Pixel Pipeline
 
