@@ -16,7 +16,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
       builder.screenSize = windowScene.screen.bounds.size
       builder.fontScale = 1.0
         
-      builder.config?.registerUI(LynxColorBoxViewManager.self, withName: "color-box-view")
+      builder.config?.registerUI(LynxColorBoxComponent.self, withName: "color-box-view")
     }
     
     lynxView.preferredLayoutWidth = windowScene.screen.bounds.size.width

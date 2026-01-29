@@ -1,9 +1,9 @@
-#import "LynxColorBoxViewManager.h"
+#import "LynxColorBoxComponent.h"
 
 #import <Lynx/LynxComponentRegistry.h>
 #import <Lynx/LynxPropsProcessor.h>
 
-@implementation LynxColorBoxViewManager
+@implementation LynxColorBoxComponent
 
 LYNX_LAZY_REGISTER_UI("color-box-view")
 

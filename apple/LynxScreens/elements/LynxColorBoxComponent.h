@@ -3,7 +3,7 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface LynxColorBoxViewManager : LynxUI <LynxColorBoxView *>
+@interface LynxColorBoxComponent : LynxUI <LynxColorBoxView *>
 
 @end
 
