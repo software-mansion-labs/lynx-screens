@@ -288,9 +288,9 @@ NS_ASSUME_NONNULL_END
 @end
 ```
 
-### View Manager Implementation
+### Component Implementation
 
-The view manager is responsible for creating the view and mapping properties passed from the JS layer to the native component.
+The component is a wrapper over a view which is responsible for creating the view and mapping properties passed from the JS layer to the native component.
 
 #### Register the Native Component
 
@@ -348,9 +348,9 @@ This method is called when the view is created in the Element Tree. It should re
 // ...
 ```
 
-### Final View Manager Code
+### Final Component Code
 
-Putting everything together, the complete view manager implementation looks like this:
+Putting everything together, the complete Component implementation looks like this:
 
 ```objective-c
 #import <Lynx/LynxUI.h>
@@ -389,7 +389,7 @@ LYNX_PROP_SETTER("backgroundColorHex", setBackgroudColorHex, NSString *) {
 
 ### Registering a Custom Native Element for an Application Instance
 
-If AppDelegate/SceneDelegate is implemented in Swift, include the header of your View Manager in the Bridging Header:
+If AppDelegate/SceneDelegate is implemented in Swift, include the header of your Component in the Bridging Header:
 ```objective-c
 #import "elements/LynxColorBoxComponent.h"
 ```
