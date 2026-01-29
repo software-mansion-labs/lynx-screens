@@ -297,11 +297,11 @@ The view manager is responsible for creating the view and mapping properties pas
 To register the component with Lynx, you need to use the `LYNX_LAZY_REGISTER_UI` macro and import `LynxComponentRegistry` header.
 
 ```objective-c
-#import "LynxColorBoxViewManager.h"
+#import "LynxColorBoxComponent.h"
 
 #import <Lynx/LynxComponentRegistry.h>
 
-@implementation LynxColorBoxViewManager
+@implementation LynxColorBoxComponent
 
 LYNX_LAZY_REGISTER_UI("color-box-view")
 
@@ -318,7 +318,7 @@ To expose properties to JavaScript, use the `LYNX_PROP_SETTER` macro and import 
 // ...
 #import <Lynx/LynxPropsProcessor.h>
 
-@implementation LynxColorBoxViewManager
+@implementation LynxColorBoxComponent
 
 // ...
 
@@ -336,7 +336,7 @@ LYNX_PROP_SETTER("backgroundColorHex", setBackgroudColorHex, NSString *) {
 This method is called when the view is created in the Element Tree. It should return the instance of your custom view.
 
 ```objective-c
-@implementation LynxColorBoxViewManager
+@implementation LynxColorBoxComponent
 
 // ...
 
@@ -358,7 +358,7 @@ Putting everything together, the complete view manager implementation looks like
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface LynxColorBoxViewManager : LynxUI <LynxColorBoxView *>
+@interface LynxColorBoxComponent : LynxUI <LynxColorBoxView *>
 
 @end
 
@@ -366,12 +366,12 @@ NS_ASSUME_NONNULL_END
 ```
 
 ```objective-c
-#import "LynxColorBoxViewManager.h"
+#import "LynxColorBoxComponent.h"
 
 #import <Lynx/LynxComponentRegistry.h>
 #import <Lynx/LynxPropsProcessor.h>
 
-@implementation LynxColorBoxViewManager
+@implementation LynxColorBoxComponent
 
 LYNX_LAZY_REGISTER_UI("color-box-view")
 
@@ -391,7 +391,7 @@ LYNX_PROP_SETTER("backgroundColorHex", setBackgroudColorHex, NSString *) {
 
 If AppDelegate/SceneDelegate is implemented in Swift, include the header of your View Manager in the Bridging Header:
 ```objective-c
-#import "elements/LynxColorBoxViewManager.h"
+#import "elements/LynxColorBoxComponent.h"
 ```
 
 Register the native component using the builder object when creating a `LynxView` instance:
@@ -399,7 +399,7 @@ Register the native component using the builder object when creating a `LynxView
 ```swift
 let lynxView = LynxView { builder in
   // ...
-  builder.config?.registerUI(LynxColorBoxViewManager.self, withName: "color-box-view")
+  builder.config?.registerUI(LynxColorBoxComponent.self, withName: "color-box-view")
 }
 ```
 
