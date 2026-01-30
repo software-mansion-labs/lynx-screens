@@ -3,7 +3,7 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface LynxColorBoxViewShadowNode :  LynxShadowNode <LynxCustomMeasureDelegate>
+@interface LynxColorBoxShadowNode :  LynxShadowNode <LynxCustomMeasureDelegate>
 
 @property (atomic, assign) CGSize uiSize;
 

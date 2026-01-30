@@ -1,8 +1,8 @@
-#import "LynxColorBoxViewShadowNode.h"
+#import "LynxColorBoxShadowNode.h"
 #import <Lynx/LynxComponentRegistry.h>
 #import <Lynx/LynxNativeLayoutNode.h>
 
-@implementation LynxColorBoxViewShadowNode
+@implementation LynxColorBoxShadowNode
 
 // Registers this custom ShadowNode implementation for the "color-box-view" component
 LYNX_LAZY_REGISTER_SHADOW_NODE("color-box-view")

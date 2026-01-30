@@ -1,5 +1,5 @@
 #import "LynxColorBoxComponent.h"
-#import "LynxColorBoxViewShadowNode.h"
+#import "LynxColorBoxShadowNode.h"
 
 #import <Lynx/LynxComponentRegistry.h>
 #import <Lynx/LynxPropsProcessor.h>
@@ -13,9 +13,9 @@ LYNX_LAZY_REGISTER_UI("color-box-view")
 // it's sufficient for basic testing and demonstration purposes.
 - (void)layoutDidFinished {
     // Retrieve the corresponding ShadowNode from the Lynx context by node sign (unique ID)
-    LynxColorBoxViewShadowNode *node = (LynxColorBoxViewShadowNode*)[self.context.nodeOwner nodeWithSign:self.sign];
+    LynxColorBoxShadowNode *node = (LynxColorBoxShadowNode*)[self.context.nodeOwner nodeWithSign:self.sign];
     // Ensure that the retrieved node is an instance of our custom ShadowNode class
-    if ([node isKindOfClass:LynxColorBoxViewShadowNode.class]) {
+    if ([node isKindOfClass:LynxColorBoxShadowNode.class]) {
         // Store the previously set size
         CGSize preSize = node.uiSize;
         
