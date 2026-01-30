@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from '@lynx-js/react';
+import * as Lynx from "@lynx-js/types";
 
 import './App.css';
 import arrow from './assets/arrow.png';
@@ -34,6 +35,13 @@ export function App(props: { onRender?: () => void }) {
           <text className="Subtitle">on Lynx</text>
         </view>
         <view className="Content">
+          <color-box-view 
+            backgroundColorHex="#45ac1f"
+            style={{
+              height: 200,
+              width: 200,
+            }}
+          />
           <image src={arrow} className="Arrow" />
           <text className="Description">Tap the logo and have fun!</text>
           <text className="Hint">
