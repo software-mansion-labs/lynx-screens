@@ -7,7 +7,7 @@ import com.lynx.tasm.behavior.LynxContext
 import com.lynx.tasm.behavior.LynxProp
 import com.lynx.tasm.behavior.ui.LynxUI
 
-class LynxColorBoxViewManager(context: LynxContext) : LynxUI<View>(context) {
+class LynxColorBoxComponent(context: LynxContext) : LynxUI<View>(context) {
     override fun createView(context: Context): View {
         return View(context)
     }

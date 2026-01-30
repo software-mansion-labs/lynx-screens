@@ -11,7 +11,7 @@ import com.lynx.tasm.behavior.Behavior
 import com.lynx.tasm.behavior.LynxContext
 import com.lynx.tasm.behavior.ui.LynxUI
 import com.lynx.xelement.XElementBehaviors
-import com.lynxscreens.elements.LynxColorBoxViewManager
+import com.lynxscreens.elements.LynxColorBoxComponent
 
 class MainActivity : Activity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -39,8 +39,8 @@ class MainActivity : Activity() {
         viewBuilder.setGenericResourceFetcher(GenericResourceFetcher())
 
         viewBuilder.addBehavior(object : Behavior("color-box-view") {
-            override fun createUI(context: LynxContext): LynxColorBoxViewManager {
-                return LynxColorBoxViewManager(context)
+            override fun createUI(context: LynxContext): LynxColorBoxComponent {
+                return LynxColorBoxComponent(context)
             }
         })
 
