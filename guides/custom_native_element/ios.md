@@ -290,7 +290,7 @@ NS_ASSUME_NONNULL_END
 
 ### Component Implementation
 
-The component is a wrapper over a view which is responsible for creating the view and mapping properties passed from the JS layer to the native component.
+The Component is a wrapper over a view which is responsible for creating the view and mapping properties passed from the JS layer to the native component.
 
 #### Register the Native Component
 
