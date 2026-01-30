@@ -218,9 +218,9 @@ dependencies {
 
 ### Declaring Custom Element
 
-#### Creating the View Manager Class
+#### Component Implementation
 
-The View Manager class is responsible for managing the lifecycle of the custom native view and passing props from the frontend to the native component.
+The Component is a wrapper over a view which is responsible for creating the view and mapping properties passed from the JS layer to the native component.
 
 ```kotlin
 package com.lynxscreens.elements
@@ -229,7 +229,7 @@ import android.view.View
 import com.lynx.tasm.behavior.LynxContext
 import com.lynx.tasm.behavior.ui.LynxUI
 
-class LynxColorBoxViewManager(context: LynxContext) : LynxUI<View>(context) {
+class LynxColorBoxComponent(context: LynxContext) : LynxUI<View>(context) {
     // ...
 }
 ```
@@ -245,7 +245,7 @@ package com.lynxscreens.elements
 import android.content.Context
 // ...
 
-class LynxColorBoxViewManager(context: LynxContext) : LynxUI<View>(context) {
+class LynxColorBoxComponent(context: LynxContext) : LynxUI<View>(context) {
     override fun createView(context: Context): View {
         return View(context)
     }
@@ -265,7 +265,7 @@ import android.graphics.Color
 import com.lynx.tasm.behavior.LynxProp
 // ...
 
-class LynxColorBoxViewManager(context: LynxContext) : LynxUI<View>(context) {
+class LynxColorBoxComponent(context: LynxContext) : LynxUI<View>(context) {
     // ...
 
     @LynxProp(name = "backgroundColorHex")
@@ -291,15 +291,15 @@ import com.lynx.tasm.behavior.Behavior
 import com.lynx.tasm.behavior.LynxContext
 import com.lynx.tasm.behavior.ui.LynxUI
 // ...
-import com.lynxscreens.elements.LynxColorBoxViewManager
+import com.lynxscreens.elements.LynxColorBoxComponent
 
 class MainActivity : Activity() {
     private fun buildLynxView(): LynxView {
         // ...
 
         viewBuilder.addBehavior(object : Behavior("color-box-view") {
-            override fun createUI(context: LynxContext): LynxColorBoxViewManager {
-                return LynxColorBoxViewManager(context)
+            override fun createUI(context: LynxContext): LynxColorBoxComponent {
+                return LynxColorBoxComponent(context)
             }
         })
 
