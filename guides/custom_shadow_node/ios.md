@@ -5,7 +5,7 @@ This guide will walk through step-by-step process of creating a Custom Shadow No
 - Creating a Custom Shadow Node
 - Registering the Custom Shadow Node
 - Implementing custom logic for updating component size and children positioning
-- Passing information between the Native Element's View Manager and the Shadow Node instance via properties
+- Passing information between the Native Element and the Shadow Node instance via properties
 
 ---
 
@@ -14,8 +14,8 @@ This guide will walk through step-by-step process of creating a Custom Shadow No
 We're relying on 3 classes
 
 - **LynxColorBoxView** - A custom native view which extends `UIView`
-- **LynxColorBoxViewManager** - The view manager which is responsible for interaction between the Shadow Node and the native component, managing the view lifecycle and updating its properties.
-- **LynxColorBoxViewShadowNode** - A Custom Shadow Node with dedicated logic for view resizing and children offsets.
+- **LynxColorBoxComponent** - The Component is a wrapper over a view which is responsible for creating the view, mapping properties passed from the JS layer to the native component and handling interaction between the Shadow Node and the native component.
+- **LynxColorBoxShadowNode** - A Custom Shadow Node with dedicated logic for view resizing and children offsets.
 
 ---
 
@@ -25,7 +25,7 @@ We're relying on 3 classes
 
 Create a Shadow Node class that inherits from `LynxShadowNode` and implements the `LynxCustomMeasureDelegate` protocol (required for implementing custom methods for correcting the measurement and alignment).
 
-- **LynxColorBoxViewShadowNode.h**
+- **LynxColorBoxShadowNode.h**
 
 ```objective-c
 #import <Lynx/LynxCustomMeasureDelegate.h>
@@ -33,7 +33,7 @@ Create a Shadow Node class that inherits from `LynxShadowNode` and implements th
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface LynxColorBoxViewShadowNode :  LynxShadowNode <LynxCustomMeasureDelegate>
+@interface LynxColorBoxShadowNode :  LynxShadowNode <LynxCustomMeasureDelegate>
 
 @property (atomic, assign) CGSize uiSize;
 
@@ -44,15 +44,15 @@ NS_ASSUME_NONNULL_END
 
 ### Step 2 - Implement the Custom Shadow Node logic
 
-- **LynxColorBoxViewShadowNode.m**
+- **LynxColorBoxShadowNode.m**
 
 ### Step 2.1 - Use the macro to register the Custom Shadow Node and link it with the Custom Native Element of the same type.
 
 ```objective-c
-#import "LynxColorBoxViewShadowNode.h"
+#import "LynxColorBoxShadowNode.h"
 #import <Lynx/LynxComponentRegistry.h>
 
-@implementation LynxColorBoxViewShadowNode
+@implementation LynxColorBoxShadowNode
 
 // Registers this custom ShadowNode implementation for the "color-box-view" component
 LYNX_LAZY_REGISTER_SHADOW_NODE("color-box-view")
@@ -127,11 +127,11 @@ LYNX_LAZY_REGISTER_SHADOW_NODE("color-box-view")
 As a result, we should end up with the following implementation for Custom Shadow Node
 
 ```objective-c
-#import "LynxColorBoxViewShadowNode.h"
+#import "LynxColorBoxShadowNode.h"
 #import <Lynx/LynxComponentRegistry.h>
 #import <Lynx/LynxNativeLayoutNode.h>
 
-@implementation LynxColorBoxViewShadowNode
+@implementation LynxColorBoxShadowNode
 
 // Registers this custom ShadowNode implementation for the "color-box-view" component
 LYNX_LAZY_REGISTER_SHADOW_NODE("color-box-view")
@@ -183,25 +183,25 @@ LYNX_LAZY_REGISTER_SHADOW_NODE("color-box-view")
 @end
 ```
 
-### Step 3 – Implement the communication between ShadowNode and ViewManager
+### Step 3 – Implement the communication between ShadowNode and Component
 
 We link our ShadowNode with the actual view. At this point, based on the read view parameters (e.g., frame), we can introduce our layout corrections and request the engine to update.
 
 ```objective-c
 ...
-#import "LynxColorBoxViewShadowNode.h"
+#import "LynxColorBoxShadowNode.h"
 ...
 #import <Lynx/LynxShadowNodeOwner.h>
 ...
-@implementation LynxColorBoxViewManager
+@implementation LynxColorBoxComponent
 ...
 // Note: This doesn't seem to be good place to apply updates, but
 // it's sufficient for basic testing and demonstration purposes.
 - (void)layoutDidFinished {
     // Retrieve the corresponding ShadowNode from the Lynx context by node sign (unique ID)
-    LynxColorBoxViewShadowNode *node = (LynxColorBoxViewShadowNode*)[self.context.nodeOwner nodeWithSign:self.sign];
+    LynxColorBoxShadowNode *node = (LynxColorBoxShadowNode*)[self.context.nodeOwner nodeWithSign:self.sign];
     // Ensure that the retrieved node is an instance of our custom ShadowNode class
-    if ([node isKindOfClass:LynxColorBoxViewShadowNode.class]) {
+    if ([node isKindOfClass:LynxColorBoxShadowNode.class]) {
         // Store the previously set size
         CGSize preSize = node.uiSize;
         
@@ -293,5 +293,5 @@ export function App(props: { onRender?: () => void }) {
 ## Summary
 
 - Shadow Node takes control ovr the layout (`measureWithMeasureParam`) and alignment (`alignWithAlignParam`).
-- ViewManager can update the Shadow Node properties dynamically and trigger layout request on it.
+- Component can update the Shadow Node properties dynamically and trigger layout request on it.
 - The layout system (Starlight) make all ancestors dirty on the path from the node that requested layout up to the root view. Then it triggers the measure calls starting from the root and propagates the values accordingly. If Starlight engine notices custom component, for which ShadowNode has defined a custom function for performing `measure` or `align` operations, it delegates the responsibility for this custom Shadow Node to layout the subtree of the component properly.
