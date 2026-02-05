@@ -1,9 +1,9 @@
 #import <UIKit/UIKit.h>
 
-@class RNSStackHostComponentView;
+@class RNSStackHostComponent;
 
 @interface RNSStackHostView : UIView
 
-@property (nonatomic, weak) RNSStackHostComponentView *componentView;
+@property (nonatomic, weak) RNSStackHostComponent *componentView;
 
 @end

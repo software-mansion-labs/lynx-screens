@@ -1,11 +1,11 @@
-#import "RNSStackScreenComponentView.h"
+#import "RNSStackScreenComponent.h"
 
 #import <Lynx/LynxComponentRegistry.h>
 #import <Lynx/LynxPropsProcessor.h>
 
 #import "LynxScreens-Swift.h"
 
-@implementation RNSStackScreenComponentView {
+@implementation RNSStackScreenComponent {
     RNSStackScreenController *_Nonnull _controller;
     
     // Flags

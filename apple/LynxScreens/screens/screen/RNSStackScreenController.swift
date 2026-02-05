@@ -3,9 +3,9 @@ import UIKit
 
 @objc
 public class RNSStackScreenController: UIViewController {
-    @objc public var screen: RNSStackScreenComponentView
+    @objc public var screen: RNSStackScreenComponent
     
-    @objc public required init(componentView: RNSStackScreenComponentView) {
+    @objc public required init(componentView: RNSStackScreenComponent) {
         self.screen = componentView
         super.init(nibName: nil, bundle: nil)
     }

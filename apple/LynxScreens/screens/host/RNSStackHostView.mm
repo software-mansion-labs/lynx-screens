@@ -1,5 +1,5 @@
 #import "RNSStackHostView.h"
-#import "RNSStackHostComponentView.h"
+#import "RNSStackHostComponent.h"
 
 @implementation RNSStackHostView
 

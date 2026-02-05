@@ -1,11 +1,11 @@
-#import "RNSStackHostComponentView.h"
-#import "RNSStackScreenComponentView.h"
+#import "RNSStackHostComponent.h"
+#import "RNSStackScreenComponent.h"
 
 #import <Lynx/LynxComponentRegistry.h>
 
 #import "LynxScreens-Swift.h"
 
-@implementation RNSStackHostComponentView
+@implementation RNSStackHostComponent
 
 LYNX_LAZY_REGISTER_UI("stack-host-native")
 
@@ -79,12 +79,12 @@ LYNX_LAZY_REGISTER_UI("stack-host-native")
 
 #pragma mark - Communication with StackScreen
 
-- (void)stackScreenChangedActivityMode:(nonnull RNSStackScreenComponentView *)stackScreen
+- (void)stackScreenChangedActivityMode:(nonnull RNSStackScreenComponent *)stackScreen
 {
     [self synchronizeStackScreenMountState:stackScreen];
 }
 
-- (void)synchronizeStackScreenMountState:(nonnull RNSStackScreenComponentView *)stackScreen
+- (void)synchronizeStackScreenMountState:(nonnull RNSStackScreenComponent *)stackScreen
 {
     [_controller setNeedsUpdateOfChildViewControllers];
     [self updateChildMountingForStackScreen:stackScreen];
@@ -111,12 +111,12 @@ LYNX_LAZY_REGISTER_UI("stack-host-native")
 - (void)insertChild:(id)child atIndex:(NSInteger)index
 {
     NSAssert(
-             [child isKindOfClass:[RNSStackScreenComponentView class]],
+             [child isKindOfClass:[RNSStackScreenComponent class]],
              @"[RNScreens] Attempt to mount child of unsupported type: %@, expected %@",
              [child class],
-             RNSStackScreenComponentView.class
+             RNSStackScreenComponent.class
              );
-    RNSStackScreenComponentView *stackScreen = (RNSStackScreenComponentView *)child;
+    RNSStackScreenComponent *stackScreen = (RNSStackScreenComponent *)child;
     stackScreen.stackHost = self;
     self.hasModifiedSubviewsInCurrentTransaction = YES;
     
@@ -134,13 +134,13 @@ LYNX_LAZY_REGISTER_UI("stack-host-native")
 - (void)removeChild:(id)child atIndex:(NSInteger)index
 {
     NSAssert(
-             [child isKindOfClass:[RNSStackScreenComponentView class]],
+             [child isKindOfClass:[RNSStackScreenComponent class]],
              @"[RNScreens] Attempt to unmount child of unsupported type: %@, expected %@",
              [child class],
-             RNSStackScreenComponentView.class
+             RNSStackScreenComponent.class
              );
     
-    RNSStackScreenComponentView *stackScreen = (RNSStackScreenComponentView *)child;
+    RNSStackScreenComponent *stackScreen = (RNSStackScreenComponent *)child;
     stackScreen.stackHost = nil;
     self.hasModifiedSubviewsInCurrentTransaction = YES;
     
@@ -160,7 +160,7 @@ LYNX_LAZY_REGISTER_UI("stack-host-native")
     // NO-OP - UINavigationController is responsible for removing Screens
 }
 
-- (void)updateChildMountingForStackScreen:(RNSStackScreenComponentView *)stackScreen
+- (void)updateChildMountingForStackScreen:(RNSStackScreenComponent *)stackScreen
 {
     BOOL isMounted = [self.children containsObject:stackScreen];
     

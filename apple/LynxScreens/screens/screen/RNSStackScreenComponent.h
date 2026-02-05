@@ -5,7 +5,7 @@
 NS_ASSUME_NONNULL_BEGIN
 
 @class RNSStackScreenController;
-@class RNSStackHostComponentView;
+@class RNSStackHostComponent;
 
 typedef NS_ENUM(int, RNSStackScreenActivityMode) {
     RNSStackScreenActivityModeDetached = 0,
@@ -19,16 +19,16 @@ typedef NS_ENUM(NSInteger, RNSScreenLifecycleEvent) {
     RNSScreenLifecycleEventDidDisappear = 3
 };
 
-@interface RNSStackScreenComponentView : LynxUI <RNSStackScreenView *>
+@interface RNSStackScreenComponent : LynxUI <RNSStackScreenView *>
 
-@property (nonatomic, weak, readwrite, nullable) RNSStackHostComponentView *stackHost;
+@property (nonatomic, weak, readwrite, nullable) RNSStackHostComponent *stackHost;
 @property (nonatomic, strong, readonly, nonnull) RNSStackScreenController *controller;
 
 @end
 
 #pragma mark - Props
 
-@interface RNSStackScreenComponentView ()
+@interface RNSStackScreenComponent ()
 
 @property (nonatomic, strong, readwrite, nullable) NSString *screenKey;
 @property (nonatomic, readwrite) RNSStackScreenActivityMode activityMode;
@@ -37,7 +37,7 @@ typedef NS_ENUM(NSInteger, RNSScreenLifecycleEvent) {
 
 #pragma mark - Events
 
-@interface RNSStackScreenComponentView ()
+@interface RNSStackScreenComponent ()
 
 - (void)notifyLifecycleChange:(RNSScreenLifecycleEvent)event;
 

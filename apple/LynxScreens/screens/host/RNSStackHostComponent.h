@@ -1,14 +1,14 @@
 #import <UIKit/UIKit.h>
 #import <Lynx/LynxUI.h>
 #import "RNSStackHostView.h"
-#import "RNSStackHostComponentView.h"
+#import "RNSStackHostComponent.h"
 
 @class RNSStackController;
-@class RNSStackScreenComponentView;
+@class RNSStackScreenComponent;
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface RNSStackHostComponentView : LynxUI <RNSStackHostView *>
+@interface RNSStackHostComponent : LynxUI <RNSStackHostView *>
 
 @property (nonatomic, nonnull, strong, readonly) RNSStackController *controller;
 @property (nonatomic, readwrite) bool hasModifiedSubviewsInCurrentTransaction;
@@ -19,9 +19,9 @@ NS_ASSUME_NONNULL_BEGIN
 
 #pragma mark - Communication with StackScreen
 
-@interface RNSStackHostComponentView ()
+@interface RNSStackHostComponent ()
 
-- (void)stackScreenChangedActivityMode:(nonnull RNSStackScreenComponentView *)stackScreen;
+- (void)stackScreenChangedActivityMode:(nonnull RNSStackScreenComponent *)stackScreen;
 
 @end
 
