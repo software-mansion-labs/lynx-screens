@@ -1,7 +1,7 @@
 package com.lynxscreens
 
-import android.app.Activity
 import android.os.Bundle
+import androidx.appcompat.app.AppCompatActivity
 import com.lynxscreens.providers.GenericResourceFetcher
 import com.lynxscreens.providers.TemplateProvider
 import com.lynx.tasm.LynxBooleanOption
@@ -10,12 +10,13 @@ import com.lynx.tasm.LynxViewBuilder
 import com.lynx.tasm.behavior.Behavior
 import com.lynx.tasm.behavior.LynxContext
 import com.lynx.tasm.behavior.shadow.ShadowNode
-import com.lynx.tasm.behavior.ui.LynxUI
 import com.lynx.xelement.XElementBehaviors
 import com.lynxscreens.elements.LynxColorBoxComponent
 import com.lynxscreens.elements.LynxColorBoxShadowNode
+import com.lynxscreens.screens.host.StackHostComponent
+import com.lynxscreens.screens.screen.StackScreenComponent
 
-class MainActivity : Activity() {
+class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -49,6 +50,18 @@ class MainActivity : Activity() {
             // registry.
             override fun createShadowNode(): ShadowNode? {
                 return LynxColorBoxShadowNode()
+            }
+        })
+
+        viewBuilder.addBehavior(object : Behavior("stack-host-native") {
+            override fun createUI(context: LynxContext): StackHostComponent {
+                return StackHostComponent(context)
+            }
+        })
+
+        viewBuilder.addBehavior(object : Behavior("stack-screen-native") {
+            override fun createUI(context: LynxContext): StackScreenComponent {
+                return StackScreenComponent(context)
             }
         })
 
