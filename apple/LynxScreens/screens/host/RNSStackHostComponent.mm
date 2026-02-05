@@ -6,7 +6,9 @@
 
 #import "LynxScreens-Swift.h"
 
-@implementation RNSStackHostComponent
+@implementation RNSStackHostComponent {
+    BOOL _isMountingTransactionPending;
+}
 
 LYNX_LAZY_REGISTER_UI("stack-host-native")
 
@@ -24,6 +26,7 @@ LYNX_LAZY_REGISTER_UI("stack-host-native")
 {
     _controller = [[RNSStackController alloc] initWithStackHostComponentView:self];
     _hasModifiedSubviewsInCurrentTransaction = NO;
+    _isMountingTransactionPending = NO;
 }
 
 #pragma mark - View Management
@@ -90,10 +93,14 @@ LYNX_LAZY_REGISTER_UI("stack-host-native")
     [_controller setNeedsUpdateOfChildViewControllers];
     [self updateChildMountingForStackScreen:stackScreen];
     
-    // This should be called after the transaction
-    dispatch_async(dispatch_get_main_queue(), ^{
-        [self lynxMountingTransactionDidFinish];
-    });
+    if (!_isMountingTransactionPending) {
+        _isMountingTransactionPending = YES;
+        
+        dispatch_async(dispatch_get_main_queue(), ^{
+            self->_isMountingTransactionPending = NO;
+            [self lynxMountingTransactionDidFinish];
+        });
+    }
 }
 
 #pragma mark - Mounting Transaction
