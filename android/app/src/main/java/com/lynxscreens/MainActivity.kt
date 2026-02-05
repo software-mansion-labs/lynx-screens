@@ -45,6 +45,8 @@ class MainActivity : Activity() {
                 return LynxColorBoxComponent(context)
             }
 
+            // Override this method to create an instance of Custom ShadowNode and put it in the
+            // registry.
             override fun createShadowNode(): ShadowNode? {
                 return LynxColorBoxShadowNode()
             }

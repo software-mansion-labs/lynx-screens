@@ -11,6 +11,7 @@ import com.lynx.tasm.behavior.shadow.NativeLayoutNodeRef
 import com.lynx.tasm.behavior.shadow.ShadowNode
 import kotlin.math.ceil
 
+// Registers this custom ShadowNode implementation for the "color-box-view" component
 @LynxShadowNode(tagName = "color-box-view")
 class LynxColorBoxShadowNode : ShadowNode(), CustomMeasureFunc {
     private var mUIHeight:Int = 0
@@ -39,6 +40,10 @@ class LynxColorBoxShadowNode : ShadowNode(), CustomMeasureFunc {
         }
     }
 
+    // Called during the layout pass when `LayoutObject::ReLayoutWithConstraints` triggers `UpdateMeasure`.
+    // Since we define a custom measurement method, we take full control over
+    // sizing for the entire layout subtree. This method calculates and returns
+    // the size of the native view and recursively measures child nodes.
     override fun measure(param: MeasureParam?, context: MeasureContext?): MeasureResult {
         val width = ceil(mUIWidth.toDouble()).toFloat()
         val height = ceil(mUIHeight.toDouble()).toFloat()
@@ -57,6 +62,9 @@ class LynxColorBoxShadowNode : ShadowNode(), CustomMeasureFunc {
         return MeasureResult(width, height)
     }
 
+    // Called during the layout pass when `LayoutObject::ReLayoutWithConstraints` triggers `UpdateAlignment`.
+    // By defining a custom alignment method, we take control over positioning
+    // for the current subtree. Here, we offset the content by a fixed amount.
     override fun align(param: AlignParam?, context: AlignContext?) {
         val density = mContext?.resources?.displayMetrics?.density
         val offset = (100 * (density ?: 0f))
