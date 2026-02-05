@@ -155,11 +155,6 @@ LYNX_LAZY_REGISTER_UI("stack-host-native")
     [super removeChild:stackScreen atIndex:index];
 }
 
-- (void)willRemoveComponent:(id)subComponent
-{
-    // NO-OP - UINavigationController is responsible for removing Screens
-}
-
 - (void)updateChildMountingForStackScreen:(RNSStackScreenComponent *)stackScreen
 {
     BOOL isMounted = [self.children containsObject:stackScreen];
