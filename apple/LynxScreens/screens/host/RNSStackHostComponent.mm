@@ -2,6 +2,7 @@
 #import "RNSStackScreenComponent.h"
 
 #import <Lynx/LynxComponentRegistry.h>
+#import <Lynx/LynxLog.h>
 
 #import "LynxScreens-Swift.h"
 
@@ -141,6 +142,15 @@ LYNX_LAZY_REGISTER_UI("stack-host-native")
              );
     
     RNSStackScreenComponent *stackScreen = (RNSStackScreenComponent *)child;
+    // We're taking over the responsibility for managing indices, because of the symmetrical
+    // responsibility for attaching children to handle the preload case
+    NSUInteger stackScreenIndex = [self.children indexOfObject:stackScreen];
+
+    if (stackScreenIndex == NSNotFound) {
+        LLogWarn(@"[RNScreens] Attempted to remove a screen that is not attached to children.");
+        return;
+    }
+
     stackScreen.stackHost = nil;
     self.hasModifiedSubviewsInCurrentTransaction = YES;
     
@@ -152,7 +162,7 @@ LYNX_LAZY_REGISTER_UI("stack-host-native")
           index
           );
     
-    [super removeChild:stackScreen atIndex:index];
+    [super removeChild:stackScreen atIndex:stackScreenIndex];
 }
 
 - (void)updateChildMountingForStackScreen:(RNSStackScreenComponent *)stackScreen
