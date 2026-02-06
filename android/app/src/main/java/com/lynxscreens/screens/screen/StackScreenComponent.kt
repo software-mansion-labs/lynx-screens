@@ -34,6 +34,10 @@ internal class StackScreenComponent(context: LynxContext) : UIGroup<StackScreenV
 
     internal var screenKey: String? = null
 
+    private val eventEmitter: StackScreenEventEmitter by lazy {
+        StackScreenEventEmitter(lynxContext, sign)
+    }
+
     override fun createView(context: Context?): StackScreenView = StackScreenView(context as LynxContext)
 
     @LynxProp(name = "activityMode")
@@ -57,33 +61,9 @@ internal class StackScreenComponent(context: LynxContext) : UIGroup<StackScreenV
         screenKey = value
     }
 
-    internal fun notifyOnWillAppear() {
-        emitEvent("OnWillAppear", null)
-    }
-
-    internal fun notifyOnDidAppear() {
-        emitEvent("OnDidAppear", null)
-    }
-
-    internal fun notifyOnWillDisappear() {
-        emitEvent("OnWillDisappear", null)
-    }
-
-    internal fun notifyOnDidDisappear() {
-        emitEvent("OnDidDisappear", null)
-    }
-
-    internal fun notifyOnDismiss(isNativeDismiss: Boolean) {
-        emitEvent("OnDismiss", mapOf(
-            "isNativeDismiss" to isNativeDismiss
-        ))
-    }
-
-    private fun emitEvent(name: String, value: Map<String, Any>?) {
-        val detail = LynxCustomEvent(sign, name)
-        value?.forEach { (key, v) ->
-            detail.addDetail(key, v)
-        }
-        lynxContext.eventEmitter.sendCustomEvent(detail)
-    }
+    internal fun notifyOnWillAppear() = eventEmitter.notifyOnWillAppear()
+    internal fun notifyOnDidAppear() = eventEmitter.notifyOnDidAppear()
+    internal fun notifyOnWillDisappear() = eventEmitter.notifyOnWillDisappear()
+    internal fun notifyOnDidDisappear() = eventEmitter.notifyOnDidDisappear()
+    internal fun notifyOnDismiss(isNativeDismiss: Boolean) = eventEmitter.notifyOnDismiss(isNativeDismiss)
 }
