@@ -7,6 +7,7 @@ import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentTransaction
 import com.lynxscreens.screens.helpers.FragmentManagerHelper
+import com.lynxscreens.screens.helpers.ViewIdGenerator
 import com.lynxscreens.screens.helpers.createTransactionWithReordering
 import com.lynxscreens.screens.screen.StackScreenComponent
 import com.lynxscreens.screens.screen.StackScreenFragment
@@ -33,7 +34,7 @@ internal class StackContainer(
     private val pendingOperationQueue: MutableList<StackOperation> = arrayListOf()
 
     init {
-        id = generateViewId()
+        id = ViewIdGenerator.generateViewId()
     }
 
     override fun onAttachedToWindow() {
