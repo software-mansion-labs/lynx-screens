@@ -6,3 +6,5 @@
 #import <Lynx/LynxModule.h>
 
 #import "elements/LynxColorBoxComponent.h"
+#import "screens/host/RNSStackHostComponent.h"
+#import "screens/screen/RNSStackScreenComponent.h"

@@ -16,7 +16,9 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
       builder.screenSize = windowScene.screen.bounds.size
       builder.fontScale = 1.0
         
-      builder.config?.registerUI(LynxColorBoxComponent.self, withName: "color-box-view")
+      builder.config?.registerUI(RNSStackHostComponent.self, withName: "stack-host-native")
+      builder.config?.registerUI(RNSStackScreenComponent.self, withName: "stack-screen-native")
+      // builder.config?.registerUI(LynxColorBoxComponent.self, withName: "color-box-view")
     }
     
     lynxView.preferredLayoutWidth = windowScene.screen.bounds.size.width
@@ -24,7 +26,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     lynxView.layoutWidthMode = .exact
     lynxView.layoutHeightMode = .exact
     
-     let rootViewController = UIViewController()
+    let rootViewController = UIViewController()
     window?.rootViewController = rootViewController
     rootViewController.view = lynxView
     
