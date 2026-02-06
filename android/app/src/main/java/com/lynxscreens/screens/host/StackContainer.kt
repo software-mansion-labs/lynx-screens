@@ -106,6 +106,15 @@ internal class StackContainer(
                 transaction.commitAllowingStateLoss()
             }
         }
+
+        // We manually trigger a layout pass because we have disabled Lynx's default
+        // native view management for StackHostComponent. Since the FragmentManager
+        // now handles the insertion of views into this container, we must ensure
+        // that the CoordinatorLayout (StackContainer) re-measures its children.
+        // Without this call, newly added fragment views might not be measured or
+        // laid out correctly, as the system may not immediately recognize the
+        // structural changes made by the FragmentManager transaction.
+        requestLayout()
     }
 
     private fun performOperation(

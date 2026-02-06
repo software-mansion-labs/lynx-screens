@@ -28,18 +28,12 @@ internal class StackHostComponent(context: LynxContext) : UIGroup<StackHostView>
         super.insertChild(child, index)
     }
 
-    override fun insertView(child: LynxUI<*>) {
-        super.insertView(child)
-
-        // TODO: @t0maboro 
-        // This is really bad workaround, Lynx takes the responsibility for both Lynx hierarchy (insertChild) and native hierarchy (insertView)
-        // For the native hierarchy, we want to have an intermediate component - StackContainer which will perform operations on FragmentManager level.
-        // FragmentManager should be responsible for attaching/detaching Screens, therefore, I'm forcefully detaching Screen from Host.
-        // This may break some important logic for Lynx that atm. I'm not aware of, but it should be resolved ASAP.
-        val childNativeView: View = child.view
-        if (childNativeView.parent === view) {
-            view.removeView(childNativeView)
-        }
+    override fun insertView(child: LynxUI<*>?) {
+        // NO-OP
+        // We intentionally ignore Lynx's default native view insertion here.
+        // Responsibility for building and managing the native view hierarchy is
+        // transferred to StackContainer, which utilizes FragmentManager to
+        // handle view attachment within the Fragment lifecycle.
     }
 
     override fun removeChild(child: LynxBaseUI?) {
@@ -47,6 +41,14 @@ internal class StackHostComponent(context: LynxContext) : UIGroup<StackHostView>
 
         unmountLynxSubview(child)
         super.removeChild(child)
+    }
+
+    override fun removeView(child: LynxBaseUI?) {
+        // NO-OP
+        // We intentionally ignore Lynx's default native view removal here.
+        // Responsibility for building and managing the native view hierarchy is
+        // transferred to StackContainer, which utilizes FragmentManager to
+        // handle view detachment within the Fragment lifecycle.
     }
 
     override fun removeAll() {
