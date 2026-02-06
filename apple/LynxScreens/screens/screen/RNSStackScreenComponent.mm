@@ -40,7 +40,7 @@ LYNX_LAZY_REGISTER_UI("stack-screen-native")
 
 - (void)setupController
 {
-    _controller = [[RNSStackScreenController alloc] initWithComponentView:self];
+    _controller = [[RNSStackScreenController alloc] initWithComponent:self];
     _controller.view = self.view;
 }
 

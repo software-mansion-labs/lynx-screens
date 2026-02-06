@@ -5,9 +5,9 @@
 
 - (void)didMoveToWindow {
     [super didMoveToWindow];
-
+    
     if (self.window) {
-        [self.componentView viewDidMoveToWindow];
+        [self.component viewDidMoveToWindow];
     }
 }
 

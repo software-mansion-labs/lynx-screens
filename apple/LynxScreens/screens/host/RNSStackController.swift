@@ -4,10 +4,10 @@ import UIKit
 @objc
 public class RNSStackController: UINavigationController {
     private var needsChildViewControllersUpdate = false
-    private let stackHostComponentView: RNSStackHostComponent
+    private let stackHostComponent: RNSStackHostComponent
     
-    @objc public required init(stackHostComponentView: RNSStackHostComponent) {
-        self.stackHostComponentView = stackHostComponentView
+    @objc public required init(stackHostComponent: RNSStackHostComponent) {
+        self.stackHostComponent = stackHostComponent
         super.init(nibName: nil, bundle: nil)
     }
     
@@ -47,7 +47,7 @@ public class RNSStackController: UINavigationController {
     
     private func sourceAllViewControllers() -> [RNSStackScreenController] {
         let screenStackComponents =
-        stackHostComponentView.children as! [RNSStackScreenComponent]
+        stackHostComponent.children as! [RNSStackScreenComponent]
         return screenStackComponents.lazy.map(\.controller)
     }
     

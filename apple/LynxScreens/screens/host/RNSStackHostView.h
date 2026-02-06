@@ -4,6 +4,6 @@
 
 @interface RNSStackHostView : UIView
 
-@property (nonatomic, weak) RNSStackHostComponent *componentView;
+@property (nonatomic, weak) RNSStackHostComponent *component;
 
 @end
