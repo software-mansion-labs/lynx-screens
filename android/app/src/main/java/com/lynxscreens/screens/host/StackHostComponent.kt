@@ -21,7 +21,7 @@ internal class StackHostComponent(context: LynxContext) : UIGroup<StackHostView>
         return StackHostView(lynxContext, container)
     }
 
-    override fun insertChild(child: LynxBaseUI?, index: Int) {
+    override fun insertChild(child: LynxBaseUI, index: Int) {
         require(child is StackScreenComponent) { "[RNScreens] Attempt to attach child that is not of type ${StackScreenComponent::javaClass.name}" }
 
         mountLynxSubviewAt(child, index)
