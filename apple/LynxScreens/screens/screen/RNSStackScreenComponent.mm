@@ -1,12 +1,15 @@
 #import "RNSStackScreenComponent.h"
+#import "RNSStackScreenEventEmitter.h"
 
 #import <Lynx/LynxComponentRegistry.h>
+#import <Lynx/LynxLog.h>
 #import <Lynx/LynxPropsProcessor.h>
 
 #import "LynxScreens-Swift.h"
 
 @implementation RNSStackScreenComponent {
     RNSStackScreenController *_Nonnull _controller;
+    RNSStackScreenEventEmitter *_eventEmitter;
     
     // Flags
     BOOL _hasUpdatedActivityMode;
@@ -88,54 +91,55 @@ LYNX_PROP_SETTER("screenKey", setScreenKey, NSString *) {
 
 #pragma mark - Events
 
+- (RNSStackScreenEventEmitter *)getEventEmitter {
+    if (!_eventEmitter && self.context) {
+        _eventEmitter = [[RNSStackScreenEventEmitter alloc] initWithEventEmitter:self.context.eventEmitter
+                                                                      targetSign:[self sign]];
+    }
+    return _eventEmitter;
+}
+
 - (void)notifyLifecycleChange:(RNSScreenLifecycleEvent)event {
+    RNSStackScreenEventEmitter *eventEmitter = [self getEventEmitter];
+    if (!eventEmitter) {
+        LLogWarn(@"[RNScreens] Attempted to emit lifecycle event, but the emitter was null.");
+        return;
+    }
+    
     switch (event) {
         case RNSScreenLifecycleEventWillAppear:
-            [self emitOnWillAppear];
+            [eventEmitter emitWillAppear];
             break;
         case RNSScreenLifecycleEventDidAppear:
-            [self emitOnDidAppear];
+            [eventEmitter emitDidAppear];
             break;
         case RNSScreenLifecycleEventWillDisappear:
-            [self emitOnWillDisappear];
+            [eventEmitter emitWillDisappear];
             break;
         case RNSScreenLifecycleEventDidDisappear:
-            [self emitOnDidDisappear];
+            [eventEmitter emitDidDisappear];
             break;
     }
-}
-
-- (void)emitOnWillAppear {
-    [self emitEvent:@"OnWillAppear" detail:@{}];
-}
-
-- (void)emitOnDidAppear {
-    [self emitEvent:@"OnDidAppear" detail:@{}];
-}
-
-- (void)emitOnWillDisappear {
-    [self emitEvent:@"OnWillDisappear" detail:@{}];
-}
-
-- (void)emitOnDidDisappear {
-    [self emitEvent:@"OnDidDisappear" detail:@{}];
 }
 
 - (void)emitOnDismiss {
-    [self emitEvent:@"OnDismiss" detail:@{ @"isNativeDismiss": @(false) }];
+    RNSStackScreenEventEmitter *eventEmitter = [self getEventEmitter];
+    if (!eventEmitter) {
+        LLogWarn(@"[RNScreens] Attempted to emit lifecycle event, but the emitter was null.");
+        return;
+    }
+    
+    [eventEmitter emitOnDismiss:NO];
 }
 
 - (void)emitOnNativeDismiss {
-    [self emitEvent:@"OnDismiss" detail:@{ @"isNativeDismiss": @(true) }];
-}
-
-- (void)emitEvent:(NSString *)name detail:(NSDictionary *)detail {
-    if (self.context.eventEmitter != nil) {
-        LynxCustomEvent *eventInfo = [[LynxDetailEvent alloc] initWithName:name
-                                                                targetSign:[self sign]
-                                                                    detail:detail];
-        [self.context.eventEmitter dispatchCustomEvent:eventInfo];
+    RNSStackScreenEventEmitter *eventEmitter = [self getEventEmitter];
+    if (!eventEmitter) {
+        LLogWarn(@"[RNScreens] Attempted to emit lifecycle event, but the emitter was null.");
+        return;
     }
+    
+    [eventEmitter emitOnDismiss:YES];
 }
 
 @end
