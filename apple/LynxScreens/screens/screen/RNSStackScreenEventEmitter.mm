@@ -14,19 +14,19 @@
     return self;
 }
 
-- (void)emitWillAppear {
+- (void)emitOnWillAppear {
     [self dispatch:@"OnWillAppear" detail:@{}];
 }
 
-- (void)emitDidAppear {
+- (void)emitOnDidAppear {
     [self dispatch:@"OnDidAppear" detail:@{}];
 }
 
-- (void)emitWillDisappear {
+- (void)emitOnWillDisappear {
     [self dispatch:@"OnWillDisappear" detail:@{}];
 }
 
-- (void)emitDidDisappear {
+- (void)emitOnDidDisappear {
     [self dispatch:@"OnDidDisappear" detail:@{}];
 }
 

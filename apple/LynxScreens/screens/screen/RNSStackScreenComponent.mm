@@ -108,16 +108,16 @@ LYNX_PROP_SETTER("screenKey", setScreenKey, NSString *) {
     
     switch (event) {
         case RNSScreenLifecycleEventWillAppear:
-            [eventEmitter emitWillAppear];
+            [eventEmitter emitOnWillAppear];
             break;
         case RNSScreenLifecycleEventDidAppear:
-            [eventEmitter emitDidAppear];
+            [eventEmitter emitOnDidAppear];
             break;
         case RNSScreenLifecycleEventWillDisappear:
-            [eventEmitter emitWillDisappear];
+            [eventEmitter emitOnWillDisappear];
             break;
         case RNSScreenLifecycleEventDidDisappear:
-            [eventEmitter emitDidDisappear];
+            [eventEmitter emitOnDidDisappear];
             break;
     }
 }

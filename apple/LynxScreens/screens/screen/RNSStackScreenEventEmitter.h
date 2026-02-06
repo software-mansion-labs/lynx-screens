@@ -8,10 +8,10 @@ NS_ASSUME_NONNULL_BEGIN
 - (instancetype)initWithEventEmitter:(LynxEventEmitter *)eventEmitter 
                           targetSign:(NSInteger)sign;
 
-- (void)emitWillAppear;
-- (void)emitDidAppear;
-- (void)emitWillDisappear;
-- (void)emitDidDisappear;
+- (void)emitOnWillAppear;
+- (void)emitOnDidAppear;
+- (void)emitOnWillDisappear;
+- (void)emitOnDidDisappear;
 - (void)emitOnDismiss:(BOOL)isNative;
 
 @end
