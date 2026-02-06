@@ -3,7 +3,6 @@ package com.lynxscreens.screens.host
 import android.annotation.SuppressLint
 import android.content.Context
 import android.util.Log
-import android.view.View
 import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentTransaction
