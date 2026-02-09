@@ -256,9 +256,15 @@ function getNewStateAfterPush(
   state: StackState,
   newRoute: StackRoute,
 ): StackState {
-  const lastAttachedIndex = state.findLastIndex(
-    route => route.activityMode === 'attached',
-  );
+  // TODO: @t0maboro - temporary fir for `TypeError: state.findLastIndex is not a function` 
+  // which was introduces in ES2023
+  let lastAttachedIndex = -1;
+  for (let i = state.length - 1; i >= 0; i--) {
+    if (state[i].activityMode === 'attached') {
+      lastAttachedIndex = i;
+      break;
+    }
+  }
 
   if (lastAttachedIndex === -1) {
     throw new Error(
@@ -266,7 +272,13 @@ function getNewStateAfterPush(
     );
   }
 
-  return state.toSpliced(lastAttachedIndex + 1, 0, newRoute);
+  const attachAtIndex = lastAttachedIndex + 1;
+
+  return [
+    ...state.slice(0, attachAtIndex),
+    newRoute,
+    ...state.slice(attachAtIndex)
+  ];
 }
 
 export function determineFirstRoute(
