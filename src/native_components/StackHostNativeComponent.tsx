@@ -7,6 +7,8 @@ export const StackHostNativeComponent = ({ children }: Lynx.ViewProps) => {
       style={{
         display: 'flex',
         flex: 1,
+        width: '100%',
+        height: '100%',
       }}
     >
       {children}
