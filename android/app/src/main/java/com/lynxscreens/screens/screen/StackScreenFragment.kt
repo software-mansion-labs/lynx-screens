@@ -9,38 +9,29 @@ import com.lynxscreens.screens.host.StackContainer
 import java.lang.ref.WeakReference
 
 internal class StackScreenFragment(
-    internal val stackContainer: WeakReference<StackContainer>,
+    private val stackContainer: WeakReference<StackContainer>,
     internal val stackScreen: StackScreenComponent,
 ) : Fragment() {
+    private var screenLifecycleEventEmitter: StackScreenAppearanceEventsEmitter? = null
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?,
     ): View = stackScreen.view
 
-    override fun onStart() {
-        stackScreen.notifyOnWillAppear()
-        super.onStart()
-    }
-
-    override fun onResume() {
-        stackScreen.notifyOnDidAppear()
-        super.onResume()
-    }
-
-    override fun onPause() {
-        stackScreen.notifyOnWillDisappear()
-        super.onPause()
-    }
-
-    override fun onStop() {
-        stackScreen.notifyOnDidDisappear()
-        super.onStop()
+    override fun onViewCreated(
+        view: View,
+        savedInstanceState: Bundle?
+    ) {
+        super.onViewCreated(view, savedInstanceState)
+        screenLifecycleEventEmitter = stackScreen.createAppearanceEventsEmitter(viewLifecycleOwner)
     }
 
     override fun onDestroyView() {
-        stackContainer.get()?.onFragmentDestroyView(this)
-        stackScreen.notifyOnDismiss(stackScreen.activityMode == StackScreenComponent.ActivityMode.ATTACHED)
         super.onDestroyView()
+        stackScreen.onDismiss()
+        stackContainer.get()?.onFragmentDestroyView(this)
+        screenLifecycleEventEmitter = null
     }
 }

@@ -1,19 +1,4 @@
-import { TemplateScreen } from './components/TemplateScreen';
-import { StackContainer } from './components/StackContainer';
-import type { StackRouteConfig } from './types/StackContainer';
-
-const ROUTE_CONFIGS: StackRouteConfig[] = [
-  {
-    name: 'A',
-    Component: TemplateScreen,
-    options: {},
-  },
-  {
-    name: 'B',
-    Component: TemplateScreen,
-    options: {}
-  }
-];
+import * as Tests from './examples'
 
 export function App(props: { onRender?: () => void }) {
   return (
@@ -25,7 +10,7 @@ export function App(props: { onRender?: () => void }) {
         height: '100%',
       }}
     >
-      <StackContainer routeConfigs={ROUTE_CONFIGS} />
+      <Tests.TestPreload />
     </page>
   );
 }

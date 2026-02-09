@@ -1,7 +1,6 @@
 package com.lynxscreens.screens.host
 
 import android.content.Context
-import android.view.View
 import com.lynx.tasm.behavior.LynxContext
 import com.lynx.tasm.behavior.PatchFinishListener
 import com.lynx.tasm.behavior.ui.LynxBaseUI
@@ -13,6 +12,8 @@ import java.lang.ref.WeakReference
 internal class StackHostComponent(context: LynxContext) : UIGroup<StackHostView>(context), StackContainerDelegate, PatchFinishListener {
     internal val renderedScreens: ArrayList<StackScreenComponent> = arrayListOf()
     private lateinit var container: StackContainer
+
+    private val containerUpdateCoordinator = StackHostContainerUpdateCoordinator()
 
     override fun createView(context: Context?): StackHostView {
         val lynxContext = context as LynxContext
@@ -70,47 +71,44 @@ internal class StackHostComponent(context: LynxContext) : UIGroup<StackHostView>
     ) {
         renderedScreens.add(index, stackScreen)
         stackScreen.stackHost = WeakReference(this)
-        enqueueAddOperationToContainerIfNeeded(stackScreen)
+        addPushOperationIfNeeded(stackScreen)
     }
 
     private fun unmountLynxSubview(lynxSubview: StackScreenComponent) {
         renderedScreens.remove(lynxSubview)
-        enqueuePopOperationToContainerIfNeeded(lynxSubview)
+        addPopOperationIfNeeded(lynxSubview)
     }
 
     private fun unmountAllLynxSubviews() {
         renderedScreens.asReversed().forEach {
-            enqueuePopOperationToContainerIfNeeded(it)
+            addPopOperationIfNeeded(it)
         }
         renderedScreens.clear()
     }
 
-    private fun enqueueAddOperationToContainerIfNeeded(stackScreen: StackScreenComponent) {
+    private fun addPushOperationIfNeeded(stackScreen: StackScreenComponent) {
         if (stackScreen.activityMode == StackScreenComponent.ActivityMode.ATTACHED) {
-            container.enqueueAddOperation(stackScreen)
+            containerUpdateCoordinator.addPushOperation(stackScreen)
         }
     }
 
-    private fun enqueuePopOperationToContainerIfNeeded(stackScreen: StackScreenComponent) {
+    private fun addPopOperationIfNeeded(stackScreen: StackScreenComponent) {
         if (stackScreen.activityMode == StackScreenComponent.ActivityMode.ATTACHED && !stackScreen.isNativelyDismissed) {
-            container.enqueuePopOperation(stackScreen)
+            // This shouldn't happen in typical scenarios but it can happen with fast-refresh.
+            containerUpdateCoordinator.addPopOperation(stackScreen)
         }
     }
 
     internal fun stackScreenChangedActivityMode(stackScreen: StackScreenComponent) {
         when (stackScreen.activityMode) {
-            StackScreenComponent.ActivityMode.DETACHED -> container.enqueuePopOperation(stackScreen)
-            StackScreenComponent.ActivityMode.ATTACHED -> container.enqueueAddOperation(stackScreen)
+            StackScreenComponent.ActivityMode.DETACHED -> containerUpdateCoordinator.addPopOperation(stackScreen)
+            StackScreenComponent.ActivityMode.ATTACHED -> containerUpdateCoordinator.addPushOperation(stackScreen)
         }
     }
 
-    override fun onDismiss(stackScreen: StackScreenComponent) {
-        if (stackScreen.activityMode == StackScreenComponent.ActivityMode.ATTACHED) {
-            stackScreen.isNativelyDismissed = true
-        }
-    }
+    override fun onScreenDismiss(stackScreen: StackScreenComponent) = Unit
 
     override fun onPatchFinish() {
-        container.performContainerUpdateIfNeeded()
+        containerUpdateCoordinator.executePendingOperationsIfNeeded(container, renderedScreens)
     }
 }

@@ -1,6 +1,7 @@
 package com.lynxscreens.screens.screen
 
 import android.content.Context
+import androidx.lifecycle.LifecycleOwner
 import com.lynx.tasm.behavior.LynxContext
 import com.lynx.tasm.behavior.LynxProp
 import com.lynx.tasm.behavior.ui.UIGroup
@@ -38,6 +39,9 @@ internal class StackScreenComponent(context: LynxContext) : UIGroup<StackScreenV
         StackScreenEventEmitter(lynxContext, sign)
     }
 
+    internal fun createAppearanceEventsEmitter(viewLifecycleOwner: LifecycleOwner) =
+        StackScreenAppearanceEventsEmitter(viewLifecycleOwner.lifecycle, eventEmitter)
+
     override fun createView(context: Context?): StackScreenView = StackScreenView(context as LynxContext)
 
     @LynxProp(name = "activityMode")
@@ -61,9 +65,10 @@ internal class StackScreenComponent(context: LynxContext) : UIGroup<StackScreenV
         screenKey = value
     }
 
-    internal fun notifyOnWillAppear() = eventEmitter.notifyOnWillAppear()
-    internal fun notifyOnDidAppear() = eventEmitter.notifyOnDidAppear()
-    internal fun notifyOnWillDisappear() = eventEmitter.notifyOnWillDisappear()
-    internal fun notifyOnDidDisappear() = eventEmitter.notifyOnDidDisappear()
-    internal fun notifyOnDismiss(isNativeDismiss: Boolean) = eventEmitter.notifyOnDismiss(isNativeDismiss)
+    internal fun onDismiss() {
+        if (activityMode == ActivityMode.ATTACHED) {
+            isNativelyDismissed = true
+        }
+        eventEmitter.notifyOnDismiss(isNativelyDismissed)
+    }
 }
