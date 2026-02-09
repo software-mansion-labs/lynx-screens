@@ -56,12 +56,12 @@ const SCENARIOS: ScenarioConfig[] = [
 const Button = ({ onTap, label }: ButtonProps) => (
   <view
     style={{
-      width: 200,
-      height: 50,
+      width: '200px',
+      height: '50px',
       backgroundColor: 'blue',
       justifyContent: 'center',
       alignItems: 'center',
-      marginBottom: 10,
+      marginBottom: '10px',
     }}
     bindtap={onTap}
   >
@@ -86,14 +86,15 @@ function MenuScreen() {
         flex: 1,
         justifyContent: 'center',
         alignContent: 'center',
+        backgroundColor: 'white',
       }}
     >
-      <view style={{ padding: 20, maxHeight: '75%' }}>
-        <text style={{ fontSize: 24, marginBottom: 20 }}>Select Scenario</text>
+      <view style={{ padding: '20px', maxHeight: '75%' }}>
+        <text style={{ fontSize: '24px', marginBottom: '20px' }}>Select Scenario</text>
         <scroll-view style={{ gap: 10 }}>
           {SCENARIOS.map((scenario) => (
             <view key={scenario.id} style={{ borderWidth: 1, padding: 10 }}>
-              <text style={{ marginBottom: 10 }}>{scenario.description}</text>
+              <text style={{ marginBottom: '10px' }}>{scenario.description}</text>
               <Button
                 label="Run Setup"
                 onTap={() => {
@@ -105,7 +106,7 @@ function MenuScreen() {
             </view>
           ))}
         </scroll-view>
-        <text style={{ marginTop: 20 }}>
+        <text style={{ marginTop: '20px' }}>
           Note that the test can run only once due to reliance on route key
           generation. Please restart the test screen after finishing the
           scenario and after modifying the test file.
@@ -136,11 +137,17 @@ function TemplateScreen() {
     <view
       style={{
         flex: 1,
+        display: 'flex',
         justifyContent: 'center',
-        padding: 20,
+        alignItems: 'center',
+        flexDirection: 'column',
+        padding: '20px',
+        backgroundColor: 'white',
+        width: '100%',
+        height: '100%',
       }}
     >
-      <text style={{ fontSize: 20, marginBottom: 20 }}>
+      <text style={{ fontSize: '20px', marginBottom: '20px' }}>
         Route: {navigation.routeKey}
       </text>
 
