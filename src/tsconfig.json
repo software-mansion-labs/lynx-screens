@@ -3,12 +3,6 @@
   "compilerOptions": {
     "composite": true,
 
-    "jsx": "react-jsx",
-    "jsxImportSource": "@lynx-js/react",
-
-    "module": "ESNext",
-    "moduleResolution": "Bundler",
-
     "noEmit": true,
   },
   "include": ["./**/*.ts", "./**/*.tsx"],
