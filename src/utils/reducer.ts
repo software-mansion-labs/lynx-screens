@@ -256,8 +256,7 @@ function getNewStateAfterPush(
   state: StackState,
   newRoute: StackRoute,
 ): StackState {
-  // TODO: @t0maboro - temporary fir for `TypeError: state.findLastIndex is not a function` 
-  // which was introduces in ES2023
+  // Fix for `TypeError: state.findLastIndex is not a function` which was introduced in ES2023
   let lastAttachedIndex = -1;
   for (let i = state.length - 1; i >= 0; i--) {
     if (state[i].activityMode === 'attached') {
