@@ -10,11 +10,27 @@ internal class StackHostContainerUpdateCoordinator {
         get() = pendingPushOperations.isNotEmpty() || pendingPopOperations.isNotEmpty()
 
     internal fun addPushOperation(stackScreen: StackScreenComponent) {
-        pendingPushOperations.add(PushOperation(stackScreen))
+        // If a Push operation is detected for a screen already scheduled for a Pop,
+        // both operations are canceled.
+        val index = pendingPopOperations.indexOfFirst { it.screen == stackScreen }
+        val shouldCancelPopOperation = index != -1
+        if (shouldCancelPopOperation) {
+            pendingPopOperations.removeAt(index)
+        } else {
+            pendingPushOperations.add(PushOperation(stackScreen))
+        }
     }
 
     internal fun addPopOperation(stackScreen: StackScreenComponent) {
-        pendingPopOperations.add(PopOperation(stackScreen))
+        // If a Pop operation is detected for a screen already scheduled for a Push,
+        // both operations are canceled.
+        val index = pendingPushOperations.indexOfFirst { it.screen == stackScreen }
+        val shouldCancelPushOperation = index != -1
+        if (shouldCancelPushOperation) {
+            pendingPushOperations.removeAt(index)
+        } else {
+            pendingPopOperations.add(PopOperation(stackScreen))
+        }
     }
 
     internal fun executePendingOperationsIfNeeded(
