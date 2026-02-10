@@ -2,11 +2,12 @@ package com.lynxscreens.screens.screen
 
 import com.lynx.tasm.behavior.LynxContext
 import com.lynx.tasm.event.LynxCustomEvent
+import com.lynxscreens.screens.common.event.ViewAppearanceEventEmitter
 
 internal class StackScreenEventEmitter(
     private val lynxContext: LynxContext,
     private val sign: Int
-) {
+) : ViewAppearanceEventEmitter {
     companion object {
         private const val EVENT_WILL_APPEAR = "OnWillAppear"
         private const val EVENT_DID_APPEAR = "OnDidAppear"
@@ -15,13 +16,21 @@ internal class StackScreenEventEmitter(
         private const val EVENT_ON_DISMISS = "OnDismiss"
     }
 
-    fun notifyOnWillAppear() = emit(EVENT_WILL_APPEAR)
+    override fun emitOnWillAppear() {
+        emit(EVENT_WILL_APPEAR)
+    }
 
-    fun notifyOnDidAppear() = emit(EVENT_DID_APPEAR)
+    override fun emitOnDidAppear() {
+        emit(EVENT_DID_APPEAR)
+    }
 
-    fun notifyOnWillDisappear() = emit(EVENT_WILL_DISAPPEAR)
+    override fun emitOnWillDisappear() {
+        emit(EVENT_WILL_DISAPPEAR)
+    }
 
-    fun notifyOnDidDisappear() = emit(EVENT_DID_DISAPPEAR)
+    override fun emitOnDidDisappear() {
+        emit(EVENT_DID_DISAPPEAR)
+    }
 
     fun notifyOnDismiss(isNativeDismiss: Boolean) {
         emit(EVENT_ON_DISMISS, mapOf("isNativeDismiss" to isNativeDismiss))

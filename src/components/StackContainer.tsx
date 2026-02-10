@@ -55,6 +55,7 @@ export function StackContainer({ routeConfigs }: StackContainerProps) {
           push: navMethods.pushAction,
           pop: navMethods.popAction,
           preload: navMethods.preloadAction,
+          batch: navMethods.batchAction,
         };
 
         return (

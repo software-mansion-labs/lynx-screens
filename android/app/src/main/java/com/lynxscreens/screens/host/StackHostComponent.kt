@@ -1,7 +1,6 @@
 package com.lynxscreens.screens.host
 
 import android.content.Context
-import android.view.View
 import com.lynx.tasm.behavior.LynxContext
 import com.lynx.tasm.behavior.PatchFinishListener
 import com.lynx.tasm.behavior.ui.LynxBaseUI
@@ -14,6 +13,8 @@ internal class StackHostComponent(context: LynxContext) : UIGroup<StackHostView>
     internal val renderedScreens: ArrayList<StackScreenComponent> = arrayListOf()
     private lateinit var container: StackContainer
 
+    private val containerUpdateCoordinator = StackHostContainerUpdateCoordinator()
+
     override fun createView(context: Context?): StackHostView {
         val lynxContext = context as LynxContext
         container = StackContainer(lynxContext, WeakReference(this))
@@ -24,8 +25,20 @@ internal class StackHostComponent(context: LynxContext) : UIGroup<StackHostView>
     override fun insertChild(child: LynxBaseUI, index: Int) {
         require(child is StackScreenComponent) { "[RNScreens] Attempt to attach child that is not of type ${StackScreenComponent::javaClass.name}" }
 
-        mountLynxSubviewAt(child, index)
-        super.insertChild(child, index)
+        // Store the reference to StackHost, to notify it when the activity mode will change from DETACHED to ATTACHED
+        child.stackHost = WeakReference(this)
+
+        if (child.activityMode == StackScreenComponent.ActivityMode.ATTACHED) {
+            // Insert always at the last index
+            mountLynxSubviewAt(child)
+            // We manually trigger a layout pass because we have disabled Lynx's default
+            // native view management for StackHostComponent. Since the FragmentManager
+            // now handles the insertion of views into this container, we must ensure
+            // that the CoordinatorLayout (StackContainer) re-measures its children when relevant.
+            requestLayout()
+            // Add the component to Lynx children, only when it's attached
+            super.insertChild(child, super.getChildCount())
+        }
     }
 
     override fun insertView(child: LynxUI<*>?) {
@@ -65,52 +78,53 @@ internal class StackHostComponent(context: LynxContext) : UIGroup<StackHostView>
     }
 
     private fun mountLynxSubviewAt(
-        stackScreen: StackScreenComponent,
-        index: Int,
+        stackScreen: StackScreenComponent
     ) {
-        renderedScreens.add(index, stackScreen)
-        stackScreen.stackHost = WeakReference(this)
-        enqueueAddOperationToContainerIfNeeded(stackScreen)
+        renderedScreens.add(stackScreen)
+        addPushOperationIfNeeded(stackScreen)
     }
 
     private fun unmountLynxSubview(lynxSubview: StackScreenComponent) {
         renderedScreens.remove(lynxSubview)
-        enqueuePopOperationToContainerIfNeeded(lynxSubview)
+        addPopOperationIfNeeded(lynxSubview)
     }
 
     private fun unmountAllLynxSubviews() {
         renderedScreens.asReversed().forEach {
-            enqueuePopOperationToContainerIfNeeded(it)
+            addPopOperationIfNeeded(it)
         }
         renderedScreens.clear()
     }
 
-    private fun enqueueAddOperationToContainerIfNeeded(stackScreen: StackScreenComponent) {
+    private fun addPushOperationIfNeeded(stackScreen: StackScreenComponent) {
         if (stackScreen.activityMode == StackScreenComponent.ActivityMode.ATTACHED) {
-            container.enqueueAddOperation(stackScreen)
+            containerUpdateCoordinator.addPushOperation(stackScreen)
         }
     }
 
-    private fun enqueuePopOperationToContainerIfNeeded(stackScreen: StackScreenComponent) {
+    private fun addPopOperationIfNeeded(stackScreen: StackScreenComponent) {
         if (stackScreen.activityMode == StackScreenComponent.ActivityMode.ATTACHED && !stackScreen.isNativelyDismissed) {
-            container.enqueuePopOperation(stackScreen)
+            // This shouldn't happen in typical scenarios but it can happen with fast-refresh.
+            containerUpdateCoordinator.addPopOperation(stackScreen)
         }
     }
 
     internal fun stackScreenChangedActivityMode(stackScreen: StackScreenComponent) {
         when (stackScreen.activityMode) {
-            StackScreenComponent.ActivityMode.DETACHED -> container.enqueuePopOperation(stackScreen)
-            StackScreenComponent.ActivityMode.ATTACHED -> container.enqueueAddOperation(stackScreen)
+            StackScreenComponent.ActivityMode.DETACHED -> {
+                containerUpdateCoordinator.addPopOperation(stackScreen)
+            }
+            StackScreenComponent.ActivityMode.ATTACHED -> {
+                // Lynx attaches children on insert by default. To support preloading,
+                // we manually trigger the insert logic only when confirmed ATTACHED.
+                insertChild(stackScreen, super.getChildCount())
+            }
         }
     }
 
-    override fun onDismiss(stackScreen: StackScreenComponent) {
-        if (stackScreen.activityMode == StackScreenComponent.ActivityMode.ATTACHED) {
-            stackScreen.isNativelyDismissed = true
-        }
-    }
+    override fun onScreenDismiss(stackScreen: StackScreenComponent) = Unit
 
     override fun onPatchFinish() {
-        container.performContainerUpdateIfNeeded()
+        containerUpdateCoordinator.executePendingOperationsIfNeeded(container, renderedScreens)
     }
 }

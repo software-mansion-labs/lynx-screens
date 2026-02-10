@@ -1,5 +1,6 @@
 import type {
   NavigationAction,
+  NavigationActionBatch,
   NavigationActionNativePop,
   NavigationActionPop,
   NavigationActionPopCompleted,
@@ -32,6 +33,9 @@ export function navigationStateReducer(
     }
     case 'preload': {
       return navigationActionPreloadHandler(state, action);
+    }
+    case 'batch': {
+      return navigationActionBatchHandler(state, action);
     }
   }
 
@@ -78,10 +82,7 @@ function navigationActionPushHandler(
   ];
     const routeCopy = { ...route };
     routeCopy.activityMode = 'attached';
-    // Please note that we are pushing the route copy to the end of the array,
-    // to mitigate potential issues with element inspector and state restoration.
-    newState.push(routeCopy);
-    return newState;
+    return getNewStateAfterPush(newState, routeCopy);
   }
 
   // 2 - Try to render new route
@@ -97,7 +98,7 @@ function navigationActionPushHandler(
   const newRoute = createRouteFromConfig(newRouteConfig);
   newRoute.activityMode = 'attached';
 
-  return [...state, newRoute];
+  return getNewStateAfterPush(state, newRoute);
 }
 
 function navigationActionPopHandler(
@@ -228,7 +229,17 @@ function navigationActionPreloadHandler(
     return state;
   }
 
+  // Preloaded routes are kept at the end of the list to allow order manipulations
+  // that won't result in problems on native platform.
+  // More info: https://github.com/software-mansion/react-native-screens/pull/3531.
   return [...state, createRouteFromConfig(routeConfig)];
+}
+
+function navigationActionBatchHandler(
+  state: StackState,
+  action: NavigationActionBatch,
+): StackState {
+  return action.actions.reduce(navigationStateReducer, state);
 }
 
 function createRouteFromConfig(config: StackRouteConfig): StackRoute {
@@ -237,6 +248,36 @@ function createRouteFromConfig(config: StackRouteConfig): StackRoute {
     activityMode: 'detached',
     routeKey: generateRouteKeyForRouteName(config.name),
   };
+}
+
+// Ensures correct order of screens (attached first, detached at the end).
+// This will help with state restoration but WILL NOT help with inspector.
+function getNewStateAfterPush(
+  state: StackState,
+  newRoute: StackRoute,
+): StackState {
+  // Fix for `TypeError: state.findLastIndex is not a function` which was introduced in ES2023
+  let lastAttachedIndex = -1;
+  for (let i = state.length - 1; i >= 0; i--) {
+    if (state[i].activityMode === 'attached') {
+      lastAttachedIndex = i;
+      break;
+    }
+  }
+
+  if (lastAttachedIndex === -1) {
+    throw new Error(
+      `[Stack] Invalid stack state: there should be at least one attached route on the stack.`,
+    );
+  }
+
+  const attachAtIndex = lastAttachedIndex + 1;
+
+  return [
+    ...state.slice(0, attachAtIndex),
+    newRoute,
+    ...state.slice(attachAtIndex)
+  ];
 }
 
 export function determineFirstRoute(
