@@ -111,21 +111,15 @@ internal class StackHostComponent(context: LynxContext) : UIGroup<StackHostView>
 
     internal fun stackScreenChangedActivityMode(stackScreen: StackScreenComponent) {
         when (stackScreen.activityMode) {
-            StackScreenComponent.ActivityMode.DETACHED -> onStackScreenChangedActivityModeFromAttachedToDetached(stackScreen)
-            StackScreenComponent.ActivityMode.ATTACHED -> onStackScreenChangedActivityModeFromDetachedToAttached(stackScreen)
+            StackScreenComponent.ActivityMode.DETACHED -> {
+                containerUpdateCoordinator.addPopOperation(stackScreen)
+            }
+            StackScreenComponent.ActivityMode.ATTACHED -> {
+                // Lynx attaches children on insert by default. To support preloading,
+                // we manually trigger the insert logic only when confirmed ATTACHED.
+                insertChild(stackScreen, super.getChildCount())
+            }
         }
-    }
-
-    private fun onStackScreenChangedActivityModeFromAttachedToDetached(stackScreen: StackScreenComponent) {
-        containerUpdateCoordinator.addPopOperation(stackScreen)
-    }
-
-    private fun onStackScreenChangedActivityModeFromDetachedToAttached(stackScreen: StackScreenComponent) {
-        // By default, Lynx attempts to attach children as soon as an insert operation happens.
-        // To handle preloading, we need manual control over child attachment.
-        // Therefore, this adjustment is to call the whole insertChild logic which we skipped earlier.
-        // It should be only executed when we have confirmed the state is **changed** to ATTACHED.
-        insertChild(stackScreen, super.getChildCount())
     }
 
     override fun onScreenDismiss(stackScreen: StackScreenComponent) = Unit
