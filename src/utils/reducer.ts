@@ -72,7 +72,10 @@ function navigationActionPushHandler(
     const route = state[renderedRouteIndex];
 
     console.info(`[Stack] Route ${route.name} already rendered, attaching it`);
-    const newState = state.toSpliced(renderedRouteIndex, 1);
+    const newState = [
+    ...state.slice(0, renderedRouteIndex),
+    ...state.slice(renderedRouteIndex + 1)
+  ];
     const routeCopy = { ...route };
     routeCopy.activityMode = 'attached';
     // Please note that we are pushing the route copy to the end of the array,
@@ -171,7 +174,10 @@ function navigationActionPopCompletedHandler(
 
   // Let's remove the route from the state
   // TODO: Consider adding option for keeping it in state.
-  const newState = state.toSpliced(routeIndex, 1);
+  const newState = [
+    ...state.slice(0, routeIndex),
+    ...state.slice(routeIndex + 1)
+  ];
   return newState;
 }
 
@@ -200,7 +206,10 @@ function navigationActionNativePopHandler(
     console.warn('[Stack] natively popped route has "detached" state');
   }
 
-  const newState = state.toSpliced(routeIndex, 1);
+  const newState = [
+    ...state.slice(0, routeIndex),
+    ...state.slice(routeIndex + 1)
+  ];
   return newState;
 }
 

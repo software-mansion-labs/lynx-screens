@@ -118,6 +118,11 @@ dependencies {
     implementation ("org.lynxsdk.lynx:xelement:3.5.1")
     implementation ("org.lynxsdk.lynx:xelement-input:3.5.1")
 
+    // lynx-screens dependencies
+    implementation("androidx.coordinatorlayout:coordinatorlayout:1.2.0")
+    implementation("androidx.fragment:fragment-ktx:1.6.1")
+    implementation("androidx.appcompat:appcompat:1.6.1")
+
     kapt("org.lynxsdk.lynx:lynx-processor:3.5.1")
     compileOnly("org.lynxsdk.lynx:lynx-processor:3.5.1")
     annotationProcessor("org.lynxsdk.lynx:lynx-processor:3.5.1")
