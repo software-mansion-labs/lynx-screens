@@ -7,6 +7,7 @@ interface ViewIdProviding {
     fun generateViewId(): Int
 }
 
+@UiThread
 private class ReverseIdGenerator : ViewIdProviding {
     private var currentId = Int.MAX_VALUE
 
@@ -22,6 +23,7 @@ private class ReverseIdGenerator : ViewIdProviding {
     override fun generateViewId(): Int = currentId--
 }
 
+@UiThread
 internal object ViewIdGenerator : ViewIdProviding {
     /**
      * Set this field to customize view ids utilized by the library.
