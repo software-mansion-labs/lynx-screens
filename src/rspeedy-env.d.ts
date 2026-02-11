@@ -29,13 +29,18 @@ declare module "@lynx-js/types" {
       children: Lynx.Element;
       id?: string;
       style?: string | Lynx.CSSProperties;
+      // Control
       activityMode?: 'detached' | 'attached';
       screenKey?: string;
+      // Events
       bindOnWillAppear?: Lynx.EventHandler<Lynx.BaseEventOrig<EmptyEventPayload>>;
       bindOnDidAppear?: Lynx.EventHandler<Lynx.BaseEventOrig<EmptyEventPayload>>;
       bindOnWillDisappear?: Lynx.EventHandler<Lynx.BaseEventOrig<EmptyEventPayload>>;
       bindOnDidDisappear?: Lynx.EventHandler<Lynx.BaseEventOrig<EmptyEventPayload>>;
       bindOnDismiss?: Lynx.EventHandler<Lynx.BaseEventOrig<OnDismissEventPayload>>;
+      bindOnNativeDismissPrevented?: Lynx.EventHandler<Lynx.BaseEventOrig<EmptyEventPayload>>;
+      // Configuration
+      preventNativeDismiss?: boolean;
     }
   }
 }

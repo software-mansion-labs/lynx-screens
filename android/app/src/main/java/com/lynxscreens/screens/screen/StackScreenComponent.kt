@@ -17,6 +17,12 @@ internal class StackScreenComponent(context: LynxContext) : UIGroup<StackScreenV
         ATTACHED,
     }
 
+    internal var isPreventNativeDismissEnabled: Boolean by Delegates.observable(false) { _, oldValue, newValue ->
+        if (oldValue != newValue) {
+            preventNativeDismissChangeObserver?.preventNativeDismissChanged(newValue)
+        }
+    }
+
     internal var isNativelyDismissed = false
         set(value) {
             require(value) {
@@ -38,6 +44,11 @@ internal class StackScreenComponent(context: LynxContext) : UIGroup<StackScreenV
     private val eventEmitter: StackScreenEventEmitter by lazy {
         StackScreenEventEmitter(lynxContext, sign)
     }
+
+    /**
+     * Use this to set/unset the observer.
+     */
+    internal var preventNativeDismissChangeObserver: PreventNativeDismissChangeObserver? = null
 
     internal fun createAppearanceEventsEmitter(viewLifecycleOwner: LifecycleOwner) =
         StackScreenAppearanceEventsEmitter(viewLifecycleOwner.lifecycle, eventEmitter)
@@ -65,10 +76,21 @@ internal class StackScreenComponent(context: LynxContext) : UIGroup<StackScreenV
         screenKey = value
     }
 
+    @LynxProp(name = "preventNativeDismiss")
+    fun setPreventNativeDismiss(
+        value: Boolean?,
+    ) {
+        isPreventNativeDismissEnabled = value == true
+    }
+
     internal fun onDismiss() {
         if (activityMode == ActivityMode.ATTACHED) {
             isNativelyDismissed = true
         }
-        eventEmitter.notifyOnDismiss(isNativelyDismissed)
+        eventEmitter.emitOnDismiss(isNativelyDismissed)
+    }
+
+    internal fun onNativeDismissPrevented() {
+        eventEmitter.emitOnNativeDismissPrevented()
     }
 }

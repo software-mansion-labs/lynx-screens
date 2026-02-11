@@ -7,14 +7,19 @@ import type {
 
 export const StackScreenNativeComponent = ({
   children,
+  // Control
   activityMode,
   screenKey,
+  // Events
   onWillAppear,
   onDidAppear,
   onWillDisappear,
   onDidDisappear,
   onDismiss,
   onNativeDismiss,
+  onNativeDismissPrevented,
+  // Configuration
+  preventNativeDismiss,
 }: StackScreenProps) => {
   const onDismissWrapper = React.useCallback(
     (event: Lynx.BaseEventOrig<OnDismissEventPayload>) => {
@@ -47,6 +52,9 @@ export const StackScreenNativeComponent = ({
       bindOnWillDisappear={onWillDisappear}
       bindOnDidDisappear={onDidDisappear}
       bindOnDismiss={onDismissWrapper}
+      bindOnNativeDismissPrevented={onNativeDismissPrevented}
+      // Configuration
+      preventNativeDismiss={preventNativeDismiss}
     >
       {children}
     </stack-screen-native>

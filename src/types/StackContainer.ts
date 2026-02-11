@@ -33,6 +33,13 @@ export type StackScreenProps = {
 
   onDismiss?: (screenKey: string) => void;
   onNativeDismiss?: (screenKey: string) => void;
+
+  onNativeDismissPrevented?:
+    | Lynx.EventHandler<Lynx.BaseEventOrig<EmptyEventPayload>>
+    | undefined;
+
+  // Configuration
+  preventNativeDismiss?: boolean;
 };
 
 /// Route definition

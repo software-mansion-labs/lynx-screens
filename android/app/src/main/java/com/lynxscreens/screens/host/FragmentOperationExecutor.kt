@@ -48,6 +48,9 @@ internal class FragmentOperationExecutor {
     internal fun executeSetPrimaryNavFragmentOp(fragmentManager: FragmentManager, op: SetPrimaryNavFragmentOp) {
         fragmentManager.createTransactionWithReordering().let { tx ->
             tx.setPrimaryNavigationFragment(op.fragment)
+            if (op.onCommitCallback != null) {
+                tx.runOnCommit(op.onCommitCallback)
+            }
             commitTransaction(tx, allowStateLoss = true, flushSync = false)
         }
     }
