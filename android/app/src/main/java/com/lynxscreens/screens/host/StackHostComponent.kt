@@ -31,11 +31,6 @@ internal class StackHostComponent(context: LynxContext) : UIGroup<StackHostView>
         if (child.activityMode == StackScreenComponent.ActivityMode.ATTACHED) {
             // Insert always at the last index
             mountLynxSubviewAt(child)
-            // We manually trigger a layout pass because we have disabled Lynx's default
-            // native view management for StackHostComponent. Since the FragmentManager
-            // now handles the insertion of views into this container, we must ensure
-            // that the CoordinatorLayout (StackContainer) re-measures its children when relevant.
-            requestLayout()
             // Add the component to Lynx children, only when it's attached
             super.insertChild(child, super.getChildCount())
         }
@@ -63,6 +58,14 @@ internal class StackHostComponent(context: LynxContext) : UIGroup<StackHostView>
         // transferred to StackContainer, which utilizes FragmentManager to
         // handle view detachment within the Fragment lifecycle.
     }
+
+    // Overriding needCustomLayout to return `true` allows this component to handle its own
+    // child layout logic instead of relying on Lynx's default layout mechanism.
+    // This is necessary because StackScreenComponent instances are managed manually and rendered
+    // through StackContainer, which uses FragmentManager to attach/detach views as Android fragments.
+    // Automatic Lynx layout would interfere with fragment lifecycle.
+    // This is correlated with overridden `onLayout` method on StackHostView.
+    override fun needCustomLayout(): Boolean = true
 
     override fun removeAll() {
         unmountAllLynxSubviews()
