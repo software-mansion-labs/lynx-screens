@@ -35,6 +35,8 @@ export type StackScreenProps = {
   onNativeDismiss?: (screenKey: string) => void;
 };
 
+/// Route definition
+
 export type StackRouteOptions = Omit<
   StackScreenProps,
   'children' | 'activityMode' | 'screenKey'
@@ -46,13 +48,15 @@ export type StackRouteConfig = {
   options: StackRouteOptions;
 };
 
-export type StackContainerProps = {
-  routeConfigs: StackRouteConfig[];
-};
-
 export type StackRoute = StackRouteConfig & {
   activityMode: StackScreenProps['activityMode'];
   routeKey: StackScreenProps['screenKey'];
+};
+
+/// StackContainer props
+
+export type StackContainerProps = {
+  routeConfigs: StackRouteConfig[];
 };
 
 export type PushActionMethod = (routeName: string) => void;
@@ -61,6 +65,7 @@ export type PopCompletedActionMethod = (routeKey: string) => void;
 export type PopNativeActionMethod = (routeKey: string) => void;
 export type PreloadActionMethod = (routeName: string) => void;
 export type BatchActionMethod = (actions: BatchableNavigationAction[]) => void;
+export type ClearEffectsActionMethod = () => void;
 
 export type NavigationActionMethods = {
   pushAction: PushActionMethod;
@@ -69,9 +74,21 @@ export type NavigationActionMethods = {
   popNativeAction: PopNativeActionMethod;
   preloadAction: PreloadActionMethod;
   batchAction: BatchActionMethod;
+  clearEffectsAction: ClearEffectsActionMethod;
 };
 
 export type StackState = StackRoute[];
+
+export type StackNavigationState = {
+  stack: StackState;
+  effects: StackNavigationEffect[];
+};
+
+export type StackNavigationEffect = PopContainerStackNavigationEffect;
+
+type PopContainerStackNavigationEffect = {
+  type: 'pop-container';
+};
 
 export type NavigationActionPush = {
   type: 'push';
@@ -108,6 +125,13 @@ export type NavigationActionBatch = {
   actions: Exclude<NavigationAction, NavigationActionBatch>[];
 };
 
+// TODO: We need to separate navigation actions exposed to user from internal
+// state manipulation done in stack container on the type level.
+export type NavigationActionClearEffects = {
+  type: 'clear-effects';
+  ctx: NavigationActionContext;
+};
+
 export type NavigationActionContext = {
   routeConfigs: StackRouteConfig[];
 };
@@ -123,4 +147,5 @@ export type NavigationAction =
   | NavigationActionPopCompleted
   | NavigationActionNativePop
   | NavigationActionPreload
+  | NavigationActionClearEffects
   | NavigationActionBatch;
