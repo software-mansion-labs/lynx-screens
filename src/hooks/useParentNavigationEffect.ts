@@ -40,6 +40,7 @@ export function useParentNavigationEffect(
       clearEffects();
     }
     // 'effects' is the only thing that triggers this re-run.
-    // 'consumeEffect' and 'clearEffects' are stable and don't need to be in deps.
+    // 'consumeEffect' and 'clearEffects' are stable and don't need to be in deps
+    // referring to the description of useLatestCallback above.
   }, [effects]);
 }
