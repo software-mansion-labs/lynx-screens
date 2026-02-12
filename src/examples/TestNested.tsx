@@ -78,6 +78,21 @@ function NestedTemplateScreen() {
       <text>Route: {navigation.routeKey}</text>
       <Button label="Push NestedA" onTap={() => navigation.push('NestedA')} />
       <Button label="Push NestedB" onTap={() => navigation.push('NestedB')} />
+      <Button
+        label="Push both"
+        onTap={() =>
+          navigation.batch([
+            {
+              type: 'push',
+              routeName: 'NestedA',
+            },
+            {
+              type: 'push',
+              routeName: 'NestedB',
+            },
+          ])
+        }
+      />
       <Button label="Pop" onTap={() => navigation.pop(navigation.routeKey)} />
       <Button
         label="Preload NestedA"
@@ -99,17 +114,32 @@ const ROUTE_CONFIGS: StackRouteConfig[] = [
   {
     name: 'A',
     Component: TemplateScreen,
-    options: {},
+    options: {
+      onWillAppear: () => console.log('A onWillAppear'),
+      onWillDisappear: () => console.log('A onWillDisappear'),
+      onDidAppear: () => console.log('A onDidAppear'),
+      onDidDisappear: () => console.log('A onDidDisappear'),
+    },
   },
   {
     name: 'B',
     Component: TemplateScreen,
-    options: {},
+    options: {
+      onWillAppear: () => console.log('B onWillAppear'),
+      onWillDisappear: () => console.log('B onWillDisappear'),
+      onDidAppear: () => console.log('B onDidAppear'),
+      onDidDisappear: () => console.log('B onDidDisappear'),
+    },
   },
   {
     name: 'NestedStack',
     Component: NestedStackScreen,
-    options: {},
+    options: {
+      onWillAppear: () => console.log('NestedStack onWillAppear'),
+      onWillDisappear: () => console.log('NestedStack onWillDisappear'),
+      onDidAppear: () => console.log('NestedStack onDidAppear'),
+      onDidDisappear: () => console.log('NestedStack onDidDisappear'),
+    },
   },
 ];
 

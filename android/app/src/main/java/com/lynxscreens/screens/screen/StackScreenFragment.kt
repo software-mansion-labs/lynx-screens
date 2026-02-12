@@ -1,15 +1,13 @@
 package com.lynxscreens.screens.screen
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
-import com.lynxscreens.screens.host.StackContainer
-import java.lang.ref.WeakReference
 
 internal class StackScreenFragment(
-    private val stackContainer: WeakReference<StackContainer>,
     internal val stackScreen: StackScreenComponent,
 ) : Fragment() {
     private var screenLifecycleEventEmitter: StackScreenAppearanceEventsEmitter? = null
@@ -30,8 +28,12 @@ internal class StackScreenFragment(
 
     override fun onDestroyView() {
         super.onDestroyView()
-        stackScreen.onDismiss()
-        stackContainer.get()?.onFragmentDestroyView(this)
         screenLifecycleEventEmitter = null
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        Log.i("StackScreenFragment", "onDestroy")
+        stackScreen.onDismiss()
     }
 }

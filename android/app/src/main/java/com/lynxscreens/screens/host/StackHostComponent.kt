@@ -1,6 +1,7 @@
 package com.lynxscreens.screens.host
 
 import android.content.Context
+import android.util.Log
 import com.lynx.tasm.behavior.LynxContext
 import com.lynx.tasm.behavior.PatchFinishListener
 import com.lynx.tasm.behavior.ui.LynxBaseUI
@@ -109,6 +110,8 @@ internal class StackHostComponent(context: LynxContext) : UIGroup<StackHostView>
         if (stackScreen.activityMode == StackScreenComponent.ActivityMode.ATTACHED && !stackScreen.isNativelyDismissed) {
             // This shouldn't happen in typical scenarios but it can happen with fast-refresh.
             containerUpdateCoordinator.addPopOperation(stackScreen)
+        } else {
+            Log.d(TAG, "Ignoring pop operation of ${stackScreen.screenKey}, already not attached or natively dismissed")
         }
     }
 
@@ -125,9 +128,17 @@ internal class StackHostComponent(context: LynxContext) : UIGroup<StackHostView>
         }
     }
 
-    override fun onScreenDismiss(stackScreen: StackScreenComponent) = Unit
+    override fun onScreenDismiss(stackScreen: StackScreenComponent) {
+        if (stackScreen.activityMode == StackScreenComponent.ActivityMode.ATTACHED) {
+            stackScreen.isNativelyDismissed = true
+        }
+    }
 
     override fun onPatchFinish() {
         containerUpdateCoordinator.executePendingOperationsIfNeeded(container, renderedScreens)
+    }
+
+    companion object {
+        const val TAG = "StackHostComponent"
     }
 }
