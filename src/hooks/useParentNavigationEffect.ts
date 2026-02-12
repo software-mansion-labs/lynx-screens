@@ -23,6 +23,9 @@ export function useParentNavigationEffect(
       throw new Error(`[Stack] Unrecognized effect type: ${effect.type}`);
     }
     if (parentNavigation) {
+      console.log(
+        `[Stack] Delegating pop action to parent container for key ${parentNavigation.routeKey}`,
+      );
       parentNavigation.pop(parentNavigation.routeKey);
     }
   });
