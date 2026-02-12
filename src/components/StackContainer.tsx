@@ -2,11 +2,12 @@ import React from 'react';
 import type {
   NavigationAction,
   StackContainerProps,
+  StackNavigationState,
   StackRouteConfig,
   StackState,
 } from '../types/StackContainer';
 import {
-  determineFirstRoute,
+  determineInitialNavigationState,
   navigationStateReducerWithLogging,
 } from '../utils/reducer';
 import { useStackOperationMethods } from '../hooks/useStackOperationMethods';
@@ -16,20 +17,25 @@ import {
 } from '../contexts/StackNavigationContext';
 import { StackHostNativeComponent } from '../native_components/StackHostNativeComponent';
 import { StackScreenNativeComponent } from '../native_components/StackScreenNativeComponent';
+import { useParentNavigationEffect } from '../hooks/useParentNavigationEffect';
 
 export function StackContainer({ routeConfigs }: StackContainerProps) {
   useSanitizeRouteConfigs(routeConfigs);
 
-  const [stackState, navActionDispatch]: [
-    StackState,
+  const [stackNavState, navActionDispatch]: [
+    StackNavigationState,
     React.Dispatch<NavigationAction>,
   ] = React.useReducer(
     navigationStateReducerWithLogging,
     routeConfigs,
-    determineFirstRoute,
+    determineInitialNavigationState,
   );
 
   const navMethods = useStackOperationMethods(navActionDispatch, routeConfigs);
+
+  // If reducer produced a parent action, we need to dispatch it
+  // as an effect, because we can not modify the state during the render phase.
+  useParentNavigationEffect(navMethods, stackNavState.effects);
 
   const onDismiss = React.useCallback(
     (screenKey: string) => {
@@ -49,14 +55,15 @@ export function StackContainer({ routeConfigs }: StackContainerProps) {
 
   return (
     <StackHostNativeComponent>
-      {stackState.map(({ Component, options, activityMode, routeKey }) => {
-        const stackNavigationContext: StackNavigationContextPayload = {
-          routeKey,
-          push: navMethods.pushAction,
-          pop: navMethods.popAction,
-          preload: navMethods.preloadAction,
-          batch: navMethods.batchAction,
-        };
+      {stackNavState.stack.map(
+        ({ Component, options, activityMode, routeKey }) => {
+          const stackNavigationContext: StackNavigationContextPayload = {
+            routeKey,
+            push: navMethods.pushAction,
+            pop: navMethods.popAction,
+            preload: navMethods.preloadAction,
+            batch: navMethods.batchAction,
+          };
 
         return (
           <StackScreenNativeComponent
