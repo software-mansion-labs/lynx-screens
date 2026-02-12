@@ -13,7 +13,11 @@ export function useParentNavigationEffect(
 ) {
   const parentNavigation = React.useContext(StackNavigationContext);
 
-  // Replacement of React.useEffectEvent
+  /**
+   * Replacement of React.useEffectEvent.
+   * This hook returns a callback with always up-to-date reactive state inside, 
+   * allowing it to be used inside an effect without specifying it as a dependency.
+   */
   const consumeEffect = useLatestCallback((effect: StackNavigationEffect) => {
     if (effect.type !== 'pop-container') {
       throw new Error(`[Stack] Unrecognized effect type: ${effect.type}`);
