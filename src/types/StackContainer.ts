@@ -49,6 +49,9 @@ export type StackRouteOptions = Omit<
   'children' | 'activityMode' | 'screenKey'
 >;
 
+/**
+ * Blueprint for a route.
+ */
 export type StackRouteConfig = {
   name: string;
   Component: React.ComponentType;
@@ -72,6 +75,10 @@ export type PopCompletedActionMethod = (routeKey: string) => void;
 export type PopNativeActionMethod = (routeKey: string) => void;
 export type PreloadActionMethod = (routeName: string) => void;
 export type BatchActionMethod = (actions: BatchableNavigationAction[]) => void;
+export type SetRouteOptionsActionMethod = (
+  routeKey: string,
+  options: Partial<StackRouteOptions>,
+) => void;
 export type ClearEffectsActionMethod = () => void;
 
 export type NavigationActionMethods = {
@@ -82,6 +89,12 @@ export type NavigationActionMethods = {
   preloadAction: PreloadActionMethod;
   batchAction: BatchActionMethod;
   clearEffectsAction: ClearEffectsActionMethod;
+  /**
+   * Change options for the current route. This does not modify a blueprint
+   * (StackRouteConfig) for the route. It only modifies options for the
+   * given route instance.
+   */
+  setRouteOptions: SetRouteOptionsActionMethod;
 };
 
 export type StackState = StackRoute[];
@@ -139,6 +152,13 @@ export type NavigationActionClearEffects = {
   ctx: NavigationActionContext;
 };
 
+export type NavigationActionSetRouteOptions = {
+  type: 'set-options';
+  routeKey: string;
+  options: Partial<StackRouteOptions>;
+  ctx: NavigationActionContext;
+};
+
 export type NavigationActionContext = {
   routeConfigs: StackRouteConfig[];
 };
@@ -146,7 +166,8 @@ export type NavigationActionContext = {
 export type BatchableNavigationAction =
   | Omit<NavigationActionPush, 'ctx'>
   | Omit<NavigationActionPop, 'ctx'>
-  | Omit<NavigationActionPreload, 'ctx'>;
+  | Omit<NavigationActionPreload, 'ctx'>
+  | Omit<NavigationActionSetRouteOptions, 'ctx'>;
 
 export type NavigationAction =
   | NavigationActionPush
@@ -155,4 +176,5 @@ export type NavigationAction =
   | NavigationActionNativePop
   | NavigationActionPreload
   | NavigationActionClearEffects
+  | NavigationActionSetRouteOptions
   | NavigationActionBatch;

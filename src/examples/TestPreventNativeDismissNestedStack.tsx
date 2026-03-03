@@ -77,6 +77,7 @@ function AScreen() {
       <RouteInformation routeName="A" />
       <PreventNativeDismissInfo />
       <NavigationButtons isPopEnabled routeNames={['A', 'B', 'NestedStack']} />
+      <TogglePreventNativeDismiss />
     </view>
   );
 }
@@ -97,6 +98,7 @@ function BScreen() {
       <RouteInformation routeName="B" />
       <PreventNativeDismissInfo />
       <NavigationButtons isPopEnabled routeNames={['A', 'B', 'NestedStack']} />
+      <TogglePreventNativeDismiss />
     </view>
   );
 }
@@ -152,6 +154,7 @@ function NestedHomeScreen() {
       <RouteInformation routeName="NestedHome" />
       <PreventNativeDismissInfo />
       <NavigationButtons isPopEnabled routeNames={['NestedA', 'NestedB']} />
+      <TogglePreventNativeDismiss />
     </view>
   );
 }
@@ -172,6 +175,7 @@ function NestedAScreen() {
       <RouteInformation routeName="NestedA" />
       <PreventNativeDismissInfo />
       <NavigationButtons isPopEnabled routeNames={['NestedA', 'NestedB']} />
+      <TogglePreventNativeDismiss />
     </view>
   );
 }
@@ -192,6 +196,7 @@ function NestedBScreen() {
       <RouteInformation routeName="NestedB" />
       <PreventNativeDismissInfo />
       <NavigationButtons isPopEnabled routeNames={['NestedA', 'NestedB']} />
+      <TogglePreventNativeDismiss />
     </view>
   );
 }
@@ -233,6 +238,21 @@ function NavigationButtons(props: {
         />
       )}
     </>
+  );
+}
+
+function TogglePreventNativeDismiss() {
+  const navigation = useStackNavigationContext();
+
+  return (
+    <Button
+      label="Toggle Prevent Native Dismiss"
+      onTap={() =>
+        navigation.setRouteOptions(navigation.routeKey, {
+          preventNativeDismiss: !navigation.routeOptions.preventNativeDismiss,
+        })
+      }
+    />
   );
 }
 
