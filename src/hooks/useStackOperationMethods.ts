@@ -11,7 +11,7 @@ import type {
   PopNativeActionMethod,
   PreloadActionMethod,
   PushActionMethod,
-  SetRouteOptionsActionMethod as SetRouteOptionsActionMethod,
+  SetRouteOptionsActionMethod,
   StackRouteConfig,
   StackRouteOptions,
 } from '../types/StackContainer';
