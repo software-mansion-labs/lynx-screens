@@ -7,6 +7,7 @@ import type {
   NavigationActionPopCompleted,
   NavigationActionPreload,
   NavigationActionPush,
+  NavigationActionSetRouteOptions,
   StackNavigationEffect,
   StackNavigationState,
   StackScreenActivityMode,
@@ -43,6 +44,9 @@ export function navigationStateReducer(
     }
     case 'clear-effects': {
       return navigationActionClearEffectsHandler(state, action);
+    }
+    case 'set-options': {
+      return navigationActionSetOptionsHandler(state, action);
     }
   }
 
@@ -90,7 +94,7 @@ function navigationActionPushHandler(
     ];
     const routeCopy = { ...route };
     routeCopy.activityMode = 'attached';
-    return stackNavStateWithStack(state, applyPush(newStack, routeCopy));
+    return stateWithStack(state, applyPush(newStack, routeCopy));
   }
 
   // 2 - Try to render new route
@@ -104,7 +108,7 @@ function navigationActionPushHandler(
   }
 
   const newRoute = createRouteFromConfig(newRouteConfig, 'attached');
-  return stackNavStateWithStack(state, applyPush(state.stack, newRoute));
+  return stateWithStack(state, applyPush(state.stack, newRoute));
 }
 
 function navigationActionPopHandler(
@@ -135,7 +139,7 @@ function navigationActionPopHandler(
       // If there is already a pop-container effect, do nothing
       return state;
     }
-    return stackNavStateWithEffects(
+    return stateWithEffects(
       state,
       applyEffect(state.effects, { type: 'pop-container' }),
     );
@@ -167,7 +171,7 @@ function navigationActionPopHandler(
   // and the original state won't be immediatelly affected.
   route.activityMode = 'detached';
 
-  return stackNavStateWithStack(state, newStack);
+  return stateWithStack(state, newStack);
 }
 
 function navigationActionPopCompletedHandler(
@@ -198,7 +202,7 @@ function navigationActionPopCompletedHandler(
     ...stack.slice(0, routeIndex),
     ...stack.slice(routeIndex + 1)
   ];
-  return stackNavStateWithStack(state, newStack);
+  return stateWithStack(state, newStack);
 }
 
 function navigationActionNativePopHandler(
@@ -231,7 +235,7 @@ function navigationActionNativePopHandler(
     ...stack.slice(0, routeIndex),
     ...stack.slice(routeIndex + 1)
   ];
-  return stackNavStateWithStack(state, newStack);
+  return stateWithStack(state, newStack);
 }
 
 function navigationActionPreloadHandler(
@@ -253,7 +257,7 @@ function navigationActionPreloadHandler(
   // that won't result in problems on native platform.
   // More info: https://github.com/software-mansion/react-native-screens/pull/3531.
   const newStack = [...state.stack, createRouteFromConfig(routeConfig)];
-  return stackNavStateWithStack(state, newStack);
+  return stateWithStack(state, newStack);
 }
 
 function navigationActionBatchHandler(
@@ -278,7 +282,33 @@ function navigationActionClearEffectsHandler(
   if (state.effects.length === 0) {
     return state;
   }
-  return stackNavStateWithEffects(state, []);
+  return stateWithEffects(state, []);
+}
+
+function navigationActionSetOptionsHandler(
+  state: StackNavigationState,
+  action: NavigationActionSetRouteOptions,
+): StackNavigationState {
+  const routeIndex = state.stack.findIndex(
+    route => route.routeKey === action.routeKey,
+  );
+
+  if (routeIndex === NOT_FOUND_INDEX) {
+    throw new Error(
+      `[Stack] Can not set options. Route with key ${action.routeKey} not found`,
+    );
+  }
+
+  const routeCopy = { ...state.stack[routeIndex] };
+  routeCopy.options = {
+    ...routeCopy.options,
+    ...action.options,
+  };
+
+  return stateWithStack(
+    state,
+    stackWithReplacedRoute(state.stack, routeCopy, routeIndex),
+  );
 }
 
 // Ensures correct order of screens (attached first, detached at the end).
@@ -329,7 +359,7 @@ function generateRouteKeyForRouteName(routeName: string): string {
   return `r-${routeName}-${generateID()}`;
 }
 
-function stackNavStateWithStack(
+function stateWithStack(
   navState: StackNavigationState,
   newStack: StackState,
 ): StackNavigationState {
@@ -339,7 +369,7 @@ function stackNavStateWithStack(
   };
 }
 
-function stackNavStateWithEffects(
+function stateWithEffects(
   navState: StackNavigationState,
   newEffects: StackNavigationEffect[],
 ): StackNavigationState {
@@ -347,4 +377,16 @@ function stackNavStateWithEffects(
     ...navState,
     effects: newEffects,
   };
+}
+
+function stackWithReplacedRoute(
+  state: StackState,
+  newRoute: StackRoute,
+  routeIndex: number,
+): StackState {
+  return [
+    ...state.slice(0, routeIndex),
+    newRoute,
+    ...state.slice(routeIndex + 1)
+  ];
 }

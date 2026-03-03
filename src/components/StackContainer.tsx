@@ -64,6 +64,7 @@ export function StackContainer({ routeConfigs }: StackContainerProps) {
             pop: navMethods.popAction,
             preload: navMethods.preloadAction,
             batch: navMethods.batchAction,
+            setRouteOptions: navMethods.setRouteOptions,
           };
 
         return (
