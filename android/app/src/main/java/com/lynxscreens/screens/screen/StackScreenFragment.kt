@@ -1,7 +1,9 @@
 package com.lynxscreens.screens.screen
 
 import android.os.Bundle
+import android.transition.Slide
 import android.util.Log
+import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -26,7 +28,16 @@ internal class StackScreenFragment(
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
         setupPreventNativeDismissCallback()
+
+        allowEnterTransitionOverlap = true
+        allowReturnTransitionOverlap = true
+
+        enterTransition = Slide(Gravity.RIGHT)
+        exitTransition = Slide(Gravity.LEFT)
+        returnTransition = Slide(Gravity.RIGHT)
+        reenterTransition = Slide(Gravity.LEFT)
     }
 
     override fun onCreateView(
@@ -50,7 +61,6 @@ internal class StackScreenFragment(
 
     override fun onDestroy() {
         super.onDestroy()
-        Log.i("StackScreenFragment", "onDestroy")
         stackScreen.onDismiss()
         teardownPreventNativeDismissCallback()
     }

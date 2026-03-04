@@ -1,6 +1,7 @@
 import React from 'react';
 import { StackContainer } from '../components/StackContainer';
 import { useStackNavigationContext } from '../hooks/useStackNavigationContext';
+import { StackNavigationButtons } from '../components/StackNavigationButtons';
 
 function StackSetup() {
   return (
@@ -53,7 +54,7 @@ function HomeScreen() {
       }}
     >
       <RouteInformation routeName="Home" />
-      <NavigationButtons
+      <StackNavigationButtons
         isPopEnabled={false}
         routeNames={['A', 'B', 'NestedStack']}
       />
@@ -76,7 +77,7 @@ function AScreen() {
     >
       <RouteInformation routeName="A" />
       <PreventNativeDismissInfo />
-      <NavigationButtons isPopEnabled routeNames={['A', 'B', 'NestedStack']} />
+      <StackNavigationButtons isPopEnabled routeNames={['A', 'B', 'NestedStack']} />
     </view>
   );
 }
@@ -96,7 +97,7 @@ function BScreen() {
     >
       <RouteInformation routeName="B" />
       <PreventNativeDismissInfo />
-      <NavigationButtons isPopEnabled routeNames={['A', 'B', 'NestedStack']} />
+      <StackNavigationButtons isPopEnabled routeNames={['A', 'B', 'NestedStack']} />
       <TogglePreventNativeDismiss />
     </view>
   );
@@ -152,7 +153,7 @@ function NestedHomeScreen() {
     >
       <RouteInformation routeName="NestedHome" />
       <PreventNativeDismissInfo />
-      <NavigationButtons isPopEnabled routeNames={['NestedA', 'NestedB']} />
+      <StackNavigationButtons isPopEnabled routeNames={['NestedA', 'NestedB']} />
       <TogglePreventNativeDismiss />
     </view>
   );
@@ -173,7 +174,7 @@ function NestedAScreen() {
     >
       <RouteInformation routeName="NestedA" />
       <PreventNativeDismissInfo />
-      <NavigationButtons isPopEnabled routeNames={['NestedA', 'NestedB']} />
+      <StackNavigationButtons isPopEnabled routeNames={['NestedA', 'NestedB']} />
     </view>
   );
 }
@@ -193,7 +194,7 @@ function NestedBScreen() {
     >
       <RouteInformation routeName="NestedB" />
       <PreventNativeDismissInfo />
-      <NavigationButtons isPopEnabled routeNames={['NestedA', 'NestedB']} />
+      <StackNavigationButtons isPopEnabled routeNames={['NestedA', 'NestedB']} />
       <TogglePreventNativeDismiss />
     </view>
   );
@@ -211,31 +212,6 @@ function RouteInformation(props: { routeName: string }) {
         Key: {routeKey}
       </text>
     </view>
-  );
-}
-
-function NavigationButtons(props: {
-  routeNames: string[];
-  isPopEnabled: boolean;
-}) {
-  const navigation = useStackNavigationContext();
-
-  return (
-    <>
-      {props.routeNames.map((routeName) => (
-        <Button
-          key={routeName}
-          label={`Push ${routeName}`}
-          onTap={() => navigation.push(routeName)}
-        />
-      ))}
-      {props.isPopEnabled && (
-        <Button
-          label="Pop"
-          onTap={() => navigation.pop(navigation.routeKey)}
-        />
-      )}
-    </>
   );
 }
 
