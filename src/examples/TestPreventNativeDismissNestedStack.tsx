@@ -77,7 +77,6 @@ function AScreen() {
       <RouteInformation routeName="A" />
       <PreventNativeDismissInfo />
       <NavigationButtons isPopEnabled routeNames={['A', 'B', 'NestedStack']} />
-      <TogglePreventNativeDismiss />
     </view>
   );
 }
@@ -175,7 +174,6 @@ function NestedAScreen() {
       <RouteInformation routeName="NestedA" />
       <PreventNativeDismissInfo />
       <NavigationButtons isPopEnabled routeNames={['NestedA', 'NestedB']} />
-      <TogglePreventNativeDismiss />
     </view>
   );
 }
