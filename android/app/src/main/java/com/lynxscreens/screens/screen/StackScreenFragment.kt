@@ -1,13 +1,12 @@
 package com.lynxscreens.screens.screen
 
 import android.os.Bundle
-import android.transition.Slide
-import android.util.Log
 import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.transition.Slide
 
 internal class StackScreenFragment(
     internal val stackScreen: StackScreenComponent,
