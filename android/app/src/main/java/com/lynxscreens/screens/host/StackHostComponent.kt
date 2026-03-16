@@ -2,6 +2,7 @@ package com.lynxscreens.screens.host
 
 import android.content.Context
 import android.util.Log
+import android.view.View
 import com.lynx.tasm.behavior.LynxContext
 import com.lynx.tasm.behavior.PatchFinishListener
 import com.lynx.tasm.behavior.ui.LynxBaseUI
@@ -128,7 +129,7 @@ internal class StackHostComponent(context: LynxContext) : UIGroup<StackHostView>
         }
     }
 
-    override fun onScreenDismiss(stackScreen: StackScreenComponent) {
+    override fun onScreenDismissCommitted(stackScreen: StackScreenComponent) {
         if (stackScreen.activityMode == StackScreenComponent.ActivityMode.ATTACHED) {
             stackScreen.isNativelyDismissed = true
         }

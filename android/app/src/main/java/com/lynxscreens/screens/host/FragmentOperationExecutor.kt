@@ -17,12 +17,16 @@ internal class FragmentOperationExecutor {
         }
     }
 
-    internal fun executeAddOp(fragmentManager: FragmentManager, op: AddOp) {
+    internal fun executeAddAndSetAsPrimaryOp(
+        fragmentManager: FragmentManager,
+        op: AddAndSetAsPrimaryOp,
+    ) {
         fragmentManager.createTransactionWithReordering().let { tx ->
-            tx.add(op.containerViewId, op.fragment)
             if (op.addToBackStack) {
                 tx.addToBackStack(op.fragment.stackScreen.screenKey)
             }
+            tx.add(op.containerViewId, op.fragment)
+            tx.setPrimaryNavigationFragment(op.fragment)
             commitTransaction(tx, op.allowStateLoss)
         }
     }
@@ -45,14 +49,17 @@ internal class FragmentOperationExecutor {
         fragmentManager.executePendingTransactions()
     }
 
-    internal fun executeSetPrimaryNavFragmentOp(fragmentManager: FragmentManager, op: SetPrimaryNavFragmentOp) {
-        fragmentManager.createTransactionWithReordering().let { tx ->
-            tx.setPrimaryNavigationFragment(op.fragment)
-            if (op.onCommitCallback != null) {
-                tx.runOnCommit(op.onCommitCallback)
-            }
-            commitTransaction(tx, allowStateLoss = true, flushSync = false)
-        }
+    internal fun executeOnCommitCallbackOp(
+        fragmentManager: FragmentManager,
+        op: OnCommitCallbackOp,
+    ) {
+        commitTransaction(
+            fragmentManager
+                .createTransactionWithReordering()
+                .runOnCommit(op.onCommitCallback),
+            allowStateLoss = op.allowStateLoss,
+            flushSync = op.flushSync,
+        )
     }
 
     private fun commitTransaction(

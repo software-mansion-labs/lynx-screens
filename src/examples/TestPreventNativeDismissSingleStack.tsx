@@ -1,6 +1,7 @@
 import React from 'react';
 import { StackContainer } from '../components/StackContainer';
 import { useStackNavigationContext } from '../hooks/useStackNavigationContext';
+import { StackNavigationButtons } from '../components/StackNavigationButtons';
 
 interface ButtonProps {
   onTap: () => void;
@@ -72,7 +73,7 @@ function HomeScreen() {
       }}
     >
       <RouteInformation routeName="Home" />
-      <NavigationButtons isPopEnabled={false} />
+      <StackNavigationButtons isPopEnabled={false} routeNames={['A', 'B']} />
     </view>
   );
 }
@@ -92,7 +93,7 @@ function AScreen() {
     >
       <RouteInformation routeName="A" />
       <PreventNativeDismissInfo />
-      <NavigationButtons isPopEnabled={true} />
+      <StackNavigationButtons isPopEnabled={true} routeNames={['A', 'B']} />
     </view>
   );
 }
@@ -112,7 +113,7 @@ function BScreen() {
     >
       <RouteInformation routeName="B" />
       <PreventNativeDismissInfo />
-      <NavigationButtons isPopEnabled={true} />
+      <StackNavigationButtons isPopEnabled={true} routeNames={['A', 'B']} />
       <TogglePreventNativeDismiss />
     </view>
   );
@@ -130,20 +131,6 @@ function RouteInformation(props: { routeName: string }) {
         Key: {routeKey}
       </text>
     </view>
-  );
-}
-
-function NavigationButtons(props: { isPopEnabled: boolean }) {
-  const navigation = useStackNavigationContext();
-
-  return (
-    <>
-      <Button label="Push A" onTap={() => navigation.push('A')} />
-      <Button label="Push B" onTap={() => navigation.push('B')} />
-      {props.isPopEnabled && (
-        <Button label="Pop" onTap={() => navigation.pop(navigation.routeKey)} />
-      )}
-    </>
   );
 }
 

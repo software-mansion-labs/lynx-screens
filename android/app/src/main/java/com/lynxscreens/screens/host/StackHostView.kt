@@ -2,6 +2,7 @@ package com.lynxscreens.screens.host
 
 import android.annotation.SuppressLint
 import android.util.Log
+import android.view.View
 import android.view.ViewGroup
 import com.lynx.tasm.behavior.LynxContext
 
@@ -9,7 +10,7 @@ import com.lynx.tasm.behavior.LynxContext
 internal class StackHostView(
     private val lynxContext: LynxContext,
     private val container: StackContainer,
-) : ViewGroup(lynxContext) {
+) : ViewGroup(lynxContext), StackContainerParent {
     init {
         addView(container)
     }
@@ -35,6 +36,16 @@ internal class StackHostView(
         b: Int,
     ) {
         container.layout(l, t, r, b)
+    }
+
+    override fun layoutContainerNow() {
+        if (measuredWidth != container.measuredWidth || measuredHeight != container.measuredHeight) {
+            container.measure(
+                View.MeasureSpec.makeMeasureSpec(measuredWidth, MeasureSpec.EXACTLY),
+                View.MeasureSpec.makeMeasureSpec(measuredHeight, MeasureSpec.EXACTLY),
+            )
+        }
+        container.layout(left, top, right, bottom)
     }
 
     companion object {

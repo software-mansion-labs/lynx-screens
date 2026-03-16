@@ -7,12 +7,12 @@ plugins {
 
 android {
     namespace = "com.lynxscreens"
-    compileSdk = 34
+    compileSdk = 36
 
     defaultConfig {
         applicationId = "com.lynxscreens"
         minSdk = 24
-        targetSdk = 34
+        targetSdk = 36
         versionCode = 1
         versionName = "1.0"
 
@@ -120,8 +120,11 @@ dependencies {
 
     // lynx-screens dependencies
     implementation("androidx.coordinatorlayout:coordinatorlayout:1.2.0")
-    implementation("androidx.fragment:fragment-ktx:1.6.1")
-    implementation("androidx.appcompat:appcompat:1.6.1")
+    implementation("androidx.fragment:fragment-ktx:1.8.9")
+    implementation("androidx.appcompat:appcompat:1.7.1")
+    implementation("androidx.transition:transition-ktx:1.7.0")
+    implementation("com.google.android.material:material:1.13.0")
+    implementation("androidx.core:core-ktx:1.17.0")
 
     kapt("org.lynxsdk.lynx:lynx-processor:3.5.1")
     compileOnly("org.lynxsdk.lynx:lynx-processor:3.5.1")

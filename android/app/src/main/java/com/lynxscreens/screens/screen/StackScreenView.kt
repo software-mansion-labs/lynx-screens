@@ -11,6 +11,12 @@ import com.lynxscreens.screens.ext.findFragmentOrNull
 class StackScreenView(
     private val lynxContext: LynxContext,
 ) : AndroidView(lynxContext), FragmentProviding {
+    init {
+        // Needed when Transition API is in use to ensure that shadows do not disappear,
+        // views do not jump around the screen and whole sub-tree is animated as a whole.
+        isTransitionGroup = true
+    }
+
     override fun getAssociatedFragment(): Fragment? = this.findFragmentOrNull()?.also {
         check(it is StackScreenFragment) { "[RNScreens] Unexpected fragment type: ${it.javaClass.simpleName}"}
     }
