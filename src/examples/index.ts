@@ -1,3 +1,4 @@
+export { default as PreviewShopApp } from '../preview/ShopApp';
 export { default as TestAnimationAndroid } from './TestAnimationAndroid';
 export { default as TestBatch } from './TestBatch';
 export { default as TestBase } from './TestBase';
