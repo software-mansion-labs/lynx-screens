@@ -6,40 +6,12 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
   func scene(_ scene: UIScene, willConnectTo session: UISceneSession, options connectionOptions: UIScene.ConnectionOptions) {
     guard let windowScene = (scene as? UIWindowScene) else { return }
     
-    window = UIWindow(windowScene: windowScene)
+    let window = UIWindow(windowScene: windowScene)
     
-    let lynxView = LynxView { builder in
-#if DEBUG
-      builder.enableGenericResourceFetcher = .true
-      builder.genericResourceFetcher = GenericResourceFetcher()
-#endif
-      builder.screenSize = windowScene.screen.bounds.size
-      builder.fontScale = 1.0
-        
-      builder.config?.registerUI(RNSStackHostComponent.self, withName: "stack-host-native")
-      builder.config?.registerUI(RNSStackScreenComponent.self, withName: "stack-screen-native")
-      // builder.config?.registerUI(LynxColorBoxComponent.self, withName: "color-box-view")
-    }
+    let rootViewController = ViewController()
     
-    lynxView.preferredLayoutWidth = windowScene.screen.bounds.size.width
-    lynxView.preferredLayoutHeight = windowScene.screen.bounds.size.height
-    lynxView.layoutWidthMode = .exact
-    lynxView.layoutHeightMode = .exact
-    
-    let rootViewController = UIViewController()
-    window?.rootViewController = rootViewController
-    rootViewController.view = lynxView
-    
-#if DEBUG
-    lynxView.loadTemplate(
-      fromURL: "http://localhost:3000/main.lynx.bundle?fullscreen=true",
-      initData: nil
-    )
-#else
-    lynxView.loadTemplate(fromURL: "main.lynx")
-#endif
-    
-    window?.makeKeyAndVisible()
+    window.rootViewController = rootViewController
+    self.window = window
+    window.makeKeyAndVisible()
   }
 }
-
