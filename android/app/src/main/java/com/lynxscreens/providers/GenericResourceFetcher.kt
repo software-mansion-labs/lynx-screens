@@ -19,11 +19,7 @@ class GenericResourceFetcher : LynxGenericResourceFetcher() {
         callback: LynxResourceCallback<ByteArray>
     ) {
         if (request == null) {
-            callback.onResponse(
-                LynxResourceResponse.onFailed(
-                    Throwable("request is null!")
-                )
-            )
+            callback.onResponse(onFailed(Throwable("request is null!")))
             return
         }
 
@@ -42,18 +38,16 @@ class GenericResourceFetcher : LynxGenericResourceFetcher() {
                             LynxResourceResponse.onSuccess(responseBytes)
                         )
                     } else {
-                        callback.onResponse(
-                            LynxResourceResponse.onFailed(Throwable("response body is null."))
-                        )
+                        callback.onResponse(onFailed(Throwable("response body is null.")))
                     }
                 } catch (e: IOException) {
                     e.printStackTrace()
-                    callback.onResponse(LynxResourceResponse.onFailed(e))
+                    callback.onResponse(onFailed(e))
                 }
             }
 
             override fun onFailure(call: Call<ResponseBody?>, throwable: Throwable) {
-                callback.onResponse(LynxResourceResponse.onFailed(throwable))
+                callback.onResponse(onFailed(throwable))
             }
         })
     }
@@ -61,9 +55,7 @@ class GenericResourceFetcher : LynxGenericResourceFetcher() {
     override fun fetchResourcePath(
         request: LynxResourceRequest, callback: LynxResourceCallback<String>
     ) {
-        callback.onResponse(
-            LynxResourceResponse.onFailed(Throwable("fetchResourcePath not supported."))
-        )
+        callback.onResponse(onFailed(Throwable("fetchResourcePath not supported.")))
     }
 
     override fun fetchStream(request: LynxResourceRequest, delegate: StreamDelegate) {
@@ -74,5 +66,11 @@ class GenericResourceFetcher : LynxGenericResourceFetcher() {
 
     companion object {
         const val TAG: String = "DemoGenericResourceFetcher"
+
+        // LynxResourceResponse.onFailed is raw as of Lynx 3.9.0, so its result needs
+        // narrowing to the callback's type. A failed response carries only an error and
+        // never populates data, so no T instance exists for the cast to trip over.
+        private fun <T> onFailed(error: Throwable): LynxResourceResponse<T> =
+            LynxResourceResponse.onFailed(error) as LynxResourceResponse<T>
     }
 }

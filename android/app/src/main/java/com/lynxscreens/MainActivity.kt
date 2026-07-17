@@ -27,16 +27,14 @@ class MainActivity : AppCompatActivity() {
             "main.lynx.bundle"
         }
 
-        val lynxView: LynxView = buildLynxView()
+        val lynxView = buildLynxView()
         setContentView(lynxView)
 
         lynxView.renderTemplateUrl(uri, "")
     }
     
     private fun buildLynxView(): LynxView {
-        val viewBuilder: LynxViewBuilder = LynxViewBuilder()
-        viewBuilder.addBehaviors(XElementBehaviors().create())
-
+        val viewBuilder = LynxViewBuilder()
         viewBuilder.setTemplateProvider(TemplateProvider(this))
         viewBuilder.isEnableGenericResourceFetcher = LynxBooleanOption.TRUE
         viewBuilder.setGenericResourceFetcher(GenericResourceFetcher())
