@@ -1,7 +1,12 @@
 import { StackContainer } from '../components/StackContainer';
 import type { StackRouteConfig } from '../types/StackContainer';
 import { ROUTE } from './routes';
-import { AccountScreen } from './screens/AccountScreen';
+import {
+  AccountScreen,
+  OrderDetailScreen,
+  OrdersScreen,
+  SettingsScreen,
+} from './screens/AccountScreen';
 import { CartScreen } from './screens/CartScreen';
 import { CheckoutScreen } from './screens/CheckoutScreen';
 import { ConfirmationScreen } from './screens/ConfirmationScreen';
@@ -48,9 +53,23 @@ const ROUTE_CONFIGS: StackRouteConfig[] = [
     options: {},
   },
   {
-    // Hosts a nested StackContainer of its own.
     name: ROUTE.Account,
     Component: AccountScreen,
+    options: {},
+  },
+  {
+    name: ROUTE.Orders,
+    Component: OrdersScreen,
+    options: {},
+  },
+  {
+    name: ROUTE.OrderDetail,
+    Component: OrderDetailScreen,
+    options: {},
+  },
+  {
+    name: ROUTE.Settings,
+    Component: SettingsScreen,
     options: {},
   },
 ];

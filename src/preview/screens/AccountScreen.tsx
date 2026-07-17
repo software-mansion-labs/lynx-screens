@@ -1,8 +1,6 @@
 import React from 'react';
-import { StackContainer } from '../../components/StackContainer';
 import { useStackNavigationContext } from '../../hooks/useStackNavigationContext';
-import type { StackRouteConfig } from '../../types/StackContainer';
-import { ACCOUNT_ROUTE, type OrderDetailParams } from '../routes';
+import { ROUTE, type OrderDetailParams } from '../routes';
 import { setPendingParams, useRouteParams } from '../state/navParams';
 import { useShopStore } from '../state/shopStoreContext';
 import { useGoBack } from '../state/shopNavigation';
@@ -20,21 +18,18 @@ import {
 import { findProduct } from '../data/catalog';
 
 /**
- * The account section is its own StackContainer nested inside a screen of the
- * root one — the shape a real app reaches for when a tab or a modal flow owns
- * its own history.
+ * The account section pushes onto the root stack like every other screen.
  *
- * The payoff is in AccountHomeScreen: popping the *root* of a nested container
- * has nothing left to pop, so StackContainer raises a `pop-container` effect
- * and the parent container pops the screen hosting this stack. One `pop` call
- * closes the whole section, and the same thing happens for a system back
- * gesture, with no coordination code in the app.
+ * It used to be its own StackContainer nested inside a root screen — the shape a
+ * real app reaches for when a tab or a modal flow owns its own history — which
+ * is the more interesting thing to demonstrate. It is flat because a nested
+ * container puts a second UINavigationController inside a screen of the first,
+ * and iOS then draws both of their navigation bars: two back chevrons stacked
+ * down the top-left corner, the lower one landing on the app's own header. The
+ * library has no way to hide a stack's native header, so there is nothing the
+ * app can do about it from here.
  */
 export function AccountScreen() {
-  return <StackContainer routeConfigs={ACCOUNT_ROUTE_CONFIGS} />;
-}
-
-function AccountHomeScreen() {
   const navigation = useStackNavigationContext();
   const { orders } = useShopStore();
 
@@ -91,14 +86,14 @@ function AccountHomeScreen() {
               label="Orders"
               value={orders.length === 0 ? 'None yet' : `${orders.length} →`}
               emphasis
-              onTap={() => navigation.push(ACCOUNT_ROUTE.Orders)}
+              onTap={() => navigation.push(ROUTE.Orders)}
             />
             <Divider />
             <Row
               label="Settings"
               value="→"
               emphasis
-              onTap={() => navigation.push(ACCOUNT_ROUTE.Settings)}
+              onTap={() => navigation.push(ROUTE.Settings)}
             />
           </Card>
 
@@ -109,8 +104,8 @@ function AccountHomeScreen() {
               textAlign: 'center',
             }}
           >
-            This section is a nested StackContainer. Back from here closes the
-            whole section — the nested stack asks its parent to pop.
+            Every screen in this section is pushed onto the one stack the app
+            has. Back from here returns to the storefront.
           </text>
         </view>
       </scroll-view>
@@ -118,7 +113,7 @@ function AccountHomeScreen() {
   );
 }
 
-function OrdersScreen() {
+export function OrdersScreen() {
   const navigation = useStackNavigationContext();
   const { orders } = useShopStore();
 
@@ -156,10 +151,10 @@ function OrdersScreen() {
               <Card
                 key={order.id}
                 onTap={() => {
-                  setPendingParams(ACCOUNT_ROUTE.OrderDetail, {
+                  setPendingParams(ROUTE.OrderDetail, {
                     orderId: order.id,
                   } satisfies OrderDetailParams);
-                  navigation.push(ACCOUNT_ROUTE.OrderDetail);
+                  navigation.push(ROUTE.OrderDetail);
                 }}
               >
                 <view
@@ -197,8 +192,8 @@ function OrdersScreen() {
   );
 }
 
-function OrderDetailScreen() {
-  const params = useRouteParams<OrderDetailParams>(ACCOUNT_ROUTE.OrderDetail);
+export function OrderDetailScreen() {
+  const params = useRouteParams<OrderDetailParams>(ROUTE.OrderDetail);
   const { orders } = useShopStore();
   const order = orders.find((candidate) => candidate.id === params?.orderId);
 
@@ -264,7 +259,7 @@ function OrderDetailScreen() {
   );
 }
 
-function SettingsScreen() {
+export function SettingsScreen() {
   const goBack = useGoBack();
   const { settings, updateSettings } = useShopStore();
 
@@ -382,10 +377,3 @@ function SettingsScreen() {
     </Screen>
   );
 }
-
-const ACCOUNT_ROUTE_CONFIGS: StackRouteConfig[] = [
-  { name: ACCOUNT_ROUTE.AccountHome, Component: AccountHomeScreen, options: {} },
-  { name: ACCOUNT_ROUTE.Orders, Component: OrdersScreen, options: {} },
-  { name: ACCOUNT_ROUTE.OrderDetail, Component: OrderDetailScreen, options: {} },
-  { name: ACCOUNT_ROUTE.Settings, Component: SettingsScreen, options: {} },
-];

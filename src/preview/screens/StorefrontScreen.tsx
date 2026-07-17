@@ -4,7 +4,7 @@ import { ROUTE } from '../routes';
 import { useRegisterRoute } from '../state/RouteRegistry';
 import { useShopStore } from '../state/shopStoreContext';
 import { useOpenProduct, usePreloadCheckout } from '../state/shopNavigation';
-import { color, font, formatPrice, inset, radius, space } from '../theme';
+import { color, font, formatPrice, radius, space, useSafeArea } from '../theme';
 import { Badge, CartButton, Card, ProductImage, Screen } from '../ui/kit';
 
 export function StorefrontScreen() {
@@ -17,6 +17,7 @@ export function StorefrontScreen() {
   const navigation = useStackNavigationContext();
   const { cartCount, settings } = useShopStore();
   const openProduct = useOpenProduct();
+  const safeArea = useSafeArea();
 
   return (
     <Screen background={color.surface}>
@@ -24,11 +25,12 @@ export function StorefrontScreen() {
         style={{
           display: 'flex',
           flexDirection: 'row',
+          flexShrink: 0,
           alignItems: 'center',
           justifyContent: 'space-between',
           paddingLeft: space.lg,
           paddingRight: space.lg,
-          paddingTop: inset.top,
+          paddingTop: safeArea.top,
           paddingBottom: space.md,
           backgroundColor: color.bg,
         }}

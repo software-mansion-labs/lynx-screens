@@ -1,5 +1,5 @@
 import React from 'react';
-import { color, font, inset, radius, shadow, space } from '../theme';
+import { color, font, radius, shadow, space, useSafeArea } from '../theme';
 
 /**
  * Presentational primitives shared by the preview screens. Nothing here touches
@@ -31,23 +31,32 @@ export function Screen(props: {
  * native stack's job — the iOS nav bar's back button and the system back
  * gesture on both platforms — and that is the thing this app exists to show.
  *
- * `inset.top` is what keeps this clear of the iOS nav bar it renders under.
+ * `useSafeArea().top` is what keeps this clear of the iOS nav bar it renders
+ * under, and of the Android status bar.
+ *
+ * `flexShrink: 0` is not decoration: the screen is a flex column whose
+ * scroll-view sizes to its content, so a long screen overflows the column and
+ * the chrome — being shrinkable by default — gets squeezed. That truncated the
+ * title on Checkout, the longest form in the app.
  */
 export function Header(props: {
   title: string;
   subtitle?: string;
   right?: React.ReactNode;
 }) {
+  const safeArea = useSafeArea();
+
   return (
     <view
       style={{
         display: 'flex',
         flexDirection: 'row',
+        flexShrink: 0,
         alignItems: 'center',
         gap: space.sm,
         paddingLeft: space.lg,
         paddingRight: space.lg,
-        paddingTop: inset.top,
+        paddingTop: safeArea.top,
         paddingBottom: space.md,
         backgroundColor: color.bg,
         borderBottomWidth: '1px',
@@ -94,16 +103,22 @@ export function Header(props: {
  * The pinned action bar at the foot of a screen. Owns the home-indicator inset
  * so that its buttons are tappable rather than tucked under the system gesture
  * area.
+ *
+ * `flexShrink: 0` for the same reason as Header — without it the column squeezes
+ * this bar and its rows overlap each other.
  */
 export function BottomBar(props: { children: React.ReactNode }) {
+  const safeArea = useSafeArea();
+
   return (
     <view
       style={{
         display: 'flex',
         flexDirection: 'column',
+        flexShrink: 0,
         gap: space.sm,
         padding: space.lg,
-        paddingBottom: inset.bottom,
+        paddingBottom: safeArea.bottom,
         backgroundColor: color.bg,
         borderTopWidth: '1px',
         borderTopStyle: 'solid',

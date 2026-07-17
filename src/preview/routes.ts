@@ -10,6 +10,9 @@ export const ROUTE = {
   Checkout: 'Checkout',
   Confirmation: 'Confirmation',
   Account: 'Account',
+  Orders: 'Orders',
+  OrderDetail: 'OrderDetail',
+  Settings: 'Settings',
 } as const;
 
 export type RouteName = (typeof ROUTE)[keyof typeof ROUTE];
@@ -17,11 +20,5 @@ export type RouteName = (typeof ROUTE)[keyof typeof ROUTE];
 /** Params carried to the Product screen. See state/navParams.ts. */
 export type ProductParams = { productId: string };
 
-export const ACCOUNT_ROUTE = {
-  AccountHome: 'AccountHome',
-  Orders: 'Orders',
-  OrderDetail: 'OrderDetail',
-  Settings: 'Settings',
-} as const;
-
+/** Params carried to the Order detail screen. */
 export type OrderDetailParams = { orderId: string };
