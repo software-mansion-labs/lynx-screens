@@ -3,29 +3,39 @@ source 'https://cdn.cocoapods.org/'
 platform :ios, '10.0'
 
 target 'LynxScreens' do
-  pod 'Lynx', '3.5.1', :subspecs => [
+  pod 'Lynx', '3.9.0', :subspecs => [
     'Framework',
   ]
 
-  pod 'LynxDevtool', '3.5.1', :subspecs => [
-    'Framework',
-    'LynxRecorder',
+  # TODO: @t0maboro - I couldn't found 3.9.0: `pod trunk info PrimJS`
+  pod 'PrimJS', '3.8.0-alpha.6', :subspecs => ['quickjs', 'napi']
+
+  # integrate image-service, log-service, and http-service
+  pod 'LynxService', '3.9.0', :subspecs => [
+      'Image',
+      'Log',
+      'Http',
   ]
 
-  pod 'BaseDevtool', '3.5.1'
-
-  pod 'LynxService', '3.5.1', :subspecs => [
-    'Image',
-    'Log',
-    'Devtool',
-    'Http',
-  ]
-
-  # ImageService dependencies:
+  # ImageService
   pod 'SDWebImage','5.15.5'
   pod 'SDWebImageWebPCoder', '0.11.0'
 
-  # XElement
-  pod 'XElement', '3.5.1'
-  pod 'DebugRouter', '5.0.13'
+  pod 'XElement', '3.9.0'
+end
+
+post_install do |installer|
+  installer.pods_project.targets.each do |target|
+    target.build_configurations.each do |config|
+      config.build_settings['GCC_TREAT_WARNINGS_AS_ERRORS'] = 'NO'
+
+      disable = ['-Wno-error', '-Wno-c99-designator',
+                 '-Wno-deprecated-declarations', '-Wno-deprecated-implementations']
+      ['OTHER_CPLUSPLUSFLAGS', 'OTHER_CFLAGS'].each do |key|
+        flags = config.build_settings[key] || ['$(inherited)']
+        flags = [flags] unless flags.is_a?(Array)
+        config.build_settings[key] = flags + disable
+      end
+    end
+  end
 end
