@@ -1,6 +1,7 @@
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.jetbrains.kotlin.android)
+    alias(libs.plugins.compose.compiler)
 
     id("kotlin-kapt")
 }
@@ -123,7 +124,7 @@ dependencies {
     implementation("com.google.android.material:material:1.13.0")
     implementation("androidx.core:core-ktx:1.17.0")
 
-    kapt("org.lynxsdk.lynx:lynx-processor:3.5.1")
-    compileOnly("org.lynxsdk.lynx:lynx-processor:3.5.1")
-    annotationProcessor("org.lynxsdk.lynx:lynx-processor:3.5.1")
+    kapt("org.lynxsdk.lynx:lynx-processor:3.9.0")
+    compileOnly("org.lynxsdk.lynx:lynx-processor:3.9.0")
+    annotationProcessor("org.lynxsdk.lynx:lynx-processor:3.9.0")
 }
