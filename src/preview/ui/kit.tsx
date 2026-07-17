@@ -1,5 +1,5 @@
 import React from 'react';
-import { color, font, radius, shadow, space } from '../theme';
+import { color, font, inset, radius, shadow, space } from '../theme';
 
 /**
  * Presentational primitives shared by the preview screens. Nothing here touches
@@ -27,13 +27,15 @@ export function Screen(props: {
 }
 
 /**
- * The stack renders screens without any native header, so every screen brings
- * its own. `onBack` is wired to `navigation.pop` by the caller.
+ * Titles the screen. Deliberately has no back affordance: going back is the
+ * native stack's job — the iOS nav bar's back button and the system back
+ * gesture on both platforms — and that is the thing this app exists to show.
+ *
+ * `inset.top` is what keeps this clear of the iOS nav bar it renders under.
  */
 export function Header(props: {
   title: string;
   subtitle?: string;
-  onBack?: () => void;
   right?: React.ReactNode;
 }) {
   return (
@@ -42,9 +44,10 @@ export function Header(props: {
         display: 'flex',
         flexDirection: 'row',
         alignItems: 'center',
+        gap: space.sm,
         paddingLeft: space.lg,
         paddingRight: space.lg,
-        paddingTop: '52px',
+        paddingTop: inset.top,
         paddingBottom: space.md,
         backgroundColor: color.bg,
         borderBottomWidth: '1px',
@@ -52,29 +55,19 @@ export function Header(props: {
         borderBottomColor: color.line,
       }}
     >
-      {props.onBack && (
-        <view
-          bindtap={props.onBack}
-          style={{
-            display: 'flex',
-            width: '32px',
-            height: '32px',
-            marginRight: space.sm,
-            marginLeft: '-6px',
-            alignItems: 'center',
-            justifyContent: 'center',
-            borderRadius: radius.pill,
-          }}
-        >
-          <text
-            native-interaction-enabled={false}
-            style={{ fontSize: '22px', color: color.ink }}
-          >
-            ‹
-          </text>
-        </view>
-      )}
-      <view style={{ display: 'flex', flexDirection: 'column', flexGrow: 1 }}>
+      {/*
+        `flexShrink` + `minWidth: 0` let a long subtitle give way to `right`
+        instead of pushing it out of the header.
+      */}
+      <view
+        style={{
+          display: 'flex',
+          flexDirection: 'column',
+          flexGrow: 1,
+          flexShrink: 1,
+          minWidth: 0,
+        }}
+      >
         <text
           style={{
             fontSize: font.title,
@@ -90,7 +83,34 @@ export function Header(props: {
           </text>
         )}
       </view>
-      {props.right}
+      {props.right && (
+        <view style={{ display: 'flex', flexShrink: 0 }}>{props.right}</view>
+      )}
+    </view>
+  );
+}
+
+/**
+ * The pinned action bar at the foot of a screen. Owns the home-indicator inset
+ * so that its buttons are tappable rather than tucked under the system gesture
+ * area.
+ */
+export function BottomBar(props: { children: React.ReactNode }) {
+  return (
+    <view
+      style={{
+        display: 'flex',
+        flexDirection: 'column',
+        gap: space.sm,
+        padding: space.lg,
+        paddingBottom: inset.bottom,
+        backgroundColor: color.bg,
+        borderTopWidth: '1px',
+        borderTopStyle: 'solid',
+        borderTopColor: color.line,
+      }}
+    >
+      {props.children}
     </view>
   );
 }

@@ -25,12 +25,12 @@ export function useOpenProduct(): (productId: string) => void {
 }
 
 /**
- * "Buy now" — skip the cart and land on Checkout, with the Product screen
- * underneath so that going back does something sensible.
+ * "Buy now" — add the item and skip the cart, straight to Checkout.
  *
- * `batch` is what makes this one transition instead of two: both pushes land in
- * a single reducer pass, so the native side animates once, from Storefront
- * straight to Checkout, rather than flashing the Product screen on the way.
+ * Only ever called from the Product screen, so the Product the user is buying
+ * from is already on the stack and stays underneath: going back from Checkout
+ * lands on it. Pushing a Product here as well would stack a second copy of the
+ * screen the user is looking at.
  */
 export function useBuyNow(): (productId: string, size: string) => void {
   const navigation = useStackNavigationContext();
@@ -39,11 +39,7 @@ export function useBuyNow(): (productId: string, size: string) => void {
   return React.useCallback(
     (productId: string, size: string) => {
       addToCart(productId, size);
-      setPendingParams(ROUTE.Product, { productId } satisfies ProductParams);
-      navigation.batch([
-        { type: 'push', routeName: ROUTE.Product },
-        { type: 'push', routeName: ROUTE.Checkout },
-      ]);
+      navigation.push(ROUTE.Checkout);
     },
     [navigation, addToCart],
   );

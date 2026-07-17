@@ -36,14 +36,11 @@ export function AccountScreen() {
 
 function AccountHomeScreen() {
   const navigation = useStackNavigationContext();
-  // Pops this stack's root → delegated up to the root container, which pops the
-  // Account screen itself.
-  const closeSection = useGoBack();
   const { orders } = useShopStore();
 
   return (
     <Screen background={color.surface}>
-      <Header title="Account" subtitle="Tomasz Boroń" onBack={closeSection} />
+      <Header title="Account" subtitle="Tomasz Boroń" />
 
       <scroll-view scroll-y style={{ display: 'flex', flexGrow: 1, width: '100%' }}>
         <view
@@ -123,12 +120,11 @@ function AccountHomeScreen() {
 
 function OrdersScreen() {
   const navigation = useStackNavigationContext();
-  const goBack = useGoBack();
   const { orders } = useShopStore();
 
   return (
     <Screen background={color.surface}>
-      <Header title="Orders" onBack={goBack} />
+      <Header title="Orders" />
       <scroll-view scroll-y style={{ display: 'flex', flexGrow: 1, width: '100%' }}>
         <view
           style={{
@@ -203,13 +199,12 @@ function OrdersScreen() {
 
 function OrderDetailScreen() {
   const params = useRouteParams<OrderDetailParams>(ACCOUNT_ROUTE.OrderDetail);
-  const goBack = useGoBack();
   const { orders } = useShopStore();
   const order = orders.find((candidate) => candidate.id === params?.orderId);
 
   return (
     <Screen background={color.surface}>
-      <Header title={order?.id ?? 'Order'} onBack={goBack} />
+      <Header title={order?.id ?? 'Order'} />
       <scroll-view scroll-y style={{ display: 'flex', flexGrow: 1, width: '100%' }}>
         <view
           style={{
@@ -275,7 +270,7 @@ function SettingsScreen() {
 
   return (
     <Screen background={color.surface}>
-      <Header title="Settings" onBack={goBack} />
+      <Header title="Settings" />
       <scroll-view scroll-y style={{ display: 'flex', flexGrow: 1, width: '100%' }}>
         <view
           style={{

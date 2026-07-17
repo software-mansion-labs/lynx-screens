@@ -12,6 +12,7 @@ import { useCompleteOrder, useGoBack } from '../state/shopNavigation';
 import { color, font, formatPrice, radius, space } from '../theme';
 import {
   Badge,
+  BottomBar,
   Button,
   Card,
   Divider,
@@ -102,14 +103,6 @@ export function CheckoutScreen() {
 
   const isGuarded = navigation.routeOptions.preventNativeDismiss === true;
 
-  const requestLeave = React.useCallback(() => {
-    if (isGuarded) {
-      setShowDiscardSheet(true);
-    } else {
-      goBack();
-    }
-  }, [isGuarded, goBack]);
-
   const discardAndLeave = React.useCallback(() => {
     setShowDiscardSheet(false);
     releaseGuard();
@@ -131,8 +124,7 @@ export function CheckoutScreen() {
     <Screen background={color.surface}>
       <Header
         title="Checkout"
-        subtitle={isGuarded ? 'Unsaved changes — back is guarded' : undefined}
-        onBack={requestLeave}
+        subtitle={isGuarded ? 'Unsaved changes' : undefined}
         right={isGuarded ? <Badge label="Guarded" tone="accent" /> : undefined}
       />
 
@@ -309,19 +301,7 @@ export function CheckoutScreen() {
         </view>
       </scroll-view>
 
-      <view
-        style={{
-          display: 'flex',
-          flexDirection: 'column',
-          gap: space.sm,
-          padding: space.lg,
-          paddingBottom: space.xl,
-          backgroundColor: color.bg,
-          borderTopWidth: '1px',
-          borderTopStyle: 'solid',
-          borderTopColor: color.line,
-        }}
-      >
+      <BottomBar>
         <Button
           fullWidth
           label={`Place order · ${formatPrice(totalCents)}`}
@@ -337,7 +317,7 @@ export function CheckoutScreen() {
         >
           Paying {formatPrice(totalCents)} with {card.label}
         </text>
-      </view>
+      </BottomBar>
 
       {showDiscardSheet && (
         <Sheet

@@ -54,6 +54,62 @@ export const shadow = {
   sheet: '0px -8px 32px rgba(16, 16, 20, 0.18)',
 } as const;
 
+/**
+ * ---------------------------------------------------------------------------
+ * Workaround: no safe-area insets, and the two platforms disagree about the top.
+ * ---------------------------------------------------------------------------
+ *
+ * StackContainer hands every screen the full window and Lynx has no safe-area
+ * API (no `env(safe-area-inset-*)`), so the app has to work out for itself where
+ * it is allowed to draw.
+ *
+ * The top differs per platform, because the stacks are not the same thing:
+ *   - iOS puts the screens in a `UINavigationController`, so a real, translucent
+ *     nav bar already owns the top of every screen and the content renders
+ *     underneath it. Chrome has to start below the bar or it collides with the
+ *     native back button.
+ *   - Android hosts the screens as fragments under a `NoActionBar` theme, so
+ *     there is no native bar and only the status bar is in the way.
+ *
+ * The values are deliberate over-estimates: `SystemInfo` reports the screen but
+ * not its insets, and the iOS status bar is not a function of screen height
+ * (a 14 Pro is 59pt, a 13 of near-identical height is 47pt), so it can only be
+ * bounded, not derived. A few points of slack read as header padding, whereas
+ * an under-estimate collides with the native chrome. See PREVIEW_APP.md.
+ */
+const systemInfo: Partial<typeof SystemInfo> =
+  typeof SystemInfo === 'undefined' ? {} : SystemInfo;
+
+const isIOS = systemInfo.platform === 'iOS';
+
+const screenHeightPt =
+  systemInfo.pixelHeight && systemInfo.pixelRatio
+    ? systemInfo.pixelHeight / systemInfo.pixelRatio
+    : 0;
+
+/** Every iPhone with a home indicator is at least 812pt tall. */
+const isEdgeToEdgeIPhone = isIOS && screenHeightPt >= 812;
+
+const IOS_NAV_BAR_HEIGHT = 44;
+/** The tallest status bar in each class — 62pt is the iPhone 16 Pro. */
+const IOS_STATUS_BAR_HEIGHT = isEdgeToEdgeIPhone ? 62 : 20;
+
+/** Home indicator on iOS, gesture bar on Android. */
+const SYSTEM_BOTTOM_INSET = isIOS ? (isEdgeToEdgeIPhone ? 34 : 0) : 16;
+
+/** `space.lg`, as a number — the app's base padding. */
+const BASE_PADDING = 16;
+
+export const inset = {
+  /** The first y a screen may draw its own chrome at. */
+  top: isIOS ? `${IOS_STATUS_BAR_HEIGHT + IOS_NAV_BAR_HEIGHT}px` : '28px',
+  /**
+   * Bottom padding for a surface pinned to the foot of the screen: clears the
+   * system gesture area without ever dropping below the app's base padding.
+   */
+  bottom: `${Math.max(SYSTEM_BOTTOM_INSET, BASE_PADDING)}px`,
+} as const;
+
 export function formatPrice(cents: number): string {
   return `$${(cents / 100).toFixed(2)}`;
 }

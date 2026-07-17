@@ -4,7 +4,7 @@ import { ROUTE } from '../routes';
 import { useRegisterRoute } from '../state/RouteRegistry';
 import { useShopStore } from '../state/shopStoreContext';
 import { useOpenProduct, usePreloadCheckout } from '../state/shopNavigation';
-import { color, font, formatPrice, radius, space } from '../theme';
+import { color, font, formatPrice, inset, radius, space } from '../theme';
 import { Badge, CartButton, Card, ProductImage, Screen } from '../ui/kit';
 
 export function StorefrontScreen() {
@@ -28,7 +28,7 @@ export function StorefrontScreen() {
           justifyContent: 'space-between',
           paddingLeft: space.lg,
           paddingRight: space.lg,
-          paddingTop: '52px',
+          paddingTop: inset.top,
           paddingBottom: space.md,
           backgroundColor: color.bg,
         }}

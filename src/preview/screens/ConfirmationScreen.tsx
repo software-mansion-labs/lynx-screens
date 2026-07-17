@@ -4,7 +4,7 @@ import { ROUTE } from '../routes';
 import { useRegisterRoute } from '../state/RouteRegistry';
 import { useShopStore } from '../state/shopStoreContext';
 import { useGoBack } from '../state/shopNavigation';
-import { color, font, formatPrice, radius, space } from '../theme';
+import { color, font, formatPrice, inset, radius, space } from '../theme';
 import { Button, Card, Divider, Row, Screen, SectionTitle } from '../ui/kit';
 
 export function ConfirmationScreen() {
@@ -22,7 +22,8 @@ export function ConfirmationScreen() {
             display: 'flex',
             flexDirection: 'column',
             padding: space.lg,
-            paddingTop: '96px',
+            paddingTop: inset.top,
+            paddingBottom: inset.bottom,
             gap: space.lg,
           }}
         >
@@ -31,6 +32,7 @@ export function ConfirmationScreen() {
               display: 'flex',
               flexDirection: 'column',
               alignItems: 'center',
+              marginTop: space.xxl,
               gap: space.md,
             }}
           >

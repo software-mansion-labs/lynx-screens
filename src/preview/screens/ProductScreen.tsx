@@ -5,10 +5,11 @@ import { ROUTE, type ProductParams } from '../routes';
 import { useRouteParams } from '../state/navParams';
 import { useRegisterRoute } from '../state/RouteRegistry';
 import { useShopStore } from '../state/shopStoreContext';
-import { useBuyNow, useGoBack, useOpenProduct } from '../state/shopNavigation';
+import { useBuyNow, useOpenProduct } from '../state/shopNavigation';
 import { color, font, formatPrice, radius, space } from '../theme';
 import {
   Badge,
+  BottomBar,
   Button,
   Card,
   Divider,
@@ -29,7 +30,6 @@ export function ProductScreen() {
   const { addToCart, cartCount } = useShopStore();
   const openProduct = useOpenProduct();
   const buyNow = useBuyNow();
-  const goBack = useGoBack();
 
   const [size, setSize] = React.useState(() => product?.sizes[0] ?? '');
   const [added, setAdded] = React.useState(false);
@@ -50,7 +50,6 @@ export function ProductScreen() {
           <text style={{ fontSize: font.body, color: color.inkMuted }}>
             This product could not be loaded.
           </text>
-          <Button label="Go back" variant="secondary" onTap={goBack} />
         </view>
       </Screen>
     );
@@ -62,31 +61,8 @@ export function ProductScreen() {
     <Screen background={color.surface}>
       <scroll-view scroll-y style={{ display: 'flex', flexGrow: 1, width: '100%' }}>
         <view style={{ display: 'flex', flexDirection: 'column' }}>
-          <view style={{ display: 'flex', flexDirection: 'column', position: 'relative' }}>
-            <ProductImage gradient={product.gradient} height="320px" />
-            <view
-              bindtap={goBack}
-              style={{
-                display: 'flex',
-                position: 'absolute',
-                top: '52px',
-                left: space.lg,
-                width: '36px',
-                height: '36px',
-                borderRadius: radius.pill,
-                backgroundColor: 'rgba(255,255,255,0.92)',
-                alignItems: 'center',
-                justifyContent: 'center',
-              }}
-            >
-              <text
-                native-interaction-enabled={false}
-                style={{ fontSize: '20px', color: color.ink }}
-              >
-                ‹
-              </text>
-            </view>
-          </view>
+          {/* Full-bleed hero: renders under the iOS nav bar on purpose. */}
+          <ProductImage gradient={product.gradient} height="320px" />
 
           <view
             style={{
@@ -267,19 +243,7 @@ export function ProductScreen() {
         </view>
       </scroll-view>
 
-      <view
-        style={{
-          display: 'flex',
-          flexDirection: 'column',
-          gap: space.sm,
-          padding: space.lg,
-          paddingBottom: space.xl,
-          backgroundColor: color.bg,
-          borderTopWidth: '1px',
-          borderTopStyle: 'solid',
-          borderTopColor: color.line,
-        }}
-      >
+      <BottomBar>
         <view style={{ display: 'flex', flexDirection: 'row', gap: space.sm }}>
           <view style={{ display: 'flex', flexGrow: 1 }}>
             <Button
@@ -300,26 +264,31 @@ export function ProductScreen() {
             />
           </view>
         </view>
-        {added && (
-          <view
-            style={{
-              display: 'flex',
-              flexDirection: 'row',
-              alignItems: 'center',
-              justifyContent: 'center',
-              gap: space.sm,
-            }}
-          >
-            <Badge label="Added" tone="success" />
-            <text
-              style={{ fontSize: font.label, color: color.inkMuted }}
-              bindtap={() => navigation.push(ROUTE.Cart)}
-            >
-              View cart
-            </text>
-          </view>
-        )}
-      </view>
+        {/* Height is reserved so revealing the confirmation cannot shift the
+            buttons out from under the user's finger. */}
+        <view
+          style={{
+            display: 'flex',
+            flexDirection: 'row',
+            height: '22px',
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: space.sm,
+          }}
+        >
+          {added && (
+            <>
+              <Badge label="Added" tone="success" />
+              <text
+                style={{ fontSize: font.label, color: color.inkMuted }}
+                bindtap={() => navigation.push(ROUTE.Cart)}
+              >
+                View cart
+              </text>
+            </>
+          )}
+        </view>
+      </BottomBar>
     </Screen>
   );
 }

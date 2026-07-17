@@ -4,7 +4,7 @@ import { useRegisterRoute } from '../state/RouteRegistry';
 import { SHIPPING_FLAT_CENTS, useCartLineProducts, useShopStore } from '../state/shopStoreContext';
 import { useGoBack, useOpenProduct } from '../state/shopNavigation';
 import { color, font, formatPrice, radius, space } from '../theme';
-import { Button, Card, Divider, Header, Row, Screen } from '../ui/kit';
+import { BottomBar, Button, Card, Divider, Header, Row, Screen } from '../ui/kit';
 
 export function CartScreen() {
   useRegisterRoute(ROUTE.Cart);
@@ -22,7 +22,6 @@ export function CartScreen() {
       <Header
         title="Cart"
         subtitle={cartCount === 1 ? '1 item' : `${cartCount} items`}
-        onBack={goBack}
       />
 
       {lines.length === 0 ? (
@@ -140,24 +139,13 @@ export function CartScreen() {
             </view>
           </scroll-view>
 
-          <view
-            style={{
-              display: 'flex',
-              flexDirection: 'column',
-              padding: space.lg,
-              paddingBottom: space.xl,
-              backgroundColor: color.bg,
-              borderTopWidth: '1px',
-              borderTopStyle: 'solid',
-              borderTopColor: color.line,
-            }}
-          >
+          <BottomBar>
             <Button
               fullWidth
               label={`Checkout · ${formatPrice(totalCents)}`}
               onTap={() => navigation.push(ROUTE.Checkout)}
             />
-          </view>
+          </BottomBar>
         </>
       )}
     </Screen>
