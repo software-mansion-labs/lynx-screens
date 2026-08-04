@@ -6,11 +6,10 @@
 
 #import "LynxScreens-Swift.h"
 
+@LynxElement("stack-host-native")
 @implementation RNSStackHostComponent {
     BOOL _isMountingTransactionPending;
 }
-
-LYNX_LAZY_REGISTER_UI("stack-host-native")
 
 #pragma mark - Init
 

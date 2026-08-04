@@ -15,9 +15,6 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 #endif
       builder.screenSize = windowScene.screen.bounds.size
       builder.fontScale = 1.0
-        
-      builder.config?.registerUI(RNSStackHostComponent.self, withName: "stack-host-native")
-      builder.config?.registerUI(RNSStackScreenComponent.self, withName: "stack-screen-native")
       // builder.config?.registerUI(LynxColorBoxComponent.self, withName: "color-box-view")
     }
     

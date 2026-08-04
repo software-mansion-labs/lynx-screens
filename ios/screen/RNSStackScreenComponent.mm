@@ -1,4 +1,5 @@
 #import "RNSStackScreenComponent.h"
+#import "RNSStackHostComponent.h"
 #import "RNSStackScreenEventEmitter.h"
 
 #import <Lynx/LynxComponentRegistry.h>
@@ -7,15 +8,14 @@
 
 #import "LynxScreens-Swift.h"
 
+@LynxElement("stack-screen-native")
 @implementation RNSStackScreenComponent {
     RNSStackScreenController *_Nonnull _controller;
     RNSStackScreenEventEmitter *_eventEmitter;
-    
+
     // Flags
     BOOL _hasUpdatedActivityMode;
 }
-
-LYNX_LAZY_REGISTER_UI("stack-screen-native")
 
 - (instancetype)init
 {
