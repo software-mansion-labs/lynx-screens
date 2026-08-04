@@ -3,6 +3,7 @@ package com.lynxscreens.screens.screen
 import android.content.Context
 import androidx.lifecycle.LifecycleOwner
 import com.lynx.tasm.behavior.LynxContext
+import com.lynx.tasm.behavior.LynxElement
 import com.lynx.tasm.behavior.LynxProp
 import com.lynx.tasm.behavior.ui.UIGroup
 import com.lynx.tasm.event.LynxCustomEvent
@@ -11,6 +12,7 @@ import java.lang.IllegalArgumentException
 import java.lang.ref.WeakReference
 import kotlin.properties.Delegates
 
+@LynxElement(name = "stack-screen-native")
 internal class StackScreenComponent(context: LynxContext) : UIGroup<StackScreenView>(context) {
     enum class ActivityMode {
         DETACHED,

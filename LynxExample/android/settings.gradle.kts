@@ -11,6 +11,11 @@ pluginManagement {
         gradlePluginPortal()
     }
 }
+
+plugins {
+    id("org.lynxsdk.lynx.library-settings") version "4.0.1"
+}
+
 dependencyResolutionManagement {
     repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
     repositories {
@@ -19,6 +24,6 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "LynxScreens"
+rootProject.name = "LynxExample"
 include(":app")
  

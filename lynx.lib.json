@@ -1,7 +1,7 @@
 {
   "platforms": {
     "android": {
-      "packageName": "com.lynxscreens",
+      "packageName": "com.lynxscreens.screens",
       "sourceDir": "android"
     },
     "ios": {

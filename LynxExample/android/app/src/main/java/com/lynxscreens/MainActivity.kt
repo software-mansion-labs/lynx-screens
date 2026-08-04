@@ -13,8 +13,6 @@ import com.lynx.tasm.behavior.shadow.ShadowNode
 import com.lynx.xelement.XElementBehaviors
 import com.lynxscreens.elements.LynxColorBoxComponent
 import com.lynxscreens.elements.LynxColorBoxShadowNode
-import com.lynxscreens.screens.host.StackHostComponent
-import com.lynxscreens.screens.screen.StackScreenComponent
 
 class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -50,18 +48,6 @@ class MainActivity : AppCompatActivity() {
             // registry.
             override fun createShadowNode(): ShadowNode? {
                 return LynxColorBoxShadowNode()
-            }
-        })
-
-        viewBuilder.addBehavior(object : Behavior("stack-host-native") {
-            override fun createUI(context: LynxContext): StackHostComponent {
-                return StackHostComponent(context)
-            }
-        })
-
-        viewBuilder.addBehavior(object : Behavior("stack-screen-native") {
-            override fun createUI(context: LynxContext): StackScreenComponent {
-                return StackScreenComponent(context)
             }
         })
 

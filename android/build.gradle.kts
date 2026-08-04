@@ -5,7 +5,7 @@ plugins {
 }
 
 android {
-    namespace = "com.lynxscreens"
+    namespace = "com.lynxscreens.screens"
     compileSdk = 36
 
     defaultConfig {

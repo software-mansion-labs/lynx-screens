@@ -3,6 +3,7 @@ plugins {
     alias(libs.plugins.jetbrains.kotlin.android)
 
     id("kotlin-kapt")
+    id("org.lynxsdk.lynx.library-build")
 }
 
 android {
@@ -87,13 +88,17 @@ dependencies {
     implementation("com.squareup.retrofit2:retrofit:2.7.0")
 
     // lynx dependencies
-    implementation("org.lynxsdk.lynx:lynx:3.5.1")
-    implementation("org.lynxsdk.lynx:lynx-jssdk:3.5.1")
-    implementation("org.lynxsdk.lynx:lynx-trace:3.5.1")
-    implementation("org.lynxsdk.lynx:primjs:2.14.1")
+    implementation("org.lynxsdk.lynx:lynx:4.0.1")
+    implementation("org.lynxsdk.lynx:lynx-jssdk:4.0.1")
+    implementation("org.lynxsdk.lynx:lynx-trace:4.0.1")
+    // primjs 4.0.1 is not published to Maven Central (latest stable is 4.0.0),
+    // but lynx:4.0.1 transitively requires it - force 4.0.0 until upstream publishes 4.0.1
+    implementation("org.lynxsdk.lynx:primjs") {
+        version { strictly("4.0.0") }
+    }
 
     // integrating image-service
-    implementation("org.lynxsdk.lynx:lynx-service-image:3.5.1")
+    implementation("org.lynxsdk.lynx:lynx-service-image:4.0.1")
 
     // image-service dependencies, if not added, images cannot be loaded; if the host APP needs to use other image libraries, you can customize the image-service and remove this dependency
     implementation("com.facebook.fresco:fresco:2.3.0")
@@ -103,30 +108,24 @@ dependencies {
     implementation("com.facebook.fresco:animated-base:2.3.0")
 
     // integrating log-service
-    implementation("org.lynxsdk.lynx:lynx-service-log:3.5.1")
+    implementation("org.lynxsdk.lynx:lynx-service-log:4.0.1")
 
     // integrating http-service
-    implementation("org.lynxsdk.lynx:lynx-service-http:3.5.1")
+    implementation("org.lynxsdk.lynx:lynx-service-http:4.0.1")
 
     implementation("com.squareup.okhttp3:okhttp:4.9.0")
 
     // add devtool's dependencies
-    implementation ("org.lynxsdk.lynx:lynx-devtool:3.5.1")
-    implementation ("org.lynxsdk.lynx:lynx-service-devtool:3.5.1")
+    implementation ("org.lynxsdk.lynx:lynx-devtool:4.0.1")
+    implementation ("org.lynxsdk.lynx:lynx-service-devtool:4.0.1")
 
     // add xelement's dependencies
-    implementation ("org.lynxsdk.lynx:xelement:3.5.1")
-    implementation ("org.lynxsdk.lynx:xelement-input:3.5.1")
+    implementation ("org.lynxsdk.lynx:xelement:4.0.1")
+    implementation ("org.lynxsdk.lynx:xelement-input:4.0.1")
 
-    // lynx-screens dependencies
-    implementation("androidx.coordinatorlayout:coordinatorlayout:1.2.0")
-    implementation("androidx.fragment:fragment-ktx:1.8.9")
     implementation("androidx.appcompat:appcompat:1.7.1")
-    implementation("androidx.transition:transition-ktx:1.7.0")
-    implementation("com.google.android.material:material:1.13.0")
-    implementation("androidx.core:core-ktx:1.17.0")
 
-    kapt("org.lynxsdk.lynx:lynx-processor:3.5.1")
-    compileOnly("org.lynxsdk.lynx:lynx-processor:3.5.1")
-    annotationProcessor("org.lynxsdk.lynx:lynx-processor:3.5.1")
+    kapt("org.lynxsdk.lynx:lynx-processor:4.0.1")
+    compileOnly("org.lynxsdk.lynx:lynx-processor:4.0.1")
+    annotationProcessor("org.lynxsdk.lynx:lynx-processor:4.0.1")
 }

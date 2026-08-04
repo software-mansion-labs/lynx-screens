@@ -4,6 +4,7 @@ import android.content.Context
 import android.util.Log
 import android.view.View
 import com.lynx.tasm.behavior.LynxContext
+import com.lynx.tasm.behavior.LynxElement
 import com.lynx.tasm.behavior.PatchFinishListener
 import com.lynx.tasm.behavior.ui.LynxBaseUI
 import com.lynx.tasm.behavior.ui.LynxUI
@@ -11,6 +12,7 @@ import com.lynx.tasm.behavior.ui.UIGroup
 import com.lynxscreens.screens.screen.StackScreenComponent
 import java.lang.ref.WeakReference
 
+@LynxElement(name = "stack-host-native")
 internal class StackHostComponent(context: LynxContext) : UIGroup<StackHostView>(context), StackContainerDelegate, PatchFinishListener {
     internal val renderedScreens: ArrayList<StackScreenComponent> = arrayListOf()
     private lateinit var container: StackContainer
