@@ -15,8 +15,10 @@ import {
   StackNavigationContext,
   type StackNavigationContextPayload,
 } from '../contexts/StackNavigationContext';
-import { StackHostNativeComponent } from '../native_components/StackHostNativeComponent';
-import { StackScreenNativeComponent } from '../native_components/StackScreenNativeComponent';
+import {
+  StackHostNativeComponent,
+  StackScreenNativeComponent,
+} from 'lynx-screens';
 import { useParentNavigationEffect } from '../hooks/useParentNavigationEffect';
 
 export function StackContainer({ routeConfigs }: StackContainerProps) {
