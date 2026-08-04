@@ -16,6 +16,5 @@
   },
   "include": [
     "./lynx.config.ts",
-    "./vitest.config.ts",
   ],
 }
