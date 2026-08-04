@@ -2,18 +2,40 @@
 
 This project aims to expose native navigation container components (currently the Stack v5 navigation model) to Lynx. It is not designed to be used as a standalone library but rather as a dependency of a full-featured navigation library. The implementation is based on [`react-native-screens`](https://github.com/software-mansion/react-native-screens).
 
-The repository is a playground app rather than a shippable library: 
-- `src/` holds the ReactLynx side (`StackContainer`, navigation state, native component wrappers)
-- `android/` + `apple/` hold the native element implementations, which are statically registered inside the application context.
+The repository is structured similarly as `react-native-screens`: a library at the root with an example app, integrated via [Lynx autolinking](https://lynxjs.org/4.0/guide/autolink.html):
+
+- `src/` - the library sources for JS side of `lynx-screens` package
+- `android/` + `ios/` - the native element implementations, exposed through `@LynxElement` annotations
+- `LynxExample/` - the example app; it installs `lynx-screens` locally (`"file:../"`) and hosts the demo `StackContainer` navigator built on top of the primitives
 
 ## Getting started
 
+Install dependencies - both the library root and the example app, which links `lynx-screens` from the repo root:
+
 ```bash
+npm install
+cd LynxExample
 npm install
 npm run dev        # start the Rspeedy dev server
 ```
 
-Then run the `android/` or `apple/` project from the proper IDE.
+### Android
+
+```bash
+cd LynxExample/android
+./gradlew :app:assembleDebug   # or open LynxExample/android in Android Studio
+```
+
+### iOS
+
+```bash
+cd LynxExample/ios
+bundle install             # once; provides CocoaPods with the cocoapods-lynx-library plugin
+bundle exec pod install
+open LynxScreens.xcworkspace
+```
+
+Run the `LynxScreens` app scheme from XCode.
 
 ## Roadmap
 
