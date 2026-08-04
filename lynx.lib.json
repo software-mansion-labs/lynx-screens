@@ -1,0 +1,12 @@
+{
+  "platforms": {
+    "android": {
+      "packageName": "com.lynxscreens.screens",
+      "sourceDir": "android"
+    },
+    "ios": {
+      "sourceDir": "ios",
+      "podspecPath": "ios/LynxScreens.podspec"
+    }
+  }
+}

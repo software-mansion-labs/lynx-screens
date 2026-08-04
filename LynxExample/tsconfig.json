@@ -1,0 +1,19 @@
+{
+  "compilerOptions": {
+    "jsx": "preserve",
+    "jsxImportSource": "@lynx-js/react",
+
+    "target": "ESNext",
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+
+    "strict": true,
+    "isolatedModules": true,
+    "verbatimModuleSyntax": true,
+
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+  },
+  "include": ["src"],
+  "exclude": ["dist/"],
+}

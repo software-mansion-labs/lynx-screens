@@ -1,0 +1,44 @@
+source 'https://cdn.cocoapods.org/'
+
+platform :ios, '12.0'
+
+plugin 'cocoapods-lynx-library'
+
+target 'LynxScreens' do
+  use_lynx_library!
+
+  # :modular_headers is required so the Swift sources of the LynxScreens pod
+  # (a static framework) can import Lynx through its clang module.
+  pod 'Lynx', '4.0.1', :subspecs => [
+    'Framework',
+  ], :modular_headers => true
+
+  # PrimJS 4.0.1 is not published to CocoaPods (latest stable is 4.0.0)
+  pod 'PrimJS', '4.0.0', :subspecs => [
+    'quickjs',
+    'napi',
+  ]
+
+  pod 'LynxDevtool', '4.0.1', :subspecs => [
+    'Framework',
+    'LynxRecorder',
+  ]
+
+  pod 'BaseDevtool', '4.0.1'
+
+  pod 'LynxService', '4.0.1', :subspecs => [
+    'Image',
+    'Log',
+    'Devtool',
+    'Http',
+  ]
+
+  # ImageService dependencies:
+  pod 'SDWebImage','5.15.5'
+  pod 'SDWebImageWebPCoder', '0.11.0'
+
+  # XElement
+  pod 'XElement', '4.0.1'
+  # DebugRouter version is dictated by LynxDevtool (>= 5.0.15)
+  pod 'DebugRouter'
+end
