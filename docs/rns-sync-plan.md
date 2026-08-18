@@ -16,7 +16,7 @@ Sizes are rough (files touched in relevant paths): **S** ≤3, **M** ≤12, **L*
 Lanes: `core` = existing lynx-screens code (Host/Screen/model), `hdr-and` / `hdr-ios` = header epic (new functional area for lynx-screens), `example` = `StackContainer` in LynxExample.
 
 - [-] `17a668299` S core-ios — fix(iOS, StackV5): Fix default props type ([#3800](https://github.com/software-mansion/react-native-screens/commit/17a668299)) — N/A: fixes a wrong Fabric default-props struct in `resetProps`; lynx-screens sets plain ivar defaults via `LYNX_PROP_SETTER`, no props structs exist
-- [ ] `a68e00538` M core-js — chore: make all exports from v5 component modules explicit ([#3808](https://github.com/software-mansion/react-native-screens/commit/a68e00538))
+- [x] `a68e00538` M core-js — chore: make all exports from v5 component modules explicit ([#3808](https://github.com/software-mansion/react-native-screens/commit/a68e00538)) — only the stack type exports apply; lynx-screens had no default exports
 - [ ] `a821ff0af` L hdr-and — feat(Android, Stack v5): add basic support for header ([#3753](https://github.com/software-mansion/react-native-screens/commit/a821ff0af))
 - [ ] `33feebbb3` L core-ios — feat(iOS, Stack v5): Align Stack implementation with RFC 753 ([#3774](https://github.com/software-mansion/react-native-screens/commit/33feebbb3))
 - [ ] `29b2a2b2a` M core-js — chore(types): enable `exactOptionalPropertyTypes` support ([#3719](https://github.com/software-mansion/react-native-screens/commit/29b2a2b2a))
