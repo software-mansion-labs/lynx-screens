@@ -39,6 +39,17 @@ internal class StackHeaderConfigComponent(
     override var backButtonIcon: Drawable? = null
         internal set
 
+    override var scrollFlagScroll: Boolean = false
+        internal set
+    override var scrollFlagEnterAlways: Boolean = false
+        internal set
+    override var scrollFlagEnterAlwaysCollapsed: Boolean = false
+        internal set
+    override var scrollFlagExitUntilCollapsed: Boolean = false
+        internal set
+    override var scrollFlagSnap: Boolean = false
+        internal set
+
     // Staging fields for back button icon resolution.
     // Both props may arrive in any order within a single update batch.
     // Resolution happens in resolveBackButtonIconIfNeeded(), called from onPropsUpdated.
@@ -227,5 +238,30 @@ internal class StackHeaderConfigComponent(
     @LynxProp(name = "backButtonImageIconUri")
     fun setBackButtonImageIconUri(value: String?) {
         backButtonImageIconUri = value
+    }
+
+    @LynxProp(name = "scrollFlagScroll")
+    fun setScrollFlagScroll(value: Boolean?) {
+        scrollFlagScroll = value == true
+    }
+
+    @LynxProp(name = "scrollFlagEnterAlways")
+    fun setScrollFlagEnterAlways(value: Boolean?) {
+        scrollFlagEnterAlways = value == true
+    }
+
+    @LynxProp(name = "scrollFlagEnterAlwaysCollapsed")
+    fun setScrollFlagEnterAlwaysCollapsed(value: Boolean?) {
+        scrollFlagEnterAlwaysCollapsed = value == true
+    }
+
+    @LynxProp(name = "scrollFlagExitUntilCollapsed")
+    fun setScrollFlagExitUntilCollapsed(value: Boolean?) {
+        scrollFlagExitUntilCollapsed = value == true
+    }
+
+    @LynxProp(name = "scrollFlagSnap")
+    fun setScrollFlagSnap(value: Boolean?) {
+        scrollFlagSnap = value == true
     }
 }
