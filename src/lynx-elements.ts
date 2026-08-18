@@ -32,7 +32,26 @@ declare module "@lynx-js/types" {
       bindOnNativeDismissPrevented?: Lynx.EventHandler<Lynx.BaseEventOrig<EmptyEventPayload>> | undefined;
       // Configuration
       preventNativeDismiss?: boolean | undefined;
-    }
+    };
+    "stack-header-config-native": {
+      className?: string | undefined;
+      children?: ReactNode | undefined;
+      id?: string | undefined;
+      style?: string | Lynx.CSSProperties | undefined;
+      type?: 'small' | 'medium' | 'large' | undefined;
+      title?: string | undefined;
+      hidden?: boolean | undefined;
+      transparent?: boolean | undefined;
+      hasBackgroundSubview?: boolean | undefined;
+    };
+    "stack-header-subview-native": {
+      className?: string | undefined;
+      children?: ReactNode | undefined;
+      id?: string | undefined;
+      style?: string | Lynx.CSSProperties | undefined;
+      type?: 'background' | 'leading' | 'center' | 'trailing' | undefined;
+      collapseMode?: 'off' | 'parallax' | undefined;
+    };
   }
 }
 

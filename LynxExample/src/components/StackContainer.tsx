@@ -16,6 +16,7 @@ import {
   type StackNavigationContextPayload,
 } from '../contexts/StackNavigationContext';
 import {
+  StackHeaderConfigNativeComponent,
   StackHostNativeComponent,
   StackScreenNativeComponent,
 } from 'lynx-screens';
@@ -58,7 +59,7 @@ export function StackContainer({ routeConfigs }: StackContainerProps) {
   return (
     <StackHostNativeComponent>
       {stackNavState.stack.map(
-        ({ Component, options, activityMode, routeKey }) => {
+        ({ Component, options: { headerConfig, ...options }, activityMode, routeKey }) => {
           const stackNavigationContext: StackNavigationContextPayload = {
             routeKey,
             routeOptions: { ...options },
@@ -80,6 +81,9 @@ export function StackContainer({ routeConfigs }: StackContainerProps) {
           >
             <StackNavigationContext.Provider value={stackNavigationContext}>
               <Component />
+              {headerConfig !== undefined && (
+                <StackHeaderConfigNativeComponent {...headerConfig} />
+              )}
             </StackNavigationContext.Provider>
           </StackScreenNativeComponent>
         );

@@ -11,8 +11,37 @@ internal class StackHostView(
     private val lynxContext: LynxContext,
     private val container: StackContainer,
 ) : ViewGroup(lynxContext), StackContainerParent {
+    private var isLayoutEnqueued = false
+
     init {
         addView(container)
+    }
+
+    // The Lynx view pipeline does not propagate requestLayout up to the root view reliably,
+    // so - like RNS does for ReactViewGroup's no-op requestLayout - we manually force a
+    // measure and layout pass of the subtree.
+    override fun requestLayout() {
+        super.requestLayout()
+        refreshLayout()
+    }
+
+    private fun refreshLayout() {
+        if (!isLayoutEnqueued) {
+            isLayoutEnqueued = true
+            post {
+                isLayoutEnqueued = false
+                forceSubtreeMeasureAndLayoutPass()
+            }
+        }
+    }
+
+    private fun forceSubtreeMeasureAndLayoutPass() {
+        measure(
+            MeasureSpec.makeMeasureSpec(width, MeasureSpec.EXACTLY),
+            MeasureSpec.makeMeasureSpec(height, MeasureSpec.EXACTLY),
+        )
+
+        layout(left, top, right, bottom)
     }
 
     override fun onAttachedToWindow() {

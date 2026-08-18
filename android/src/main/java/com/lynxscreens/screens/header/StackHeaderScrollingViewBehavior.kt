@@ -1,11 +1,11 @@
-package com.lynxscreens.screens.screen.header
+package com.lynxscreens.screens.header
 
 import android.view.View
 import androidx.coordinatorlayout.widget.CoordinatorLayout
 import com.google.android.material.appbar.AppBarLayout
 
-internal class StackScreenScrollingViewBehavior(
-    private val onHeaderHeightChanged: (headerHeight: Int) -> Unit,
+internal class StackHeaderScrollingViewBehavior(
+    private val onDependencyChanged: (contentTop: Int, dependency: View) -> Unit,
 ) : AppBarLayout.ScrollingViewBehavior() {
     override fun onDependentViewChanged(
         parent: CoordinatorLayout,
@@ -13,7 +13,7 @@ internal class StackScreenScrollingViewBehavior(
         dependency: View,
     ): Boolean {
         val result = super.onDependentViewChanged(parent, child, dependency)
-        onHeaderHeightChanged(child.top)
+        onDependencyChanged(child.top, dependency)
         return result
     }
 }

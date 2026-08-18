@@ -1,5 +1,5 @@
 import React from 'react';
-import type { StackScreenProps } from 'lynx-screens';
+import type { StackHeaderConfigProps, StackScreenProps } from 'lynx-screens';
 
 export type {
   StackScreenActivityMode,
@@ -13,7 +13,9 @@ export type {
 export type StackRouteOptions = Omit<
   StackScreenProps,
   'children' | 'activityMode' | 'screenKey'
->;
+> & {
+  headerConfig?: StackHeaderConfigProps | undefined;
+};
 
 /**
  * Blueprint for a route.
