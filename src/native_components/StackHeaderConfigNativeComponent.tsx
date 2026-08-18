@@ -61,22 +61,22 @@ export const StackHeaderConfigNativeComponent = (
           type="background"
           collapseMode={backgroundSubview.collapseMode}
         >
-          {backgroundSubview.Component}
+          {backgroundSubview.render()}
         </StackHeaderSubviewNativeComponent>
       )}
       {leadingSubview && (
         <StackHeaderSubviewNativeComponent type="leading">
-          {leadingSubview.Component}
+          {leadingSubview.render()}
         </StackHeaderSubviewNativeComponent>
       )}
       {centerSubview && (
         <StackHeaderSubviewNativeComponent type="center">
-          {centerSubview.Component}
+          {centerSubview.render()}
         </StackHeaderSubviewNativeComponent>
       )}
       {trailingSubview && (
         <StackHeaderSubviewNativeComponent type="trailing">
-          {trailingSubview.Component}
+          {trailingSubview.render()}
         </StackHeaderSubviewNativeComponent>
       )}
     </stack-header-config-native>

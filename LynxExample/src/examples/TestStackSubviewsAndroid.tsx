@@ -106,7 +106,7 @@ function buildHeaderConfig(config: Config): StackHeaderConfigProps | undefined {
     }
     const dims = getSubviewDimensions(size);
     return {
-      Component: (
+      render: () => (
         <view
           style={{
             display: 'flex',
@@ -129,7 +129,7 @@ function buildHeaderConfig(config: Config): StackHeaderConfigProps | undefined {
   const backgroundSubview = config.backgroundEnabled
     ? {
         collapseMode: config.backgroundCollapseMode,
-        Component: (
+        render: () => (
           <view
             style={{
               display: 'flex',
