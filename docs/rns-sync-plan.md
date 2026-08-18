@@ -5,6 +5,7 @@ Working checklist for backporting `react-native-screens` Stack v5 commits into `
 - **Synced up to:** [`63b3baab`](https://github.com/software-mansion/react-native-screens/commit/63b3baab65a1fd36da04ae426f98ad460217e1e0)
 - **Target:** [`c0305806`](https://github.com/software-mansion/react-native-screens/commit/c030580604fc89d30ea13b1e56a3b9f398c4fcce) (RNS `main` as of 2026-08-18) — 418 commits in range
 - **Method:** walk the range oldest → newest and backport every commit that touches Stack v5, **always one commit at a time, strictly in RNS order** — no batching, no squashing. One RNS commit per PR, with `Related commit from RNScreens: <link>` in the PR description.
+- **Examples:** when the RNS commit adds an example/test screen, port the example into `LynxExample/src/examples` and set it active in `LynxExample/src/App.tsx` in the same commit, so it can be tested right after checkout. Never port `scenario.md` files or scenario descriptions — the example only.
 - **Statuses:** `[ ]` pending · `[x]` backported · `[-]` reviewed, not applicable (note why)
 
 Out of the 418 commits, ~55 are in the backport queue below. The rest is: Tabs/Split/ScrollViewMarker (~70), FormSheet v5 (~45, out of scope — see below), Stack v4 / legacy cleanups, e2e tests, examples, docs and CI.
@@ -17,7 +18,7 @@ Lanes: `core` = existing lynx-screens code (Host/Screen/model), `hdr-and` / `hdr
 
 - [-] `17a668299` S core-ios — fix(iOS, StackV5): Fix default props type ([#3800](https://github.com/software-mansion/react-native-screens/commit/17a668299)) — N/A: fixes a wrong Fabric default-props struct in `resetProps`; lynx-screens sets plain ivar defaults via `LYNX_PROP_SETTER`, no props structs exist
 - [x] `a68e00538` M core-js — chore: make all exports from v5 component modules explicit ([#3808](https://github.com/software-mansion/react-native-screens/commit/a68e00538)) — only the stack type exports apply; lynx-screens had no default exports
-- [ ] `a821ff0af` L hdr-and — feat(Android, Stack v5): add basic support for header ([#3753](https://github.com/software-mansion/react-native-screens/commit/a821ff0af))
+- [x] `a821ff0af` L hdr-and — feat(Android, Stack v5): add basic support for header ([#3753](https://github.com/software-mansion/react-native-screens/commit/a821ff0af)) — Fabric state/C++ shadow node replaced with Lynx `StackScreenShadowNode` (CustomMeasureFunc); header height NOT forwarded as content offset (native wrapper already offset — see comment in `StackScreenCoordinatorLayout`)
 - [ ] `33feebbb3` L core-ios — feat(iOS, Stack v5): Align Stack implementation with RFC 753 ([#3774](https://github.com/software-mansion/react-native-screens/commit/33feebbb3))
 - [ ] `29b2a2b2a` M core-js — chore(types): enable `exactOptionalPropertyTypes` support ([#3719](https://github.com/software-mansion/react-native-screens/commit/29b2a2b2a))
 - [ ] `6b51e5e04` L hdr-and — feat(Android, Stack v5): handle header configuration and custom subviews ([#3796](https://github.com/software-mansion/react-native-screens/commit/6b51e5e04))

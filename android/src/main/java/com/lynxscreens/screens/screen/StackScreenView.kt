@@ -11,10 +11,17 @@ import com.lynxscreens.screens.ext.findFragmentOrNull
 class StackScreenView(
     private val lynxContext: LynxContext,
 ) : AndroidView(lynxContext), FragmentProviding {
-    init {
-        // Needed when Transition API is in use to ensure that shadows do not disappear,
-        // views do not jump around the screen and whole sub-tree is animated as a whole.
-        isTransitionGroup = true
+    internal var onLaidOut: ((width: Int, height: Int) -> Unit)? = null
+
+    override fun onLayout(
+        changed: Boolean,
+        l: Int,
+        t: Int,
+        r: Int,
+        b: Int,
+    ) {
+        super.onLayout(changed, l, t, r, b)
+        onLaidOut?.invoke(r - l, b - t)
     }
 
     override fun getAssociatedFragment(): Fragment? = this.findFragmentOrNull()?.also {

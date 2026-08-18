@@ -43,6 +43,17 @@ internal class StackScreenComponent(context: LynxContext) : UIGroup<StackScreenV
 
     internal var screenKey: String? = null
 
+    private val shadowStateProxy: StackScreenShadowStateProxy by lazy {
+        StackScreenShadowStateProxy(lynxContext, sign)
+    }
+
+    internal fun updateStateIfNeeded(
+        x: Int? = null,
+        y: Int? = null,
+        width: Int? = null,
+        height: Int? = null,
+    ) = shadowStateProxy.updateStateIfNeeded(x, y, width, height)
+
     private val eventEmitter: StackScreenEventEmitter by lazy {
         StackScreenEventEmitter(lynxContext, sign)
     }
@@ -55,7 +66,10 @@ internal class StackScreenComponent(context: LynxContext) : UIGroup<StackScreenV
     internal fun createAppearanceEventsEmitter(viewLifecycleOwner: LifecycleOwner) =
         StackScreenAppearanceEventsEmitter(viewLifecycleOwner.lifecycle, eventEmitter)
 
-    override fun createView(context: Context?): StackScreenView = StackScreenView(context as LynxContext)
+    override fun createView(context: Context?): StackScreenView =
+        StackScreenView(context as LynxContext).also { view ->
+            view.onLaidOut = { width, height -> updateStateIfNeeded(width = width, height = height) }
+        }
 
     @LynxProp(name = "activityMode")
     fun setActivityMode(
