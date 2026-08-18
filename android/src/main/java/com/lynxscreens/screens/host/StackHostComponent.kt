@@ -6,6 +6,7 @@ import android.view.View
 import com.lynx.tasm.behavior.LynxContext
 import com.lynx.tasm.behavior.LynxElement
 import com.lynx.tasm.behavior.PatchFinishListener
+import com.lynx.tasm.behavior.event.EventTarget
 import com.lynx.tasm.behavior.ui.LynxBaseUI
 import com.lynx.tasm.behavior.ui.LynxUI
 import com.lynx.tasm.behavior.ui.UIGroup
@@ -24,6 +25,62 @@ internal class StackHostComponent(context: LynxContext) : UIGroup<StackHostView>
         container = StackContainer(lynxContext, WeakReference(this))
 
         return StackHostView(lynxContext, container)
+    }
+
+    /**
+     * Header subview views are reparented into the native Toolbar, outside any Lynx-managed view
+     * subtree, so the custom-layout view walk (which only knows the host's direct Lynx children -
+     * the screens) cannot find them and taps on them resolve to the host itself. When that
+     * happens, probe the reparented subviews of the rendered screens by their actual window
+     * positions and continue the hit-test inside the matching subview.
+     *
+     * This is the Lynx counterpart of RNS's contentOriginOffset-based touch correction on Fabric.
+     */
+    override fun findUIWithCustomLayout(
+        x: Float,
+        y: Float,
+        parent: UIGroup<*>?,
+    ): EventTarget {
+        val target = super.findUIWithCustomLayout(x, y, parent)
+        if (target !== this) {
+            return target
+        }
+        return findHeaderSubviewTarget(x, y) ?: target
+    }
+
+    private fun findHeaderSubviewTarget(
+        x: Float,
+        y: Float,
+    ): EventTarget? {
+        val hostView = view ?: return null
+        val hostPosition = IntArray(2)
+        hostView.getLocationInWindow(hostPosition)
+
+        for (screen in renderedScreens.asReversed()) {
+            val config = screen.headerConfig ?: continue
+            // Background goes last - toolbar subviews render on top of it.
+            val subviews =
+                listOfNotNull(
+                    config.leadingSubview,
+                    config.centerSubview,
+                    config.trailingSubview,
+                    config.backgroundSubview,
+                )
+            for (subview in subviews) {
+                val subviewView = subview.subviewView
+                if (!subviewView.isShown) continue
+
+                val subviewPosition = IntArray(2)
+                subviewView.getLocationInWindow(subviewPosition)
+                // Note: ignores scale/rotation transforms between the host and the subview.
+                val childX = x - (subviewPosition[0] - hostPosition[0])
+                val childY = y - (subviewPosition[1] - hostPosition[1])
+                if (childX >= 0f && childY >= 0f && childX <= subviewView.width && childY <= subviewView.height) {
+                    return subview.hitTest(childX, childY)
+                }
+            }
+        }
+        return null
     }
 
     override fun insertChild(child: LynxBaseUI, index: Int) {

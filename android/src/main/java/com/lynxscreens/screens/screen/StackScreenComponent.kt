@@ -5,8 +5,12 @@ import androidx.lifecycle.LifecycleOwner
 import com.lynx.tasm.behavior.LynxContext
 import com.lynx.tasm.behavior.LynxElement
 import com.lynx.tasm.behavior.LynxProp
+import com.lynx.tasm.behavior.ui.LynxBaseUI
 import com.lynx.tasm.behavior.ui.UIGroup
 import com.lynx.tasm.event.LynxCustomEvent
+import com.lynxscreens.screens.common.ShadowStateProxy
+import com.lynxscreens.screens.header.config.OnHeaderConfigAttachListener
+import com.lynxscreens.screens.header.config.StackHeaderConfigComponent
 import com.lynxscreens.screens.host.StackHostComponent
 import java.lang.IllegalArgumentException
 import java.lang.ref.WeakReference
@@ -43,8 +47,8 @@ internal class StackScreenComponent(context: LynxContext) : UIGroup<StackScreenV
 
     internal var screenKey: String? = null
 
-    private val shadowStateProxy: StackScreenShadowStateProxy by lazy {
-        StackScreenShadowStateProxy(lynxContext, sign)
+    private val shadowStateProxy: ShadowStateProxy by lazy {
+        ShadowStateProxy(lynxContext, sign)
     }
 
     internal fun updateStateIfNeeded(
@@ -52,7 +56,55 @@ internal class StackScreenComponent(context: LynxContext) : UIGroup<StackScreenV
         y: Int? = null,
         width: Int? = null,
         height: Int? = null,
-    ) = shadowStateProxy.updateStateIfNeeded(x, y, width, height)
+    ) = shadowStateProxy.updateStateIfNeeded(
+        contentOffsetX = x,
+        contentOffsetY = y,
+        frameWidth = width,
+        frameHeight = height,
+    )
+
+    internal var headerConfig: StackHeaderConfigComponent? = null
+        private set
+
+    internal var onHeaderConfigAttachListener: WeakReference<OnHeaderConfigAttachListener>? = null
+
+    internal fun attachHeaderConfig(header: StackHeaderConfigComponent) {
+        headerConfig = header
+        onHeaderConfigAttachListener?.get()?.onHeaderConfigAttach(header)
+    }
+
+    internal fun detachHeaderConfig(header: StackHeaderConfigComponent) {
+        if (headerConfig === header) {
+            headerConfig = null
+            onHeaderConfigAttachListener?.get()?.onHeaderConfigAttach(null)
+        }
+    }
+
+    override fun insertChild(
+        child: LynxBaseUI,
+        index: Int,
+    ) {
+        // HeaderConfig is not added to native hierarchy & it must be the last child of StackScreen.
+        if (child is StackHeaderConfigComponent) {
+            require(index >= super.getChildCount()) {
+                "[RNScreens] StackHeaderConfig must be the last child of StackScreen."
+            }
+            attachHeaderConfig(child)
+        } else {
+            require(index <= super.getChildCount()) {
+                "[RNScreens] StackHeaderConfig must be the last child of StackScreen."
+            }
+            super.insertChild(child, index)
+        }
+    }
+
+    override fun removeChild(child: LynxBaseUI?) {
+        if (child is StackHeaderConfigComponent) {
+            detachHeaderConfig(child)
+        } else {
+            super.removeChild(child)
+        }
+    }
 
     private val eventEmitter: StackScreenEventEmitter by lazy {
         StackScreenEventEmitter(lynxContext, sign)

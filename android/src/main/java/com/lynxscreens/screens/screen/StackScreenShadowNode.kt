@@ -10,6 +10,7 @@ import com.lynx.tasm.behavior.shadow.MeasureParam
 import com.lynx.tasm.behavior.shadow.MeasureResult
 import com.lynx.tasm.behavior.shadow.NativeLayoutNodeRef
 import com.lynx.tasm.behavior.shadow.ShadowNode
+import com.lynxscreens.screens.common.ShadowStateUpdating
 
 /**
  * Counterpart of RNS RNSStackScreenShadowNode (+ State & ComponentDescriptor). Instead of the
@@ -19,11 +20,16 @@ import com.lynx.tasm.behavior.shadow.ShadowNode
  *   constrained by the header's ScrollingViewBehavior), falling back to engine constraints
  *   until the first native layout pass happens,
  * - align: children are offset by the stored content origin offset.
+ *
+ * Children are measured/aligned through signature-based LayoutNodeManager calls: a child backed
+ * by its own custom shadow node (e.g. StackHeaderConfigShadowNode) is NOT a NativeLayoutNodeRef,
+ * but the engine routes the measurement to its custom measure func all the same.
  */
 @LynxShadowNode(tagName = "stack-screen-native")
 internal class StackScreenShadowNode :
     ShadowNode(),
-    CustomMeasureFunc {
+    CustomMeasureFunc,
+    ShadowStateUpdating {
     private var frameWidth: Float = 0f
     private var frameHeight: Float = 0f
     private var contentOffsetX: Float = 0f
@@ -33,16 +39,16 @@ internal class StackScreenShadowNode :
         setCustomMeasureFunc(this)
     }
 
-    internal fun updateState(
-        x: Float,
-        y: Float,
-        width: Float,
-        height: Float,
+    override fun updateState(
+        contentOffsetX: Float,
+        contentOffsetY: Float,
+        frameWidth: Float,
+        frameHeight: Float,
     ) {
-        contentOffsetX = x
-        contentOffsetY = y
-        frameWidth = width
-        frameHeight = height
+        this.contentOffsetX = contentOffsetX
+        this.contentOffsetY = contentOffsetY
+        this.frameWidth = frameWidth
+        this.frameHeight = frameHeight
 
         resetIsDirty()
         markDirty()
@@ -61,7 +67,19 @@ internal class StackScreenShadowNode :
                 updateConstraints(width, MeasureMode.EXACTLY, height, MeasureMode.EXACTLY)
             }
         for (index in 0 until childCount) {
-            (getChildAt(index) as? NativeLayoutNodeRef)?.measureNativeNode(context, childParam)
+            when (val child = getChildAt(index)) {
+                is NativeLayoutNodeRef -> child.measureNativeNode(context, childParam)
+                else ->
+                    // finalMeasure is not readable from MeasureContext (package-private).
+                    layoutNodeManager.measureNativeNode(
+                        child.signature,
+                        width,
+                        MeasureMode.EXACTLY.intValue(),
+                        height,
+                        MeasureMode.EXACTLY.intValue(),
+                        true,
+                    )
+            }
         }
 
         return MeasureResult(width, height)
@@ -72,13 +90,17 @@ internal class StackScreenShadowNode :
         context: AlignContext?,
     ) {
         for (index in 0 until childCount) {
-            val child = getChildAt(index) as? NativeLayoutNodeRef ?: continue
-            val alignParam =
-                AlignParam().apply {
-                    leftOffset = contentOffsetX
-                    topOffset = contentOffsetY
-                }
-            child.alignNativeNode(context, alignParam)
+            when (val child = getChildAt(index)) {
+                is NativeLayoutNodeRef ->
+                    child.alignNativeNode(
+                        context,
+                        AlignParam().apply {
+                            leftOffset = contentOffsetX
+                            topOffset = contentOffsetY
+                        },
+                    )
+                else -> layoutNodeManager.alignNativeNode(child.signature, contentOffsetY, contentOffsetX)
+            }
         }
     }
 }
