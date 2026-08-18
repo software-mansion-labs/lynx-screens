@@ -1,7 +1,11 @@
 import React from 'react';
 import * as Lynx from '@lynx-js/types';
 
-export const StackHostNativeComponent = ({ children }: Lynx.ViewProps) => {
+export const StackHostNativeComponent = ({
+  children,
+}: {
+  children: NonNullable<Lynx.ViewProps['children']>;
+}) => {
   return (
     <stack-host-native
       style={{
