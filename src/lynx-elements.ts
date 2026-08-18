@@ -46,6 +46,11 @@ declare module "@lynx-js/types" {
       backButtonTintColor?: string | undefined;
       backButtonDrawableIconResourceName?: string | undefined;
       backButtonImageIconUri?: string | undefined;
+      scrollFlagScroll?: boolean | undefined;
+      scrollFlagEnterAlways?: boolean | undefined;
+      scrollFlagEnterAlwaysCollapsed?: boolean | undefined;
+      scrollFlagExitUntilCollapsed?: boolean | undefined;
+      scrollFlagSnap?: boolean | undefined;
       hasBackgroundSubview?: boolean | undefined;
     };
     "stack-header-subview-native": {
