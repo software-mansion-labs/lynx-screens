@@ -24,9 +24,11 @@ object FragmentManagerHelper {
         // If parent adheres to FragmentProviding interface it means we are inside a nested fragment structure.
         // Otherwise we expect to connect directly with root view and get root fragment manager
         if (parent is FragmentProviding) {
-            return checkNotNull(parent.getAssociatedFragment()) {
-                "[RNScreens] Parent fragment providing view $parent returned nullish fragment"
-            }.childFragmentManager
+            val fragment = parent.getAssociatedFragment() ?: return null
+
+            // A disappearing Fragment view can be temporarily reattached through ViewOverlay after
+            // its Fragment has detached. There is no usable child FragmentManager in that state.
+            return fragment.takeIf { it.isAdded }?.childFragmentManager
         } else {
             // we expect top level view to be of type LynxView, this isn't really necessary but in
             // order to find root view we test if parent is null. This could potentially happen also when
