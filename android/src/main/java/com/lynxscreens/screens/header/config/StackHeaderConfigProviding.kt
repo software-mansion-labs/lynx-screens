@@ -1,5 +1,6 @@
 package com.lynxscreens.screens.header.config
 
+import android.graphics.drawable.Drawable
 import com.lynxscreens.screens.header.subview.StackHeaderSubviewProviding
 
 interface StackHeaderConfigProviding {
@@ -7,6 +8,9 @@ interface StackHeaderConfigProviding {
     val title: String
     val hidden: Boolean
     val transparent: Boolean
+    val backButtonHidden: Boolean
+    val backButtonTintColor: Int?
+    val backButtonIcon: Drawable?
     val leadingSubview: StackHeaderSubviewProviding?
     val centerSubview: StackHeaderSubviewProviding?
     val trailingSubview: StackHeaderSubviewProviding?

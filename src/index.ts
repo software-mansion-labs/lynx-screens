@@ -20,6 +20,8 @@ export type {
   StackHeaderToolbarSubviewAndroid,
   StackHeaderBackgroundSubviewAndroid,
   StackHeaderConfigPropsAndroid,
+  PlatformIconShared,
+  PlatformIconAndroid,
   // iOS
   StackHeaderConfigPropsIOS,
 } from './types/StackHeaderConfig';

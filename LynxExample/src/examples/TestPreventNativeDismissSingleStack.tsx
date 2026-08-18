@@ -42,7 +42,11 @@ function StackSetup() {
         {
           name: 'A',
           Component: AScreen,
-          options: {},
+          options: {
+            headerConfig: {
+              title: 'A',
+            },
+          },
         },
         {
           name: 'B',
@@ -51,6 +55,9 @@ function StackSetup() {
             preventNativeDismiss: true,
             onNativeDismissPrevented: () => {
               console.info('Native dismiss prevented');
+            },
+            headerConfig: {
+              title: 'B',
             },
           },
         },

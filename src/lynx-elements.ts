@@ -42,6 +42,10 @@ declare module "@lynx-js/types" {
       title?: string | undefined;
       hidden?: boolean | undefined;
       transparent?: boolean | undefined;
+      backButtonHidden?: boolean | undefined;
+      backButtonTintColor?: string | undefined;
+      backButtonDrawableIconResourceName?: string | undefined;
+      backButtonImageIconUri?: string | undefined;
       hasBackgroundSubview?: boolean | undefined;
     };
     "stack-header-subview-native": {
