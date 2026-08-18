@@ -7,8 +7,9 @@ import android.widget.FrameLayout
 import androidx.activity.OnBackPressedDispatcherOwner
 import androidx.coordinatorlayout.widget.CoordinatorLayout
 import com.lynxscreens.screens.header.config.OnHeaderConfigAttachListener
-import com.lynxscreens.screens.header.config.OnHeaderConfigChangeListener
+import com.lynxscreens.screens.header.config.StackHeaderConfigDelegate
 import com.lynxscreens.screens.header.config.StackHeaderConfigProviding
+import com.lynxscreens.screens.header.toolbar.StackHeaderToolbarMenuItemOptions
 import com.lynxscreens.screens.screen.StackScreenComponent
 import java.lang.ref.WeakReference
 
@@ -39,7 +40,7 @@ internal class StackHeaderCoordinatorLayout(
 
     /**
      * This callback is used to detect when header config is attached.
-     * This allows us to configure listener for header config changes.
+     * This allows us to configure the delegate for header config interactions.
      */
     private val onHeaderConfigAttach =
         OnHeaderConfigAttachListener { config ->
@@ -57,14 +58,24 @@ internal class StackHeaderCoordinatorLayout(
         }
 
     /**
-     * This callback is used to listen for header config changes.
-     * We use [isHeaderUpdatePending] to batch changes and pass them to [headerCoordinator].
+     * Single delegate that owns all interactions flowing from the header config to this layout.
+     * [onConfigChange] is batched via [post] to coalesce rapid updates.
+     * [onMenuItemUpdate] is dispatched immediately — commands must not be deferred.
      */
-    private val onHeaderConfigChange =
-        OnHeaderConfigChangeListener {
-            if (!isHeaderUpdatePending) {
-                isHeaderUpdatePending = true
-                post(headerUpdateRunnable)
+    private val headerConfigDelegate =
+        object : StackHeaderConfigDelegate {
+            override fun onConfigChange(config: StackHeaderConfigProviding) {
+                if (!isHeaderUpdatePending) {
+                    isHeaderUpdatePending = true
+                    post(headerUpdateRunnable)
+                }
+            }
+
+            override fun onMenuItemUpdate(
+                id: String,
+                options: StackHeaderToolbarMenuItemOptions,
+            ) {
+                headerCoordinator.handleMenuItemUpdate(id, options)
             }
         }
 
@@ -91,11 +102,11 @@ internal class StackHeaderCoordinatorLayout(
     }
 
     private fun handleHeaderConfigAttach(config: StackHeaderConfigProviding?) {
-        // Disconnect old config to prevent spurious updates from a detached config.
-        currentConfig?.removeOnConfigChangeListener(onHeaderConfigChange)
+        // Disconnect old config to prevent spurious updates from a detached config
+        currentConfig?.removeDelegate(headerConfigDelegate)
         currentConfig = config
 
-        config?.setOnConfigChangeListener(onHeaderConfigChange)
+        config?.setDelegate(headerConfigDelegate)
 
         // We run this even if config is null to properly remove the header if config
         // is removed in runtime.
@@ -108,7 +119,7 @@ internal class StackHeaderCoordinatorLayout(
 
         stackScreenWrapper.removeView(stackScreen.view)
 
-        currentConfig?.removeOnConfigChangeListener(onHeaderConfigChange)
+        currentConfig?.removeDelegate(headerConfigDelegate)
         currentConfig = null
 
         stackScreen.onHeaderConfigAttachListener

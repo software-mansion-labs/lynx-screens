@@ -1,4 +1,4 @@
-import type { ReactNode } from '@lynx-js/react';
+import type { ReactNode, Ref } from '@lynx-js/react';
 import type * as Lynx from '@lynx-js/types';
 
 declare module "@lynx-js/types" {
@@ -34,6 +34,7 @@ declare module "@lynx-js/types" {
       preventNativeDismiss?: boolean | undefined;
     };
     "stack-header-config-native": {
+      ref?: Ref<Lynx.NodesRef> | undefined;
       className?: string | undefined;
       children?: ReactNode | undefined;
       id?: string | undefined;
@@ -52,6 +53,16 @@ declare module "@lynx-js/types" {
       scrollFlagExitUntilCollapsed?: boolean | undefined;
       scrollFlagSnap?: boolean | undefined;
       hasBackgroundSubview?: boolean | undefined;
+      toolbarMenuItems?:
+        | Array<{
+            id: string;
+            title?: string | undefined;
+            hidden?: boolean | undefined;
+          }>
+        | undefined;
+      bindOnToolbarMenuItemClicked?:
+        | Lynx.EventHandler<Lynx.BaseEventOrig<{ id: string }>>
+        | undefined;
     };
     "stack-header-subview-native": {
       className?: string | undefined;

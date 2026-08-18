@@ -14,14 +14,20 @@ export type {
 export type {
   StackHeaderConfigPropsBase,
   StackHeaderConfigProps,
+  StackHeaderConfigRef,
   // Android
   StackHeaderTypeAndroid,
   StackHeaderBackgroundSubviewCollapseModeAndroid,
   StackHeaderToolbarSubviewAndroid,
   StackHeaderBackgroundSubviewAndroid,
   StackHeaderConfigPropsAndroid,
+  StackHeaderConfigCommandsAndroid,
+  StackHeaderToolbarMenuItemAndroid,
+  StackHeaderToolbarMenuItemOptionsAndroid,
+  StackHeaderToolbarMenuItemClickedEventPayload,
   PlatformIconShared,
   PlatformIconAndroid,
   // iOS
   StackHeaderConfigPropsIOS,
+  StackHeaderConfigCommandsIOS,
 } from './types/StackHeaderConfig';

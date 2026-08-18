@@ -1,4 +1,5 @@
 import type { ReactElement, ReactNode } from '@lynx-js/react';
+import type * as Lynx from '@lynx-js/types';
 
 // copied from react-native-screens/src/components/gamma/stack/header/*.types.ts
 
@@ -82,6 +83,55 @@ export interface StackHeaderBackgroundSubviewAndroid {
    * @platform android
    */
   render: () => ReactElement;
+}
+
+export interface StackHeaderToolbarMenuItemAndroid {
+  /**
+   * @summary Unique identifier of the menu item.
+   *
+   * @platform android
+   */
+  id: string;
+  /**
+   * @summary Title of the menu item.
+   *
+   * @platform android
+   */
+  title?: string | undefined;
+  /**
+   * @summary Specifies if the menu item should be hidden.
+   *
+   * @default false
+   * @platform android
+   */
+  hidden?: boolean | undefined;
+}
+
+export type StackHeaderToolbarMenuItemClickedEventPayload = {
+  /**
+   * @summary ID of the clicked menu item.
+   */
+  id: string;
+};
+
+export type StackHeaderToolbarMenuItemOptionsAndroid = Partial<
+  Omit<StackHeaderToolbarMenuItemAndroid, 'id'>
+>;
+
+export interface StackHeaderConfigCommandsAndroid {
+  /**
+   * @summary Allows to change menu item configuration in runtime.
+   *
+   * @param id The ID of the menu item which will be updated.
+   * @param options Object with properties that should be changed. If property
+   *        is omitted, the current value will be preserved. If property is
+   *        explicitly set to `undefined`, the default value of the prop will be
+   *        restored.
+   */
+  setToolbarMenuItemOptions: (
+    id: string,
+    options: StackHeaderToolbarMenuItemOptionsAndroid,
+  ) => void;
 }
 
 export interface StackHeaderConfigPropsAndroid {
@@ -233,10 +283,36 @@ export interface StackHeaderConfigPropsAndroid {
    * @platform android
    */
   scrollFlagSnap?: boolean | undefined;
+  /**
+   * @summary Menu items displayed in the toolbar menu.
+   *
+   * This prop serves as initial configuration of the toolbar menu items. If you
+   * want to change some property in runtime, use `setToolbarMenuItemOptions`
+   * view command.
+   *
+   * Changing this prop in runtime will result in full toolbar menu rebuild.
+   * Any prior changes applied via `setToolbarMenuItemOptions` will be lost.
+   *
+   * @platform android
+   */
+  toolbarMenuItems?: StackHeaderToolbarMenuItemAndroid[] | undefined;
+  /**
+   * @summary Callback invoked when a toolbar menu item is clicked.
+   *
+   * @platform android
+   */
+  onToolbarMenuItemClicked?:
+    | Lynx.EventHandler<
+        Lynx.BaseEventOrig<StackHeaderToolbarMenuItemClickedEventPayload>
+      >
+    | undefined;
 }
 
 // eslint-disable-next-line @typescript-eslint/no-empty-object-type
 export interface StackHeaderConfigPropsIOS {}
+
+// eslint-disable-next-line @typescript-eslint/no-empty-object-type
+export interface StackHeaderConfigCommandsIOS {}
 
 export interface StackHeaderConfigPropsBase {
   /**
@@ -285,6 +361,11 @@ export interface StackHeaderConfigPropsBase {
 export interface StackHeaderConfigProps extends StackHeaderConfigPropsBase {
   android?: StackHeaderConfigPropsAndroid | undefined;
   ios?: StackHeaderConfigPropsIOS | undefined;
+}
+
+export interface StackHeaderConfigRef {
+  android?: StackHeaderConfigCommandsAndroid;
+  ios?: StackHeaderConfigCommandsIOS;
 }
 
 export type StackHeaderSubviewProps = {

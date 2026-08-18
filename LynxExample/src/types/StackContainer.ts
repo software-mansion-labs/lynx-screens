@@ -1,5 +1,9 @@
 import React from 'react';
-import type { StackHeaderConfigProps, StackScreenProps } from 'lynx-screens';
+import type {
+  StackHeaderConfigProps,
+  StackHeaderConfigRef,
+  StackScreenProps,
+} from 'lynx-screens';
 
 export type {
   StackScreenActivityMode,
@@ -15,6 +19,7 @@ export type StackRouteOptions = Omit<
   'children' | 'activityMode' | 'screenKey'
 > & {
   headerConfig?: StackHeaderConfigProps | undefined;
+  headerConfigRef?: React.Ref<StackHeaderConfigRef> | undefined;
 };
 
 /**

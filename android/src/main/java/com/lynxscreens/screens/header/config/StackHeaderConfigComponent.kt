@@ -4,12 +4,20 @@ import android.content.Context
 import android.graphics.Color
 import android.graphics.drawable.Drawable
 import android.util.LayoutDirection
+import com.lynx.react.bridge.Callback
+import com.lynx.react.bridge.ReadableArray
+import com.lynx.react.bridge.ReadableMap
 import com.lynx.tasm.behavior.LynxContext
 import com.lynx.tasm.behavior.LynxElement
 import com.lynx.tasm.behavior.LynxProp
+import com.lynx.tasm.behavior.LynxUIMethod
+import com.lynx.tasm.behavior.LynxUIMethodConstants
 import com.lynx.tasm.behavior.ui.LynxBaseUI
 import com.lynx.tasm.behavior.ui.UIGroup
 import com.lynxscreens.screens.common.ShadowStateProxy
+import com.lynxscreens.screens.header.toolbar.StackHeaderToolbarMenuItemConfig
+import com.lynxscreens.screens.header.toolbar.StackHeaderToolbarMenuItemDefaults
+import com.lynxscreens.screens.header.toolbar.StackHeaderToolbarMenuItemOptions
 import com.lynxscreens.screens.helpers.getSystemDrawableResource
 import com.lynxscreens.screens.helpers.loadImage
 import com.lynxscreens.screens.header.subview.OnStackHeaderSubviewChangeListener
@@ -48,6 +56,9 @@ internal class StackHeaderConfigComponent(
     override var scrollFlagExitUntilCollapsed: Boolean = false
         internal set
     override var scrollFlagSnap: Boolean = false
+        internal set
+
+    override var toolbarMenuItems: List<StackHeaderToolbarMenuItemConfig> = emptyList()
         internal set
 
     // Staging fields for back button icon resolution.
@@ -116,20 +127,35 @@ internal class StackHeaderConfigComponent(
         )
     }
 
-    private var onConfigChangeListener: WeakReference<OnHeaderConfigChangeListener>? = null
-
-    override fun setOnConfigChangeListener(listener: OnHeaderConfigChangeListener) {
-        onConfigChangeListener = WeakReference(listener)
+    private val eventEmitter: StackHeaderConfigEventEmitter by lazy {
+        StackHeaderConfigEventEmitter(lynxContext, sign)
     }
 
-    override fun removeOnConfigChangeListener(listener: OnHeaderConfigChangeListener) {
-        if (onConfigChangeListener?.get() === listener) {
-            onConfigChangeListener = null
+    private var delegate: WeakReference<StackHeaderConfigDelegate>? = null
+
+    override fun onMenuItemClick(id: String) {
+        eventEmitter.emitOnToolbarMenuItemClicked(id)
+    }
+
+    override fun setDelegate(delegate: StackHeaderConfigDelegate) {
+        this.delegate = WeakReference(delegate)
+    }
+
+    override fun removeDelegate(delegate: StackHeaderConfigDelegate) {
+        if (this.delegate?.get() === delegate) {
+            this.delegate = null
         }
     }
 
     internal fun notifyConfigChanged() {
-        onConfigChangeListener?.get()?.onHeaderConfigChange(this)
+        delegate?.get()?.onConfigChange(this)
+    }
+
+    internal fun dispatchMenuItemUpdate(
+        id: String,
+        options: StackHeaderToolbarMenuItemOptions,
+    ) {
+        delegate?.get()?.onMenuItemUpdate(id, options)
     }
 
     override fun onStackHeaderSubviewChange() = notifyConfigChanged()
@@ -270,4 +296,81 @@ internal class StackHeaderConfigComponent(
     fun setScrollFlagSnap(value: Boolean?) {
         scrollFlagSnap = value == true
     }
+
+    @LynxProp(name = "toolbarMenuItems")
+    fun setToolbarMenuItems(value: ReadableArray?) {
+        toolbarMenuItems =
+            value?.let { array ->
+                (0 until array.size()).map { i ->
+                    val item = requireNotNull(array.getMap(i))
+                    StackHeaderToolbarMenuItemConfig(
+                        id = item.requireNotNullString("id"),
+                        title = item.readString("title", StackHeaderToolbarMenuItemDefaults.TITLE),
+                        hidden = item.readBoolean("hidden", StackHeaderToolbarMenuItemDefaults.HIDDEN),
+                    )
+                }
+            } ?: emptyList()
+    }
+
+    // The Lynx counterpart of RNS's setToolbarMenuItemOptions view command,
+    // invoked via NodesRef.invoke from JS.
+    @LynxUIMethod
+    fun setToolbarMenuItemOptions(
+        params: ReadableMap,
+        callback: Callback,
+    ) {
+        val id = params.getString("id")
+        if (id == null) {
+            callback.invoke(LynxUIMethodConstants.PARAM_INVALID)
+            return
+        }
+        val options = params.getMap("options")
+        dispatchMenuItemUpdate(
+            id,
+            StackHeaderToolbarMenuItemOptions(
+                title = options?.readNullableStringUpdate("title", StackHeaderToolbarMenuItemDefaults.TITLE),
+                hidden = options?.readNullableBooleanUpdate("hidden", StackHeaderToolbarMenuItemDefaults.HIDDEN),
+            ),
+        )
+        callback.invoke(LynxUIMethodConstants.SUCCESS)
+    }
 }
+
+private fun ReadableMap.requireNotNullString(key: String): String =
+    requireNotNull(this.getString(key)) {
+        "[RNScreens] toolbarMenuItem $key property must not be null."
+    }
+
+// Helpers for regular props (null/not defined -> default)
+private fun ReadableMap.readString(
+    key: String,
+    default: String,
+): String = if (!this.hasKey(key) || this.isNull(key)) default else this.getString(key) ?: default
+
+private fun ReadableMap.readBoolean(
+    key: String,
+    default: Boolean,
+): Boolean = if (!this.hasKey(key) || this.isNull(key)) default else this.getBoolean(key)
+
+// Helpers for view commands:
+// - not defined -> null (means "no update")
+// - null -> default (means "reset to default value")
+private fun ReadableMap.readNullableStringUpdate(
+    key: String,
+    default: String,
+): String? =
+    when {
+        !this.hasKey(key) -> null
+        this.isNull(key) -> default
+        else -> this.getString(key) ?: default
+    }
+
+private fun ReadableMap.readNullableBooleanUpdate(
+    key: String,
+    default: Boolean,
+): Boolean? =
+    when {
+        !this.hasKey(key) -> null
+        this.isNull(key) -> default
+        else -> this.getBoolean(key)
+    }
