@@ -18,6 +18,7 @@ import com.lynxscreens.screens.common.ShadowStateProxy
 import com.lynxscreens.screens.header.toolbar.StackHeaderToolbarMenuItemConfig
 import com.lynxscreens.screens.header.toolbar.StackHeaderToolbarMenuItemDefaults
 import com.lynxscreens.screens.header.toolbar.StackHeaderToolbarMenuItemOptions
+import com.lynxscreens.screens.header.toolbar.StackHeaderToolbarMenuItemShowAsAction
 import com.lynxscreens.screens.helpers.getSystemDrawableResource
 import com.lynxscreens.screens.helpers.loadImage
 import com.lynxscreens.screens.header.subview.OnStackHeaderSubviewChangeListener
@@ -307,6 +308,11 @@ internal class StackHeaderConfigComponent(
                         id = item.requireNotNullString("id"),
                         title = item.readString("title", StackHeaderToolbarMenuItemDefaults.TITLE),
                         hidden = item.readBoolean("hidden", StackHeaderToolbarMenuItemDefaults.HIDDEN),
+                        showAsAction =
+                            item.readShowAsActionEnum(
+                                "showAsAction",
+                                StackHeaderToolbarMenuItemDefaults.SHOW_AS_ACTION,
+                            ),
                     )
                 }
             } ?: emptyList()
@@ -330,6 +336,11 @@ internal class StackHeaderConfigComponent(
             StackHeaderToolbarMenuItemOptions(
                 title = options?.readNullableStringUpdate("title", StackHeaderToolbarMenuItemDefaults.TITLE),
                 hidden = options?.readNullableBooleanUpdate("hidden", StackHeaderToolbarMenuItemDefaults.HIDDEN),
+                showAsAction =
+                    options?.readNullableShowAsActionEnumUpdate(
+                        "showAsAction",
+                        StackHeaderToolbarMenuItemDefaults.SHOW_AS_ACTION,
+                    ),
             ),
         )
         callback.invoke(LynxUIMethodConstants.SUCCESS)
@@ -352,6 +363,14 @@ private fun ReadableMap.readBoolean(
     default: Boolean,
 ): Boolean = if (!this.hasKey(key) || this.isNull(key)) default else this.getBoolean(key)
 
+private fun ReadableMap.readShowAsActionEnum(
+    key: String,
+    default: StackHeaderToolbarMenuItemShowAsAction,
+): StackHeaderToolbarMenuItemShowAsAction {
+    val stringValue = this.getString(key) ?: return default
+    return toMenuItemShowAsActionEnum(stringValue)
+}
+
 // Helpers for view commands:
 // - not defined -> null (means "no update")
 // - null -> default (means "reset to default value")
@@ -373,4 +392,27 @@ private fun ReadableMap.readNullableBooleanUpdate(
         !this.hasKey(key) -> null
         this.isNull(key) -> default
         else -> this.getBoolean(key)
+    }
+
+private fun ReadableMap.readNullableShowAsActionEnumUpdate(
+    key: String,
+    default: StackHeaderToolbarMenuItemShowAsAction,
+): StackHeaderToolbarMenuItemShowAsAction? =
+    when {
+        !this.hasKey(key) -> null
+        this.isNull(key) -> default
+        else ->
+            this.getString(key)?.let {
+                toMenuItemShowAsActionEnum(it)
+            } ?: default
+    }
+
+private fun toMenuItemShowAsActionEnum(value: String): StackHeaderToolbarMenuItemShowAsAction =
+    when (value) {
+        "always" -> StackHeaderToolbarMenuItemShowAsAction.ALWAYS
+        "alwaysWithText" -> StackHeaderToolbarMenuItemShowAsAction.ALWAYS_WITH_TEXT
+        "ifRoom" -> StackHeaderToolbarMenuItemShowAsAction.IF_ROOM
+        "ifRoomWithText" -> StackHeaderToolbarMenuItemShowAsAction.IF_ROOM_WITH_TEXT
+        "never" -> StackHeaderToolbarMenuItemShowAsAction.NEVER
+        else -> throw IllegalArgumentException("[RNScreens] Invalid value for StackHeaderToolbarMenuItemShowAsAction: $value.")
     }

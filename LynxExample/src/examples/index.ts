@@ -6,5 +6,6 @@ export { default as TestPreventNativeDismissNestedStack } from './TestPreventNat
 export { default as TestStackBackButtonAndroid } from './TestStackBackButtonAndroid';
 export { default as TestStackSimpleNav } from './TestStackSimpleNav';
 export { default as TestStackToolbarMenuCommandsAndroid } from './TestStackToolbarMenuCommandsAndroid';
+export { default as TestStackToolbarMenuShowAsActionAndroid } from './TestStackToolbarMenuShowAsActionAndroid';
 export { default as TestStackSubviewsAndroid } from './TestStackSubviewsAndroid';
 export { default as TestPreventNativeDismissSingleStack } from './TestPreventNativeDismissSingleStack';

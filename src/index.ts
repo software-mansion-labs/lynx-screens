@@ -25,6 +25,7 @@ export type {
   StackHeaderToolbarMenuItemAndroid,
   StackHeaderToolbarMenuItemOptionsAndroid,
   StackHeaderToolbarMenuItemClickedEventPayload,
+  StackHeaderToolbarMenuItemShowAsActionAndroid,
   PlatformIconShared,
   PlatformIconAndroid,
   // iOS

@@ -58,6 +58,13 @@ declare module "@lynx-js/types" {
             id: string;
             title?: string | undefined;
             hidden?: boolean | undefined;
+            showAsAction?:
+              | 'always'
+              | 'alwaysWithText'
+              | 'ifRoom'
+              | 'ifRoomWithText'
+              | 'never'
+              | undefined;
           }>
         | undefined;
       bindOnToolbarMenuItemClicked?:
