@@ -17,17 +17,15 @@ class StackHeaderSubviewView(
     // Rely on Lynx layout instead of native Toolbar layout which stretches subview to match
     // parent. RNS caches the EXACTLY specs delivered by Fabric mounting; here the Lynx engine
     // already computed the subview size, so we report it when the Toolbar remeasures us.
+    // No fallback to super.onMeasure - it would report the measure-spec size (up to the whole
+    // toolbar); by using our logic, we enforce sizing from the Lynx engine, which is the
+    // intended behavior.
     override fun onMeasure(
         widthMeasureSpec: Int,
         heightMeasureSpec: Int,
     ) {
         val (lynxWidth, lynxHeight) = lynxSizeProvider?.invoke() ?: Pair(0, 0)
-
-        if (lynxWidth > 0 && lynxHeight > 0) {
-            setMeasuredDimension(lynxWidth, lynxHeight)
-        } else {
-            super.onMeasure(widthMeasureSpec, heightMeasureSpec)
-        }
+        setMeasuredDimension(lynxWidth, lynxHeight)
     }
 
     override fun requestLayout() {
