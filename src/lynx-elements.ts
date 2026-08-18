@@ -10,28 +10,28 @@ declare module "@lynx-js/types" {
 
   interface IntrinsicElements extends Lynx.IntrinsicElements {
     "stack-host-native": {
-      className?: string;
+      className?: string | undefined;
       children: ReactNode;
-      id?: string;
-      style?: string | Lynx.CSSProperties;
+      id?: string | undefined;
+      style?: string | Lynx.CSSProperties | undefined;
     };
     "stack-screen-native": {
-      className?: string;
+      className?: string | undefined;
       children: ReactNode;
-      id?: string;
-      style?: string | Lynx.CSSProperties;
+      id?: string | undefined;
+      style?: string | Lynx.CSSProperties | undefined;
       // Control
-      activityMode?: 'detached' | 'attached';
-      screenKey?: string;
+      activityMode?: 'detached' | 'attached' | undefined;
+      screenKey?: string | undefined;
       // Events
-      bindOnWillAppear?: Lynx.EventHandler<Lynx.BaseEventOrig<EmptyEventPayload>>;
-      bindOnDidAppear?: Lynx.EventHandler<Lynx.BaseEventOrig<EmptyEventPayload>>;
-      bindOnWillDisappear?: Lynx.EventHandler<Lynx.BaseEventOrig<EmptyEventPayload>>;
-      bindOnDidDisappear?: Lynx.EventHandler<Lynx.BaseEventOrig<EmptyEventPayload>>;
-      bindOnDismiss?: Lynx.EventHandler<Lynx.BaseEventOrig<OnDismissEventPayload>>;
-      bindOnNativeDismissPrevented?: Lynx.EventHandler<Lynx.BaseEventOrig<EmptyEventPayload>>;
+      bindOnWillAppear?: Lynx.EventHandler<Lynx.BaseEventOrig<EmptyEventPayload>> | undefined;
+      bindOnDidAppear?: Lynx.EventHandler<Lynx.BaseEventOrig<EmptyEventPayload>> | undefined;
+      bindOnWillDisappear?: Lynx.EventHandler<Lynx.BaseEventOrig<EmptyEventPayload>> | undefined;
+      bindOnDidDisappear?: Lynx.EventHandler<Lynx.BaseEventOrig<EmptyEventPayload>> | undefined;
+      bindOnDismiss?: Lynx.EventHandler<Lynx.BaseEventOrig<OnDismissEventPayload>> | undefined;
+      bindOnNativeDismissPrevented?: Lynx.EventHandler<Lynx.BaseEventOrig<EmptyEventPayload>> | undefined;
       // Configuration
-      preventNativeDismiss?: boolean;
+      preventNativeDismiss?: boolean | undefined;
     }
   }
 }

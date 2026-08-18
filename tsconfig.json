@@ -8,6 +8,7 @@
     "moduleResolution": "Bundler",
 
     "strict": true,
+    "exactOptionalPropertyTypes": true,
     "isolatedModules": true,
     "verbatimModuleSyntax": true,
 
