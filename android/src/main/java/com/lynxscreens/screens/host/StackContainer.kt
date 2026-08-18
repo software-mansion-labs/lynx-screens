@@ -3,7 +3,7 @@ package com.lynxscreens.screens.host
 import android.annotation.SuppressLint
 import android.content.Context
 import android.util.Log
-import androidx.coordinatorlayout.widget.CoordinatorLayout
+import android.widget.FrameLayout
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import com.lynxscreens.screens.ext.isMeasured
@@ -17,7 +17,7 @@ import java.lang.ref.WeakReference
 internal class StackContainer(
     context: Context,
     private val delegate: WeakReference<StackContainerDelegate>,
-) : CoordinatorLayout(context),
+) : FrameLayout(context),
     FragmentManager.OnBackStackChangedListener {
     private var fragmentManager: FragmentManager? = null
 
@@ -246,6 +246,15 @@ internal class StackContainer(
                 onNativeFragmentPop(fragment)
             }
         }
+    }
+
+    internal fun forceSubtreeMeasureAndLayoutPass() {
+        measure(
+            MeasureSpec.makeMeasureSpec(width, MeasureSpec.EXACTLY),
+            MeasureSpec.makeMeasureSpec(height, MeasureSpec.EXACTLY),
+        )
+
+        layout(left, top, right, bottom)
     }
 
     companion object {
