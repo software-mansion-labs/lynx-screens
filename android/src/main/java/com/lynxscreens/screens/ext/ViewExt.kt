@@ -3,11 +3,11 @@ package com.lynxscreens.screens.ext
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.findFragment
+import androidx.fragment.app.FragmentManager
 
 internal fun View.findFragmentOrNull(): Fragment? =
     try {
-        this.findFragment()
+        FragmentManager.findFragment<Fragment>(this)
     } catch (_: IllegalStateException) {
         null
     }
