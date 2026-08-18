@@ -12,7 +12,7 @@ import java.lang.IllegalArgumentException
 import java.lang.ref.WeakReference
 import kotlin.properties.Delegates
 
-@LynxElement(name = "stack-screen-native")
+@LynxElement(name = "ls-stack-screen")
 internal class StackScreenComponent(context: LynxContext) : UIGroup<StackScreenView>(context) {
     enum class ActivityMode {
         DETACHED,

@@ -3,7 +3,7 @@ import * as Lynx from '@lynx-js/types';
 
 export const StackHostNativeComponent = ({ children }: Lynx.ViewProps) => {
   return (
-    <stack-host-native
+    <ls-stack-host
       style={{
         display: 'flex',
         flex: 1,
@@ -12,6 +12,6 @@ export const StackHostNativeComponent = ({ children }: Lynx.ViewProps) => {
       }}
     >
       {children}
-    </stack-host-native>
+    </ls-stack-host>
   );
 };

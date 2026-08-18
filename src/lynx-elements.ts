@@ -9,13 +9,13 @@ declare module "@lynx-js/types" {
   }>;
 
   interface IntrinsicElements extends Lynx.IntrinsicElements {
-    "stack-host-native": {
+    "ls-stack-host": {
       className?: string;
       children: ReactNode;
       id?: string;
       style?: string | Lynx.CSSProperties;
     };
-    "stack-screen-native": {
+    "ls-stack-screen": {
       className?: string;
       children: ReactNode;
       id?: string;

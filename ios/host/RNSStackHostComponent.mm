@@ -6,7 +6,7 @@
 
 #import "LynxScreens-Swift.h"
 
-@LynxElement("stack-host-native")
+@LynxElement("ls-stack-host")
 @implementation RNSStackHostComponent {
     BOOL _isMountingTransactionPending;
 }

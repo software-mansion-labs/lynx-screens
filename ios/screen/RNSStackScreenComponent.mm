@@ -8,7 +8,7 @@
 
 #import "LynxScreens-Swift.h"
 
-@LynxElement("stack-screen-native")
+@LynxElement("ls-stack-screen")
 @implementation RNSStackScreenComponent {
     RNSStackScreenController *_Nonnull _controller;
     RNSStackScreenEventEmitter *_eventEmitter;
