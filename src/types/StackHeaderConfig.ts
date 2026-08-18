@@ -48,7 +48,7 @@ export interface StackHeaderToolbarSubviewAndroid {
    *
    * @platform android
    */
-  Component: ReactNode;
+  Component: NonNullable<ReactNode>;
 }
 
 export interface StackHeaderBackgroundSubviewAndroid {
@@ -80,7 +80,7 @@ export interface StackHeaderBackgroundSubviewAndroid {
    *
    * @platform android
    */
-  Component: ReactNode;
+  Component: NonNullable<ReactNode>;
 }
 
 export interface StackHeaderConfigPropsAndroid {
@@ -212,7 +212,7 @@ export interface StackHeaderConfigProps extends StackHeaderConfigPropsBase {
 }
 
 export type StackHeaderSubviewProps = {
-  children?: ReactNode | undefined;
+  children: NonNullable<ReactNode>;
 
   type?: StackHeaderSubviewTypeAndroid | undefined;
   collapseMode?: StackHeaderSubviewCollapseModeAndroid | undefined;
