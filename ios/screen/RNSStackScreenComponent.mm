@@ -1,12 +1,11 @@
 #import "RNSStackScreenComponent.h"
 #import "RNSStackHostComponent.h"
+#import "RNSStackScreenController.h"
 #import "RNSStackScreenEventEmitter.h"
 
 #import <Lynx/LynxComponentRegistry.h>
 #import <Lynx/LynxLog.h>
 #import <Lynx/LynxPropsProcessor.h>
-
-#import "LynxScreens-Swift.h"
 
 @LynxElement("stack-screen-native")
 @implementation RNSStackScreenComponent {
@@ -30,8 +29,9 @@
 {
     [self resetProps];
     [self setupController];
-    
+
     _hasUpdatedActivityMode = NO;
+    _isNativelyDismissed = NO;
 }
 
 - (void)resetProps

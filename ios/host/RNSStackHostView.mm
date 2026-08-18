@@ -18,7 +18,7 @@
      * `LynxUI.insertChild` method automatically calls `insertSubview`, taking the management over the native hierarchy.
      * However, we need to intercept and ignore this call when dealing with a `StackHost` - `StackScreen` communication.
      * While attaching a `StackScreen` as a Lynx child of a `StackHost` is reasonable for Lynx component hierarchy (similarly to `reactSubviews`),
-     * the native hierarchy requires screen management to be realized by `RNStackController` (at the view controller level),
+     * the native hierarchy requires screen management to be realized by `RNSStackNavigationController` (at the view controller level),
      * rather than relying on direct insertions.
      */
     if ([view isKindOfClass:RNSStackScreenView.class]) {

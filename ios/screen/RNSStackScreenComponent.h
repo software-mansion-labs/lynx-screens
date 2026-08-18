@@ -23,6 +23,7 @@ typedef NS_ENUM(NSInteger, RNSScreenLifecycleEvent) {
 
 @property (nonatomic, weak, readwrite, nullable) RNSStackHostComponent *stackHost;
 @property (nonatomic, strong, readonly, nonnull) RNSStackScreenController *controller;
+@property (nonatomic) BOOL isNativelyDismissed;
 
 @end
 
