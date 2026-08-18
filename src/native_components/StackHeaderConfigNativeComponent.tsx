@@ -1,18 +1,29 @@
-import React from 'react';
+import {
+  forwardRef,
+  useImperativeHandle,
+  useRef,
+  type Ref,
+} from '@lynx-js/react';
+import type { NodesRef } from '@lynx-js/types';
 import type {
   PlatformIconAndroid,
   StackHeaderConfigProps,
   StackHeaderConfigPropsAndroid,
+  StackHeaderConfigRef,
+  StackHeaderToolbarMenuItemOptionsAndroid,
   StackHeaderTypeAndroid,
 } from '../types/StackHeaderConfig.js';
 import { StackHeaderSubviewNativeComponent } from './StackHeaderSubviewNativeComponent.js';
 
-export const StackHeaderConfigNativeComponent = (
+const StackHeaderConfigNativeComponentInner = (
   props: StackHeaderConfigProps,
+  forwardedRef: Ref<StackHeaderConfigRef>,
 ) => {
   // ios props are safely dropped
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const { android, ios, ...baseProps } = props;
+
+  const ref = useHeaderConfigRef(forwardedRef);
 
   const {
     backgroundSubview,
@@ -25,6 +36,7 @@ export const StackHeaderConfigNativeComponent = (
     scrollFlagEnterAlwaysCollapsed,
     scrollFlagExitUntilCollapsed,
     scrollFlagSnap,
+    onToolbarMenuItemClicked,
     ...filteredAndroidProps
   } = android ?? {};
 
@@ -39,6 +51,7 @@ export const StackHeaderConfigNativeComponent = (
 
   return (
     <stack-header-config-native
+      ref={ref}
       style={{
         position: 'absolute',
         left: 0,
@@ -51,6 +64,7 @@ export const StackHeaderConfigNativeComponent = (
       {...backButtonIconProps}
       {...scrollFlagProps}
       hasBackgroundSubview={backgroundSubview != null}
+      bindOnToolbarMenuItemClicked={onToolbarMenuItemClicked}
     >
       {/*
         Please note that the order of the subviews MUST match
@@ -82,6 +96,61 @@ export const StackHeaderConfigNativeComponent = (
     </stack-header-config-native>
   );
 };
+
+function useHeaderConfigRef(forwardedRef: Ref<StackHeaderConfigRef>) {
+  const ref = useRef<NodesRef>(null);
+
+  useImperativeHandle(forwardedRef, () => ({
+    android: {
+      setToolbarMenuItemOptions: (id, options) => {
+        if (!ref.current) {
+          console.warn(
+            '[RNScreens] Reference to native header config component has not been updated yet.',
+          );
+          return;
+        }
+
+        // RNS dispatches a Fabric view command here; the Lynx counterpart is
+        // a UI method invocation through the NodesRef.
+        ref.current
+          .invoke({
+            method: 'setToolbarMenuItemOptions',
+            params: {
+              id,
+              options: parseToolbarMenuItemOptionsToParams(options),
+            },
+          })
+          .exec();
+      },
+    },
+  }));
+
+  return ref;
+}
+
+// Doesn't support nested props.
+function parseToolbarMenuItemOptionsToParams(
+  options: StackHeaderToolbarMenuItemOptionsAndroid,
+): Record<string, unknown> {
+  return Object.fromEntries(
+    Object.entries(options).map(([key, value]) => {
+      if (
+        typeof value === 'object' &&
+        value !== null &&
+        !Array.isArray(value)
+      ) {
+        throw new Error(`[RNScreens] Unexpected nested object.`);
+      }
+
+      return [
+        key,
+        // We need to replace explicit `undefined` with `null`
+        // so that we're able to read that information on the native side.
+        value === undefined ? null : value,
+      ];
+    }),
+  );
+}
 
 function parseBackButtonIconToNativeProps(
   icon: PlatformIconAndroid | undefined,
@@ -161,3 +230,8 @@ function resolveScrollFlags(
     scrollFlagSnap: overrides.scrollFlagSnap ?? defaults.scrollFlagSnap,
   };
 }
+
+export const StackHeaderConfigNativeComponent = forwardRef<
+  StackHeaderConfigRef,
+  StackHeaderConfigProps
+>(StackHeaderConfigNativeComponentInner);
