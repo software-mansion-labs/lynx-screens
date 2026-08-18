@@ -21,9 +21,12 @@ import {
   StackScreenNativeComponent,
 } from 'lynx-screens';
 import { useParentNavigationEffect } from '../hooks/useParentNavigationEffect';
+import { useComponentsByName } from '../hooks/useComponentsByName';
 
 export function StackContainer({ routeConfigs }: StackContainerProps) {
   useSanitizeRouteConfigs(routeConfigs);
+
+  const componentsByName = useComponentsByName(routeConfigs);
 
   const [stackNavState, navActionDispatch]: [
     StackNavigationState,
@@ -59,7 +62,7 @@ export function StackContainer({ routeConfigs }: StackContainerProps) {
   return (
     <StackHostNativeComponent>
       {stackNavState.stack.map(
-        ({ Component, options: { headerConfig, ...options }, activityMode, routeKey }) => {
+        ({ options: { headerConfig, ...options }, activityMode, routeKey, name }) => {
           const stackNavigationContext: StackNavigationContextPayload = {
             routeKey,
             routeOptions: { ...options },
@@ -69,6 +72,13 @@ export function StackContainer({ routeConfigs }: StackContainerProps) {
             batch: navMethods.batchAction,
             setRouteOptions: navMethods.setRouteOptions,
           };
+
+          const Component = componentsByName.get(name);
+          if (!Component) {
+            throw new Error(
+              `[Stack] No config matches the "${name}" route name`,
+            );
+          }
 
         return (
           <StackScreenNativeComponent
