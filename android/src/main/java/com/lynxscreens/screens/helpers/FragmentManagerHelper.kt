@@ -3,12 +3,12 @@ package com.lynxscreens.screens.helpers
 import android.content.ContextWrapper
 import android.view.ViewGroup
 import android.view.ViewParent
-import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentTransaction
 import com.lynx.tasm.LynxView
 import com.lynxscreens.screens.common.FragmentProviding
+import com.lynxscreens.screens.ext.findFragmentOrNull
 
 object FragmentManagerHelper {
     fun findFragmentManagerForView(view: ViewGroup): FragmentManager? {
@@ -63,15 +63,12 @@ object FragmentManagerHelper {
             context.supportFragmentManager
         } else {
             // We are in some custom setup & we want to use the closest fragment manager in hierarchy.
-            // `findFragment` method throws IllegalStateException when it fails to resolve appropriate
-            // fragment. It might happen when e.g. Lynx is loaded directly in Activity
-            // but some custom fragments are still used. Such use case seems highly unlikely
-            // so, as for now we fallback to activity's FragmentManager in hope for the best.
-            try {
-                FragmentManager.findFragment<Fragment>(rootView).childFragmentManager
-            } catch (ex: IllegalStateException) {
-                context.supportFragmentManager
-            }
+            // Fragment KTX 1.1.0 does not provide `findFragment`, so the compatibility resolver
+            // returns null when it cannot resolve an appropriate fragment. It might happen when e.g.
+            // Lynx is loaded directly in Activity but some custom fragments are still used. Such use
+            // case seems highly unlikely so, as for now we fallback to activity's FragmentManager in
+            // hope for the best.
+            rootView.findFragmentOrNull()?.childFragmentManager ?: context.supportFragmentManager
         }
     }
 }
