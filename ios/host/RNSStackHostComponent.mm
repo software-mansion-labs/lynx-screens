@@ -4,10 +4,14 @@
 #import <Lynx/LynxComponentRegistry.h>
 #import <Lynx/LynxLog.h>
 
-#import "LynxScreens-Swift.h"
+#import "RNSStackNavigationController.h"
+#import "RNSStackOperationCoordinator.h"
 
 @LynxElement("stack-host-native")
 @implementation RNSStackHostComponent {
+    RNSStackNavigationController *_Nonnull _stackNavigationController;
+    RNSStackOperationCoordinator *_Nonnull _stackOperationCoordinator;
+    NSMutableArray<RNSStackScreenComponent *> *_Nonnull _renderedScreens;
     BOOL _isMountingTransactionPending;
 }
 
@@ -23,8 +27,9 @@
 
 - (void)initState
 {
-    _controller = [[RNSStackController alloc] initWithStackHostComponent:self];
-    _hasModifiedSubviewsInCurrentTransaction = NO;
+    _stackNavigationController = [RNSStackNavigationController new];
+    _stackOperationCoordinator = [RNSStackOperationCoordinator new];
+    _renderedScreens = [NSMutableArray new];
     _isMountingTransactionPending = NO;
 }
 
@@ -38,7 +43,96 @@
 
 - (void)viewDidMoveToWindow
 {
-    [self lynxAddControllerToClosestParent:_controller];
+    LLogInfo(@"[RNScreens] StackHost [%ld] attached to window", (long)self.view.tag);
+    [self lynxAddControllerToClosestParent:_stackNavigationController];
+}
+
+#pragma mark - Communication with StackScreen
+
+- (void)stackScreenChangedActivityMode:(nonnull RNSStackScreenComponent *)stackScreen
+{
+    NSAssert(stackScreen != nil, @"[RNScreens] Expected non nill stackScreen");
+    switch (stackScreen.activityMode) {
+        case RNSStackScreenActivityModeAttached:
+            // Lynx attaches children on insert by default. To support preloading,
+            // we manually trigger the insert logic only when confirmed ATTACHED.
+            [self insertChild:stackScreen atIndex:self.children.count];
+            break;
+        case RNSStackScreenActivityModeDetached:
+            [_stackOperationCoordinator addPopOperation:stackScreen];
+            [self scheduleMountingTransactionFinishIfNeeded];
+            break;
+        default:
+            NSAssert(NO, @"[RNScreens] Unexpected value of activityMode: %d", stackScreen.activityMode);
+            return;
+    }
+}
+
+#pragma mark - Children Lifecycle
+
+- (void)insertChild:(id)child atIndex:(NSInteger)index
+{
+    NSAssert(
+             [child isKindOfClass:[RNSStackScreenComponent class]],
+             @"[RNScreens] Attempt to mount child of unsupported type: %@, expected %@",
+             [child class],
+             RNSStackScreenComponent.class
+             );
+    RNSStackScreenComponent *stackScreen = (RNSStackScreenComponent *)child;
+    stackScreen.stackHost = self;
+
+    if (stackScreen.activityMode == RNSStackScreenActivityModeAttached) {
+        [_renderedScreens addObject:stackScreen];
+        [self addPushOperationIfNeeded:stackScreen];
+        // Insert always at the last index
+        [super insertChild:stackScreen atIndex:self.children.count];
+        [self scheduleMountingTransactionFinishIfNeeded];
+    }
+}
+
+- (void)removeChild:(id)child atIndex:(NSInteger)index
+{
+    NSAssert(
+             [child isKindOfClass:[RNSStackScreenComponent class]],
+             @"[RNScreens] Attempt to unmount child of unsupported type: %@, expected %@",
+             [child class],
+             RNSStackScreenComponent.class
+             );
+    RNSStackScreenComponent *stackScreen = (RNSStackScreenComponent *)child;
+
+    [_renderedScreens removeObject:stackScreen];
+    stackScreen.stackHost = nil;
+    [self addPopOperationIfNeeded:stackScreen];
+
+    // We're taking over the responsibility for managing indices, because of the symmetrical
+    // responsibility for attaching children to handle the preload case
+    NSUInteger stackScreenIndex = [self.children indexOfObject:stackScreen];
+    if (stackScreenIndex != NSNotFound) {
+        [super removeChild:stackScreen atIndex:stackScreenIndex];
+    }
+
+    [self scheduleMountingTransactionFinishIfNeeded];
+}
+
+#pragma mark - Utils
+
+- (void)addPushOperationIfNeeded:(nonnull RNSStackScreenComponent *)stackScreen
+{
+    if (stackScreen.activityMode == RNSStackScreenActivityModeAttached) {
+        [_stackOperationCoordinator addPushOperation:stackScreen];
+    }
+}
+
+- (void)addPopOperationIfNeeded:(nonnull RNSStackScreenComponent *)stackScreen
+{
+    if (stackScreen.activityMode == RNSStackScreenActivityModeAttached && !stackScreen.isNativelyDismissed) {
+        // This shouldn't happen in typical scenarios but it can happen with fast-refresh.
+        [_stackOperationCoordinator addPopOperation:stackScreen];
+    } else {
+        LLogInfo(
+            @"[RNScreens] ignoring pop operation of %@, already not attached or natively dismissed",
+            stackScreen.screenKey);
+    }
 }
 
 - (UIViewController *)lynxViewControllerForView:(UIView *)view
@@ -55,6 +149,7 @@
 
 - (void)lynxAddControllerToClosestParent:(UIViewController *)controller
 {
+    NSAssert(controller != nil, @"[RNScreens] Attempt to move to a nullish controller");
     if (!controller.parentViewController) {
         UIView *parentView = self.view.superview;
         while (parentView) {
@@ -72,112 +167,30 @@
     }
 }
 
-#pragma mark - Getters
-
-- (nonnull RNSStackController *)stackController
-{
-    NSAssert(_controller != nil, @"[RNScreens] Controller must not be nil");
-    return _controller;
-}
-
-#pragma mark - Communication with StackScreen
-
-- (void)stackScreenChangedActivityMode:(nonnull RNSStackScreenComponent *)stackScreen
-{
-    [self synchronizeStackScreenMountState:stackScreen];
-}
-
-- (void)synchronizeStackScreenMountState:(nonnull RNSStackScreenComponent *)stackScreen
-{
-    [_controller setNeedsUpdateOfChildViewControllers];
-    [self updateChildMountingForStackScreen:stackScreen];
-    
-    if (!_isMountingTransactionPending) {
-        _isMountingTransactionPending = YES;
-        
-        dispatch_async(dispatch_get_main_queue(), ^{
-            self->_isMountingTransactionPending = NO;
-            [self lynxMountingTransactionDidFinish];
-        });
-    }
-}
-
 #pragma mark - Mounting Transaction
+
+/**
+ * Lynx has no mounting-transaction observer on iOS, so we coalesce all updates scheduled
+ * within a single runloop tick and treat the async hop as the transaction end - the
+ * counterpart of RNS's RCTMountingTransactionObserving.
+ */
+- (void)scheduleMountingTransactionFinishIfNeeded
+{
+    if (_isMountingTransactionPending) {
+        return;
+    }
+    _isMountingTransactionPending = YES;
+
+    dispatch_async(dispatch_get_main_queue(), ^{
+        self->_isMountingTransactionPending = NO;
+        [self lynxMountingTransactionDidFinish];
+    });
+}
 
 - (void)lynxMountingTransactionDidFinish
 {
-    if (self.hasModifiedSubviewsInCurrentTransaction) {
-        [_controller setNeedsUpdateOfChildViewControllers];
-        self.hasModifiedSubviewsInCurrentTransaction = NO;
-    }
-    [_controller lynxMountingTransactionDidFinish];
-}
-
-#pragma mark - Children Lifecycle
-
-- (void)insertChild:(id)child atIndex:(NSInteger)index
-{
-    NSAssert(
-             [child isKindOfClass:[RNSStackScreenComponent class]],
-             @"[RNScreens] Attempt to mount child of unsupported type: %@, expected %@",
-             [child class],
-             RNSStackScreenComponent.class
-             );
-    RNSStackScreenComponent *stackScreen = (RNSStackScreenComponent *)child;
-    stackScreen.stackHost = self;
-    self.hasModifiedSubviewsInCurrentTransaction = YES;
-    
-    NSLog(
-          @"StackHost [%ld] mount: StackScreen [%ld] (%@) at %ld",
-          self.view.tag,
-          stackScreen.view.tag,
-          stackScreen.screenKey,
-          index
-          );
-    
-    [self synchronizeStackScreenMountState:stackScreen];
-}
-
-- (void)removeChild:(id)child atIndex:(NSInteger)index
-{
-    NSAssert(
-             [child isKindOfClass:[RNSStackScreenComponent class]],
-             @"[RNScreens] Attempt to unmount child of unsupported type: %@, expected %@",
-             [child class],
-             RNSStackScreenComponent.class
-             );
-    
-    RNSStackScreenComponent *stackScreen = (RNSStackScreenComponent *)child;
-    // We're taking over the responsibility for managing indices, because of the symmetrical
-    // responsibility for attaching children to handle the preload case
-    NSUInteger stackScreenIndex = [self.children indexOfObject:stackScreen];
-    
-    if (stackScreenIndex == NSNotFound) {
-        LLogWarn(@"[RNScreens] Attempted to remove a screen that is not attached to children.");
-        return;
-    }
-    
-    stackScreen.stackHost = nil;
-    self.hasModifiedSubviewsInCurrentTransaction = YES;
-    
-    NSLog(
-          @"StackHost [%ld] unmount: StackScreen [%ld] (%@) at %ld",
-          self.view.tag,
-          stackScreen.view.tag,
-          stackScreen.screenKey,
-          index
-          );
-    
-    [super removeChild:stackScreen atIndex:stackScreenIndex];
-}
-
-- (void)updateChildMountingForStackScreen:(RNSStackScreenComponent *)stackScreen
-{
-    BOOL isMounted = [self.children containsObject:stackScreen];
-    
-    if (stackScreen.activityMode == RNSStackScreenActivityModeAttached && !isMounted) {
-        [super insertChild:stackScreen atIndex:self.children.count];
-    }
+    [_stackOperationCoordinator executePendingOperationsIfNeeded:_stackNavigationController
+                                             withRenderedScreens:_renderedScreens];
 }
 
 @end

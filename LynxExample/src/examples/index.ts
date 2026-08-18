@@ -4,4 +4,5 @@ export { default as TestBase } from './TestBase';
 export { default as TestNested } from './TestNested';
 export { default as TestPreventNativeDismissNestedStack } from './TestPreventNativeDismissNestedStack';
 export { default as TestStackHeaderModes } from './TestStackHeaderModes';
+export { default as TestStackSimpleNav } from './TestStackSimpleNav';
 export { default as TestPreventNativeDismissSingleStack } from './TestPreventNativeDismissSingleStack';
