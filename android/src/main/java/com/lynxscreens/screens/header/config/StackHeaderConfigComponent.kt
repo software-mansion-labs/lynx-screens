@@ -1,6 +1,8 @@
 package com.lynxscreens.screens.header.config
 
 import android.content.Context
+import android.graphics.Color
+import android.graphics.drawable.Drawable
 import android.util.LayoutDirection
 import com.lynx.tasm.behavior.LynxContext
 import com.lynx.tasm.behavior.LynxElement
@@ -8,6 +10,8 @@ import com.lynx.tasm.behavior.LynxProp
 import com.lynx.tasm.behavior.ui.LynxBaseUI
 import com.lynx.tasm.behavior.ui.UIGroup
 import com.lynxscreens.screens.common.ShadowStateProxy
+import com.lynxscreens.screens.helpers.getSystemDrawableResource
+import com.lynxscreens.screens.helpers.loadImage
 import com.lynxscreens.screens.header.subview.OnStackHeaderSubviewChangeListener
 import com.lynxscreens.screens.header.subview.StackHeaderSubviewComponent
 import com.lynxscreens.screens.header.subview.StackHeaderSubviewType
@@ -28,6 +32,48 @@ internal class StackHeaderConfigComponent(
         internal set
     override var transparent: Boolean = false
         internal set
+    override var backButtonHidden: Boolean = false
+        internal set
+    override var backButtonTintColor: Int? = null
+        internal set
+    override var backButtonIcon: Drawable? = null
+        internal set
+
+    // Staging fields for back button icon resolution.
+    // Both props may arrive in any order within a single update batch.
+    // Resolution happens in resolveBackButtonIconIfNeeded(), called from onPropsUpdated.
+    internal var backButtonDrawableIconResourceName: String? = null
+    internal var backButtonImageIconUri: String? = null
+
+    private var lastResolvedDrawableIconResourceName: String? = null
+    private var lastResolvedImageIconUri: String? = null
+
+    internal fun resolveBackButtonIconIfNeeded() {
+        val name = backButtonDrawableIconResourceName
+        val uri = backButtonImageIconUri
+
+        if (name == lastResolvedDrawableIconResourceName && uri == lastResolvedImageIconUri) {
+            return
+        }
+
+        lastResolvedDrawableIconResourceName = name
+        lastResolvedImageIconUri = uri
+
+        if (name != null) {
+            backButtonIcon = getSystemDrawableResource(lynxContext, name)
+        } else if (uri != null) {
+            loadImage(lynxContext, uri) { drawable ->
+                if (uri == lastResolvedImageIconUri) {
+                    backButtonIcon = drawable
+                    // We need to call notifyConfigChanged because icons are loaded asynchronously
+                    // and regular update path might execute too early.
+                    notifyConfigChanged()
+                }
+            }
+        } else {
+            backButtonIcon = null
+        }
+    }
 
     override var backgroundSubview: StackHeaderSubviewComponent? = null
         private set
@@ -100,6 +146,7 @@ internal class StackHeaderConfigComponent(
 
     override fun onPropsUpdated() {
         super.onPropsUpdated()
+        resolveBackButtonIconIfNeeded()
         notifyConfigChanged()
     }
 
@@ -158,5 +205,27 @@ internal class StackHeaderConfigComponent(
     @LynxProp(name = "transparent")
     fun setTransparent(value: Boolean?) {
         transparent = value == true
+    }
+
+    @LynxProp(name = "backButtonHidden")
+    fun setBackButtonHidden(value: Boolean?) {
+        backButtonHidden = value == true
+    }
+
+    // RNS receives an already-processed color Int from Fabric; on Lynx the prop
+    // arrives as a CSS color string.
+    @LynxProp(name = "backButtonTintColor")
+    fun setBackButtonTintColor(value: String?) {
+        backButtonTintColor = value?.let { runCatching { Color.parseColor(it) }.getOrNull() }
+    }
+
+    @LynxProp(name = "backButtonDrawableIconResourceName")
+    fun setBackButtonDrawableIconResourceName(value: String?) {
+        backButtonDrawableIconResourceName = value
+    }
+
+    @LynxProp(name = "backButtonImageIconUri")
+    fun setBackButtonImageIconUri(value: String?) {
+        backButtonImageIconUri = value
     }
 }

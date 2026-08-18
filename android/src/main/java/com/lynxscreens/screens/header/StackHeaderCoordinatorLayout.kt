@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.view.ViewGroup.LayoutParams.MATCH_PARENT
 import android.widget.FrameLayout
+import androidx.activity.OnBackPressedDispatcherOwner
 import androidx.coordinatorlayout.widget.CoordinatorLayout
 import com.lynxscreens.screens.header.config.OnHeaderConfigAttachListener
 import com.lynxscreens.screens.header.config.OnHeaderConfigChangeListener
@@ -15,15 +16,26 @@ import java.lang.ref.WeakReference
 internal class StackHeaderCoordinatorLayout(
     context: Context,
     internal val stackScreen: StackScreenComponent,
+    canNavigateBack: Boolean,
 ) : CoordinatorLayout(context) {
-    // Divergence from RNS: on RN the current header height is pushed into the Shadow Tree here
-    // (contentOriginOffset), because Fabric mounting overrides native view offsets. In Lynx the
-    // AppBar behavior offsets stackScreenWrapper natively and the screen's Lynx children are laid
-    // out relative to the (already offset) screen view, so forwarding the header height would
-    // offset the content twice. Screen size changes reach the Shadow Tree via
-    // StackScreenView.onLayout instead.
     private val headerCoordinator =
-        StackHeaderCoordinator(context) { _ -> }
+        StackHeaderCoordinator(
+            context = context,
+            canNavigateBack = canNavigateBack,
+            // Divergence from RNS: on RN the current header height is pushed into the Shadow Tree
+            // here (contentOriginOffset), because Fabric mounting overrides native view offsets.
+            // In Lynx the AppBar behavior offsets stackScreenWrapper natively and the screen's
+            // Lynx children are laid out relative to the (already offset) screen view, so
+            // forwarding the header height would offset the content twice. Screen size changes
+            // reach the Shadow Tree via StackScreenView.onLayout instead.
+            onHeaderHeightChanged = { _ -> },
+            onNavigationIconClick = {
+                // The fragment constructs this layout with its (activity) context.
+                (getContext() as? OnBackPressedDispatcherOwner)
+                    ?.onBackPressedDispatcher
+                    ?.onBackPressed()
+            },
+        )
 
     /**
      * This callback is used to detect when header config is attached.

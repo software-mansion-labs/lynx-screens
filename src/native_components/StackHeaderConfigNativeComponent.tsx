@@ -1,5 +1,8 @@
 import React from 'react';
-import type { StackHeaderConfigProps } from '../types/StackHeaderConfig.js';
+import type {
+  PlatformIconAndroid,
+  StackHeaderConfigProps,
+} from '../types/StackHeaderConfig.js';
 import { StackHeaderSubviewNativeComponent } from './StackHeaderSubviewNativeComponent.js';
 
 export const StackHeaderConfigNativeComponent = (
@@ -14,8 +17,11 @@ export const StackHeaderConfigNativeComponent = (
     leadingSubview,
     centerSubview,
     trailingSubview,
+    backButtonIcon,
     ...filteredAndroidProps
   } = android ?? {};
+
+  const backButtonIconProps = parseBackButtonIconToNativeProps(backButtonIcon);
 
   return (
     <stack-header-config-native
@@ -28,6 +34,7 @@ export const StackHeaderConfigNativeComponent = (
       }}
       {...baseProps}
       {...filteredAndroidProps}
+      {...backButtonIconProps}
       hasBackgroundSubview={backgroundSubview != null}
     >
       {/*
@@ -60,3 +67,28 @@ export const StackHeaderConfigNativeComponent = (
     </stack-header-config-native>
   );
 };
+
+function parseBackButtonIconToNativeProps(
+  icon: PlatformIconAndroid | undefined,
+): {
+  backButtonImageIconUri?: string | undefined;
+  backButtonDrawableIconResourceName?: string | undefined;
+} {
+  if (!icon) {
+    return {};
+  }
+
+  if (icon.type === 'imageSource') {
+    return {
+      backButtonImageIconUri: icon.uri,
+    };
+  } else if (icon.type === 'drawableResource') {
+    return {
+      backButtonDrawableIconResourceName: icon.name,
+    };
+  } else {
+    throw new Error(
+      '[RNScreens] Incorrect icon format for Android. You must provide `imageSource` or `drawableResource`.',
+    );
+  }
+}
