@@ -4,6 +4,17 @@ import type * as Lynx from '@lynx-js/types';
 declare module "@lynx-js/types" {
   type EmptyEventPayload = Record<string, never>;
 
+  type StackHeaderMenuItemAttr = {
+    type: 'menuItem';
+    title?: string | undefined;
+  };
+
+  type StackHeaderMenuAttr = {
+    type: 'menu';
+    title?: string | undefined;
+    children: (StackHeaderMenuAttr | StackHeaderMenuItemAttr)[];
+  };
+
   type OnDismissEventPayload = Readonly<{
     isNativeDismiss: boolean;
   }>;
@@ -96,6 +107,7 @@ declare module "@lynx-js/types" {
         | 'largeSubtitle'
         | undefined;
       label?: string | undefined;
+      menu?: StackHeaderMenuAttr | undefined;
     };
     "ls-stack-header-item-spacer": {
       className?: string | undefined;

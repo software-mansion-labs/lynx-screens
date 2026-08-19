@@ -340,6 +340,19 @@ export interface StackHeaderConfigPropsAndroid {
     | undefined;
 }
 
+export interface StackHeaderMenuItem {
+  type: 'menuItem';
+  title?: string | undefined;
+}
+
+export interface StackHeaderMenu {
+  type: 'menu';
+  title?: string | undefined;
+  children: StackHeaderMenuElement[];
+}
+
+export type StackHeaderMenuElement = StackHeaderMenu | StackHeaderMenuItem;
+
 export interface StackHeaderBaseItemIOS {
   key: string;
   label?: string | undefined;
@@ -347,12 +360,14 @@ export interface StackHeaderBaseItemIOS {
 
 export interface StackHeaderInlineItemIOS extends StackHeaderBaseItemIOS {
   type: 'item';
+  menu?: StackHeaderMenu | undefined;
 }
 
 export interface StackHeaderInlineCustomItemIOS {
   key: string;
   type: 'item';
   render: () => ReactElement;
+  menu?: StackHeaderMenu | undefined;
 }
 
 interface StackHeaderFixedSpacerItemIOS {

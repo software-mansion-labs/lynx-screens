@@ -1,4 +1,5 @@
 #import "RNSStackHeaderItemComponent.h"
+#import "RNSStackHeaderMenuMapper.h"
 
 #import <Lynx/LynxComponentRegistry.h>
 #import <Lynx/LynxLog.h>
@@ -11,6 +12,7 @@
     RNSHeaderItemPlacement _placement;
     BOOL _didSetHeaderItemPlacement;
     NSString *_Nullable _label;
+    RNSStackHeaderMenuData *_Nullable _menu;
     BOOL _needsUpdate;
 }
 
@@ -25,6 +27,7 @@
 - (void)resetProps
 {
     _label = nil;
+    _menu = nil;
     _placement = RNSHeaderItemPlacementTrailing;
     _didSetHeaderItemPlacement = NO;
     _needsUpdate = NO;
@@ -54,6 +57,11 @@
 - (nullable NSString *)label
 {
     return _label;
+}
+
+- (nullable RNSStackHeaderMenuData *)menu
+{
+    return _menu;
 }
 
 - (nullable UIView *)customView
@@ -143,6 +151,16 @@ LYNX_PROP_SETTER("label", setLabel, NSString *) {
         _label = value;
         _needsUpdate = YES;
     }
+}
+
+LYNX_PROP_SETTER("menu", setMenu, NSDictionary *) {
+    if (requestReset) {
+        value = nil;
+    }
+    // Adaptation: Lynx delivers the prop as a plain NSDictionary - no
+    // folly::dynamic conversion is needed.
+    _menu = [RNSStackHeaderMenuMapper menuFromDictionary:value];
+    _needsUpdate = YES;
 }
 
 - (void)propsDidUpdate

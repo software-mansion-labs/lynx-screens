@@ -1,5 +1,6 @@
 import React from 'react';
 import type { ReactElement } from '@lynx-js/react';
+import type { StackHeaderMenu } from '../types/StackHeaderConfig.js';
 
 export type StackHeaderItemPlacement =
   | 'leading'
@@ -12,12 +13,14 @@ export type StackHeaderItemProps = {
   placement: StackHeaderItemPlacement;
   label?: string | undefined;
   render?: (() => ReactElement) | undefined;
+  menu?: StackHeaderMenu | undefined;
 };
 
 export const StackHeaderItemNativeComponent = ({
   placement,
   label,
   render,
+  menu,
 }: StackHeaderItemProps) => {
   return (
     <ls-stack-header-item
@@ -28,6 +31,7 @@ export const StackHeaderItemNativeComponent = ({
       }}
       placement={placement}
       label={label}
+      menu={menu}
     >
       {render?.()}
     </ls-stack-header-item>
