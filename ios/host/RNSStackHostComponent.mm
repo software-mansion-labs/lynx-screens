@@ -45,6 +45,7 @@
 {
     LLogInfo(@"[RNScreens] StackHost [%ld] attached to window", (long)self.view.tag);
     [self lynxAddControllerToClosestParent:_stackNavigationController];
+    [self setupViewConstraintsForController:_stackNavigationController];
 }
 
 #pragma mark - Communication with StackScreen
@@ -165,6 +166,24 @@
         }
         return;
     }
+}
+
+- (void)setupViewConstraintsForController:(nonnull UIViewController *)controller
+{
+    if (controller.view.superview != self.view) {
+        // lynxAddControllerToClosestParent did not attach the controller yet -
+        // constraints would have no common ancestor.
+        return;
+    }
+
+    // Enable auto-layout to ensure valid size of stack controller view.
+    controller.view.translatesAutoresizingMaskIntoConstraints = NO;
+    [NSLayoutConstraint activateConstraints:@[
+        [controller.view.topAnchor constraintEqualToAnchor:self.view.topAnchor],
+        [controller.view.bottomAnchor constraintEqualToAnchor:self.view.bottomAnchor],
+        [controller.view.leadingAnchor constraintEqualToAnchor:self.view.leadingAnchor],
+        [controller.view.trailingAnchor constraintEqualToAnchor:self.view.trailingAnchor]
+    ]];
 }
 
 #pragma mark - Mounting Transaction

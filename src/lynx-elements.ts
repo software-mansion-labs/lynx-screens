@@ -41,6 +41,7 @@ declare module "@lynx-js/types" {
       style?: string | Lynx.CSSProperties | undefined;
       type?: 'small' | 'medium' | 'large' | undefined;
       title?: string | undefined;
+      subtitle?: string | undefined;
       hidden?: boolean | undefined;
       transparent?: boolean | undefined;
       backButtonHidden?: boolean | undefined;
@@ -53,6 +54,9 @@ declare module "@lynx-js/types" {
       scrollFlagExitUntilCollapsed?: boolean | undefined;
       scrollFlagSnap?: boolean | undefined;
       hasBackgroundSubview?: boolean | undefined;
+      largeTitle?: string | undefined;
+      largeSubtitle?: string | undefined;
+      largeTitleEnabled?: boolean | undefined;
       toolbarMenuItems?:
         | Array<{
             id: string;
@@ -78,6 +82,28 @@ declare module "@lynx-js/types" {
       style?: string | Lynx.CSSProperties | undefined;
       type?: 'background' | 'leading' | 'center' | 'trailing' | undefined;
       collapseMode?: 'off' | 'parallax' | undefined;
+    };
+    "ls-stack-header-item": {
+      className?: string | undefined;
+      children?: ReactNode | undefined;
+      id?: string | undefined;
+      style?: string | Lynx.CSSProperties | undefined;
+      placement?:
+        | 'leading'
+        | 'trailing'
+        | 'title'
+        | 'subtitle'
+        | 'largeSubtitle'
+        | undefined;
+      label?: string | undefined;
+    };
+    "ls-stack-header-item-spacer": {
+      className?: string | undefined;
+      id?: string | undefined;
+      style?: string | Lynx.CSSProperties | undefined;
+      placement?: 'leading' | 'trailing' | undefined;
+      sizing?: 'fixed' | 'flexible' | undefined;
+      width?: number | undefined;
     };
   }
 }

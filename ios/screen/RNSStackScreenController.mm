@@ -1,6 +1,7 @@
 #import "RNSStackScreenController.h"
 #import <Lynx/LynxLog.h>
 #import "RNSStackScreenComponent.h"
+#import "RNSStackScreenHeaderCoordinator.h"
 
 @implementation RNSStackScreenController
 
@@ -8,6 +9,7 @@
 {
     if (self = [super initWithNibName:nil bundle:nil]) {
         _screenComponent = component;
+        _headerCoordinator = [[RNSStackScreenHeaderCoordinator alloc] initWithScreenController:self];
     }
     return self;
 }
