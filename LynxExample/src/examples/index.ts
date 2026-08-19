@@ -9,4 +9,5 @@ export { default as TestStackToolbarMenuCommandsAndroid } from './TestStackToolb
 export { default as TestStackToolbarMenuShowAsActionAndroid } from './TestStackToolbarMenuShowAsActionAndroid';
 export { default as TestStackSubviewsAndroid } from './TestStackSubviewsAndroid';
 export { default as TestStackSubviewsIOS } from './TestStackSubviewsIOS';
+export { default as TestStackHeaderMenuIOS } from './TestStackHeaderMenuIOS';
 export { default as TestPreventNativeDismissSingleStack } from './TestPreventNativeDismissSingleStack';
