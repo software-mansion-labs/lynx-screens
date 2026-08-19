@@ -3,6 +3,7 @@ import './lynx-elements';
 export { StackHostNativeComponent } from './native_components/StackHostNativeComponent';
 export { StackScreenNativeComponent } from './native_components/StackScreenNativeComponent';
 export { StackHeaderConfigNativeComponent } from './native_components/StackHeaderConfigNativeComponent';
+export { FormSheet } from './components/FormSheet.js';
 
 export type {
   OnDismissEventPayload,
@@ -32,3 +33,11 @@ export type {
   StackHeaderConfigPropsIOS,
   StackHeaderConfigCommandsIOS,
 } from './types/StackHeaderConfig';
+export type {
+  FormSheetDetentChangedEvent,
+  FormSheetEventHandler,
+  FormSheetNativeContainerStyleProps,
+  FormSheetNativeDismissPreventedEvent,
+  FormSheetProps,
+  PreventNativeDismissChannel,
+} from './types/FormSheet.js';

@@ -1,11 +1,20 @@
 import type { ReactNode, Ref } from '@lynx-js/react';
 import type * as Lynx from '@lynx-js/types';
+import type { PreventNativeDismissChannel } from './types/FormSheet.js';
 
 declare module "@lynx-js/types" {
   type EmptyEventPayload = Record<string, never>;
 
   type OnDismissEventPayload = Readonly<{
     isNativeDismiss: boolean;
+  }>;
+
+  type FormSheetDetentChangedEventPayload = Readonly<{
+    index: number;
+  }>;
+
+  type FormSheetNativeDismissPreventedEventPayload = Readonly<{
+    channel: PreventNativeDismissChannel;
   }>;
 
   interface IntrinsicElements extends Lynx.IntrinsicElements {
@@ -78,6 +87,57 @@ declare module "@lynx-js/types" {
       style?: string | Lynx.CSSProperties | undefined;
       type?: 'background' | 'leading' | 'center' | 'trailing' | undefined;
       collapseMode?: 'off' | 'parallax' | undefined;
+    };
+    'form-sheet-native': {
+      className?: string | undefined;
+      children?: ReactNode | undefined;
+      id?: string | undefined;
+      style?: string | Lynx.CSSProperties | undefined;
+      isOpen: boolean;
+      'user-interaction-enabled'?: boolean | undefined;
+      detents?: number[] | undefined;
+      prefersGrabberVisible?: boolean | undefined;
+      preferredCornerRadius?: number | undefined;
+      largestUndimmedDetentIndex?: number | undefined;
+      initialDetentIndex?: number | undefined;
+      selectedDetentIndex?: number | undefined;
+      prefersScrollingExpandsWhenScrolledToEdge?: boolean | undefined;
+      preventNativeDismiss?:
+        | boolean
+        | PreventNativeDismissChannel[]
+        | undefined;
+      preventNativeDismissDragFeedback?: boolean | undefined;
+      nativeContainerBackgroundColor?:
+        | Lynx.CSSProperties['backgroundColor']
+        | undefined;
+      bindOnWillAppear?:
+        | Lynx.EventHandler<Lynx.BaseEventOrig<EmptyEventPayload>>
+        | undefined;
+      bindOnDidAppear?:
+        | Lynx.EventHandler<Lynx.BaseEventOrig<EmptyEventPayload>>
+        | undefined;
+      bindOnWillDisappear?:
+        | Lynx.EventHandler<Lynx.BaseEventOrig<EmptyEventPayload>>
+        | undefined;
+      bindOnDidDisappear?:
+        | Lynx.EventHandler<Lynx.BaseEventOrig<EmptyEventPayload>>
+        | undefined;
+      bindOnDismiss?:
+        | Lynx.EventHandler<Lynx.BaseEventOrig<EmptyEventPayload>>
+        | undefined;
+      bindOnNativeDismiss?:
+        | Lynx.EventHandler<Lynx.BaseEventOrig<EmptyEventPayload>>
+        | undefined;
+      bindOnDetentChanged?:
+        | Lynx.EventHandler<
+            Lynx.BaseEventOrig<FormSheetDetentChangedEventPayload>
+          >
+        | undefined;
+      bindOnNativeDismissPrevented?:
+        | Lynx.EventHandler<
+            Lynx.BaseEventOrig<FormSheetNativeDismissPreventedEventPayload>
+          >
+        | undefined;
     };
   }
 }

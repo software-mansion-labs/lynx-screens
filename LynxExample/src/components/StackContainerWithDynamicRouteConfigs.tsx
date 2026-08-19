@@ -26,7 +26,10 @@ export function StackContainerWithDynamicRouteConfigs(
 
         return prevConfigs.toSpliced(routeConfigIndex, 1, {
           ...prevConfigs[routeConfigIndex],
-          options,
+          options: {
+            ...prevConfigs[routeConfigIndex].options,
+            ...options,
+          } as StackRouteOptions,
         });
       });
     },
