@@ -1,6 +1,7 @@
 import {
   forwardRef,
   useCallback,
+  useEffect,
   useImperativeHandle,
   useRef,
   type Ref,
@@ -19,7 +20,7 @@ import type {
   StackHeaderTypeAndroid,
   SupportsMenuIOS,
 } from '../types/StackHeaderConfig.js';
-import { findMenuElementByIdInItems } from './utils.js';
+import { findMenuElementByIdInItems, validateMenuCallbacks } from './utils.js';
 import { StackHeaderSubviewNativeComponent } from './StackHeaderSubviewNativeComponent.js';
 import { parseAndroidIconToNativeProps } from '../shared/index.js';
 import {
@@ -85,6 +86,33 @@ const StackHeaderConfigIOS = (props: PlatformInnerProps) => {
     [leadingItems, trailingItems],
   );
 
+  const allMenuItems: SupportsMenuIOS[] = [
+    ...(leadingItems ?? []),
+    ...(trailingItems ?? []),
+  ].filter((it) => it && it.type === 'item');
+
+  const handleSelectionChange: EventHandler<
+    BaseEventOrig<{ menuId: string; selectedMenuItemIds: string[] }>
+  > = useCallback(
+    (event) => {
+      const { menuId, selectedMenuItemIds } = event.detail;
+      const menu = findMenuElementByIdInItems(allMenuItems, menuId);
+      if (menu && menu.type === 'menu') {
+        menu.onSelectionChange?.(selectedMenuItemIds);
+      }
+    },
+    [allMenuItems],
+  );
+
+  useEffect(() => {
+    for (const item of allMenuItems) {
+      if ('menu' in item && item.menu) {
+        validateMenuCallbacks(item.menu);
+      }
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [leadingItems, trailingItems]);
+
   return (
     <ls-stack-header-config
       style={{
@@ -97,6 +125,7 @@ const StackHeaderConfigIOS = (props: PlatformInnerProps) => {
       largeSubtitle={largeSubtitle}
       largeTitleEnabled={!!largeTitleEnabled}
       bindOnMenuItemPress={handleMenuItemPress}
+      bindOnMenuSelectionChange={handleSelectionChange}
     >
       {leadingItems?.map((item) => makeItemViewFromItem(item, 'leading'))}
       {titleItem && makeItemViewFromItem(titleItem, 'title')}

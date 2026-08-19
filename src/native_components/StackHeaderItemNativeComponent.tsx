@@ -23,19 +23,23 @@ type StackHeaderMenuItemAttr = {
   id: string;
   type: 'menuItem';
   title?: string | undefined;
+  itemType?: 'action' | 'toggle' | 'automatic' | undefined;
+  initialToggleState?: boolean | undefined;
 };
 
 type StackHeaderMenuAttr = {
   id: string;
   type: 'menu';
   title?: string | undefined;
+  singleSelection?: boolean | undefined;
   children: (StackHeaderMenuAttr | StackHeaderMenuItemAttr)[];
 };
 
 // Adaptation: RNS passes the menu tree to the native component as-is and
 // relies on the RN bridge dropping function values; Lynx props must stay
-// serializable, so the onPress callbacks are stripped here - presses come
-// back through the config's OnMenuItemPress event and are resolved by id.
+// serializable, so the onPress/onSelectionChange callbacks are stripped
+// here - they come back through the config's OnMenuItemPress and
+// OnMenuSelectionChange events and are resolved by id.
 function parseMenuElementToAttr(
   element: StackHeaderMenuElementIOS,
 ): StackHeaderMenuAttr | StackHeaderMenuItemAttr {
@@ -44,6 +48,7 @@ function parseMenuElementToAttr(
       id: element.id,
       type: 'menu',
       title: element.title,
+      singleSelection: element.singleSelection,
       children: element.children.map(parseMenuElementToAttr),
     };
   }
@@ -52,6 +57,8 @@ function parseMenuElementToAttr(
     id: element.id,
     type: 'menuItem',
     title: element.title,
+    itemType: element.itemType,
+    initialToggleState: element.initialToggleState,
   };
 }
 

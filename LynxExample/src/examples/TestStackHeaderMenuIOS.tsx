@@ -5,8 +5,9 @@ import { StackContainer } from '../components/StackContainer';
 import { useStackNavigationContext } from '../hooks/useStackNavigationContext';
 
 // Port of RNS single-feature-tests/stack-v5/test-stack-header-menu-ios.
-// Adaptation: the RNS example reports onPress through a Toast; a
-// "Last clicked" text is used instead (no toast component in this app).
+// Adaptation: the RNS example reports menu events (onPress, onSelectionChange)
+// through a Toast; a "Last clicked" text is used instead (no toast component
+// in this app).
 
 const DEFAULT_TRAILING_ITEMS_COUNT = 2;
 
@@ -72,35 +73,64 @@ function buildHeaderConfig(
     menu: {
       type: 'menu',
       id: `menu-${i}`,
+      onSelectionChange: (selection) =>
+        showClicked('Selected "' + selection.join('", "') + '"'),
       children: [
         {
           id: `subitem-${i}-1`,
           type: 'menuItem',
-          title: `Item ${i}.1`,
-          onPress: () => showClicked(`Clicked Item ${i}.1`),
+          itemType: 'action',
+          title: `Action ${i}-1`,
+          onPress: () => showClicked(`Clicked Action ${i}-1`),
         },
         {
-          id: `subitem-${i}-2`,
+          id: `toggle-${i}-1`,
           type: 'menuItem',
-          title: `Item ${i}.2`,
-          onPress: () => showClicked(`Clicked Item ${i}.2`),
+          itemType: 'toggle',
+          title: `Toggle ${i}-1`,
+        },
+        {
+          id: `toggle-${i}-2`,
+          type: 'menuItem',
+          itemType: 'toggle',
+          title: `Toggle ${i}-2`,
+        },
+        {
+          id: `toggle-${i}-3`,
+          type: 'menuItem',
+          itemType: 'toggle',
+          title: `Toggle ${i}-3`,
         },
         {
           id: `submenu-${i}`,
           type: 'menu',
-          title: `Submenu ${i}`,
+          title: `Submenu with Radio`,
+          singleSelection: true,
+          onSelectionChange: (selection) =>
+            showClicked(`Selected unique "${selection}"`),
           children: [
             {
-              id: `subsubitem-${i}-1`,
+              id: `radio-${i}-1`,
               type: 'menuItem',
-              title: `Nested ${i}.1`,
-              onPress: () => showClicked(`Clicked Nested ${i}.1`),
+              title: `Radio ${i}-1`,
+              initialToggleState: true,
             },
             {
-              id: `subsubitem-${i}-2`,
-              type: 'menuItem',
-              title: `Nested ${i}.2`,
-              onPress: () => showClicked(`Clicked Nested ${i}.2`),
+              id: `subsubmenu-${i}`,
+              type: 'menu',
+              title: `SubSubMenu with Radio`,
+              children: [
+                {
+                  id: `radio-${i}-2`,
+                  type: 'menuItem',
+                  title: `Radio ${i}-2`,
+                },
+                {
+                  id: `radio-${i}-3`,
+                  type: 'menuItem',
+                  title: `Radio ${i}-3`,
+                },
+              ],
             },
           ],
         },

@@ -1,5 +1,6 @@
 #import "RNSStackHeaderItemComponent.h"
 #import "RNSStackHeaderMenuMapper.h"
+#import "RNSStackHeaderMenuToggleStateTracker.h"
 
 #import <Lynx/LynxComponentRegistry.h>
 #import <Lynx/LynxLog.h>
@@ -13,6 +14,7 @@
     BOOL _didSetHeaderItemPlacement;
     NSString *_Nullable _label;
     RNSStackHeaderMenuData *_Nullable _menu;
+    RNSStackHeaderMenuToggleStateTracker *_Nullable _menuToggleStateTracker;
     BOOL _needsUpdate;
 }
 
@@ -28,6 +30,7 @@
 {
     _label = nil;
     _menu = nil;
+    _menuToggleStateTracker = nil;
     _placement = RNSHeaderItemPlacementTrailing;
     _didSetHeaderItemPlacement = NO;
     _needsUpdate = NO;
@@ -62,6 +65,11 @@
 - (nullable RNSStackHeaderMenuData *)menu
 {
     return _menu;
+}
+
+- (nullable RNSStackHeaderMenuToggleStateTracker *)menuToggleStateTracker
+{
+    return _menuToggleStateTracker;
 }
 
 - (nullable UIView *)customView
@@ -160,6 +168,7 @@ LYNX_PROP_SETTER("menu", setMenu, NSDictionary *) {
     // Adaptation: Lynx delivers the prop as a plain NSDictionary - no
     // folly::dynamic conversion is needed.
     _menu = [RNSStackHeaderMenuMapper menuFromDictionary:value];
+    _menuToggleStateTracker = _menu != nil ? [RNSStackHeaderMenuToggleStateTracker new] : nil;
     _needsUpdate = YES;
 }
 
