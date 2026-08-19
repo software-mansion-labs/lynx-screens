@@ -4,7 +4,6 @@ import type {
   StackContainerProps,
   StackNavigationState,
   StackRouteConfig,
-  StackState,
 } from '../types/StackContainer';
 import {
   determineInitialNavigationState,
@@ -16,6 +15,7 @@ import {
   type StackNavigationContextPayload,
 } from '../contexts/StackNavigationContext';
 import {
+  FormSheet,
   StackHeaderConfigNativeComponent,
   StackHostNativeComponent,
   StackScreenNativeComponent,
@@ -59,49 +59,123 @@ export function StackContainer({ routeConfigs }: StackContainerProps) {
     [navMethods],
   );
 
-  return (
-    <StackHostNativeComponent>
-      {stackNavState.stack.map(
-        ({ options: { headerConfig, headerConfigRef, ...options }, activityMode, routeKey, name }) => {
-          const stackNavigationContext: StackNavigationContextPayload = {
-            routeKey,
-            routeOptions: { ...options },
-            push: navMethods.pushAction,
-            pop: navMethods.popAction,
-            preload: navMethods.preloadAction,
-            batch: navMethods.batchAction,
-            setRouteOptions: navMethods.setRouteOptions,
-          };
+  const routes = stackNavState.stack.map((route) => {
+    const Component = componentsByName.get(route.name);
+    if (!Component) {
+      throw new Error(
+        `[Stack] No config matches the "${route.name}" route name`,
+      );
+    }
 
-          const Component = componentsByName.get(name);
-          if (!Component) {
-            throw new Error(
-              `[Stack] No config matches the "${name}" route name`,
+    return {
+      ...route,
+      Component,
+      navigationContext: {
+        routeKey: route.routeKey,
+        routeOptions: { ...route.options },
+        push: navMethods.pushAction,
+        pop: navMethods.popAction,
+        preload: navMethods.preloadAction,
+        batch: navMethods.batchAction,
+        setRouteOptions: navMethods.setRouteOptions,
+      } satisfies StackNavigationContextPayload,
+    };
+  });
+
+  return (
+    <>
+      <StackHostNativeComponent>
+        {routes.map(
+          ({
+            Component,
+            options: routeOptions,
+            activityMode,
+            routeKey,
+            navigationContext,
+          }) => {
+            if (routeOptions.presentation === 'formSheet') {
+              return null;
+            }
+
+            const { headerConfig, headerConfigRef, ...options } = routeOptions;
+
+            return (
+              <StackScreenNativeComponent
+                key={routeKey}
+                {...options}
+                activityMode={activityMode}
+                screenKey={routeKey}
+                onDismiss={onDismiss}
+                onNativeDismiss={onNativeDismiss}
+              >
+                <StackNavigationContext.Provider value={navigationContext}>
+                  <Component />
+                  {headerConfig !== undefined && (
+                    <StackHeaderConfigNativeComponent
+                      ref={headerConfigRef}
+                      {...headerConfig}
+                    />
+                  )}
+                </StackNavigationContext.Provider>
+              </StackScreenNativeComponent>
             );
+          },
+        )}
+      </StackHostNativeComponent>
+
+      {routes.map(
+        ({ Component, options, activityMode, routeKey, navigationContext }) => {
+          if (options.presentation !== 'formSheet') {
+            return null;
           }
 
-        return (
-          <StackScreenNativeComponent
-            key={routeKey}
-            {...options}
-            activityMode={activityMode}
-            screenKey={routeKey}
-            onDismiss={onDismiss}
-            onNativeDismiss={onNativeDismiss}
-          >
-            <StackNavigationContext.Provider value={stackNavigationContext}>
-              <Component />
-              {headerConfig !== undefined && (
-                <StackHeaderConfigNativeComponent
-                  ref={headerConfigRef}
-                  {...headerConfig}
-                />
-              )}
-            </StackNavigationContext.Provider>
-          </StackScreenNativeComponent>
-        );
-      })}
-    </StackHostNativeComponent>
+          const handleDidDisappear: NonNullable<
+            typeof options.onDidDisappear
+          > = (event) => {
+            'background only';
+            if (activityMode === 'detached') {
+              navMethods.popCompletedAction(routeKey);
+            }
+            options.onDidDisappear?.(event);
+          };
+
+          const handleNativeDismiss: NonNullable<
+            typeof options.onNativeDismiss
+          > = (event) => {
+            'background only';
+            navMethods.popNativeAction(routeKey);
+            options.onNativeDismiss?.(event);
+          };
+
+          const handleDetentChanged: NonNullable<
+            typeof options.onDetentChanged
+          > = (event) => {
+            'background only';
+            if (options.selectedDetentIndex !== undefined) {
+              navMethods.setRouteOptions(routeKey, {
+                selectedDetentIndex: event.detail.index,
+              });
+            }
+            options.onDetentChanged?.(event);
+          };
+
+          return (
+            <FormSheet
+              key={routeKey}
+              {...options}
+              isOpen={activityMode === 'attached'}
+              onDidDisappear={handleDidDisappear}
+              onNativeDismiss={handleNativeDismiss}
+              onDetentChanged={handleDetentChanged}
+            >
+              <StackNavigationContext.Provider value={navigationContext}>
+                <Component />
+              </StackNavigationContext.Provider>
+            </FormSheet>
+          );
+        },
+      )}
+    </>
   );
 }
 
@@ -110,6 +184,10 @@ function useSanitizeRouteConfigs(
 ) {
   if (!routeConfigs || routeConfigs.length === 0) {
     throw new Error('[Stack] There must be at least one route configured');
+  }
+
+  if (routeConfigs[0].options.presentation === 'formSheet') {
+    throw new Error('[Stack] The initial route can not be a FormSheet');
   }
 
   // Do not recompute in case the routeConfigs have not changed

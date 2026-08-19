@@ -53,6 +53,7 @@ Already ported to Lynx and working:
 | `preventNativeDismiss` (+ `onNativeDismissPrevented`) | ✅ | ❌ |
 | Predictive back gesture support (internal) | ✅ | N/A |
 | Transition API / screen transitions (internal) | ✅ | ❌ |
+| FormSheet | ✅ | ✅ |
 
 ### 2. Able to port from RNScreens
 

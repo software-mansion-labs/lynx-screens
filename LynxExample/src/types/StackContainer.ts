@@ -1,5 +1,6 @@
 import React from 'react';
 import type {
+  FormSheetProps,
   StackHeaderConfigProps,
   StackHeaderConfigRef,
   StackScreenProps,
@@ -14,13 +15,20 @@ export type {
 
 /// Route definition
 
-export type StackRouteOptions = Omit<
+type StackScreenRouteOptions = Omit<
   StackScreenProps,
   'children' | 'activityMode' | 'screenKey'
 > & {
+  presentation?: 'stack' | undefined;
   headerConfig?: StackHeaderConfigProps | undefined;
   headerConfigRef?: React.Ref<StackHeaderConfigRef> | undefined;
 };
+
+type FormSheetRouteOptions = Omit<FormSheetProps, 'children' | 'isOpen'> & {
+  presentation: 'formSheet';
+};
+
+export type StackRouteOptions = StackScreenRouteOptions | FormSheetRouteOptions;
 
 /**
  * Blueprint for a route.

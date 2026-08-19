@@ -13,6 +13,7 @@ import type {
   StackScreenActivityMode,
   StackRoute,
   StackRouteConfig,
+  StackRouteOptions,
   StackState,
 } from '../types/StackContainer';
 import { generateID } from './id-generator';
@@ -321,7 +322,7 @@ function navigationActionSetOptionsHandler(
   routeCopy.options = {
     ...routeCopy.options,
     ...action.options,
-  };
+  } as StackRouteOptions;
 
   return stateWithStack(
     state,

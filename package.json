@@ -16,7 +16,8 @@
   "scripts": {
     "codegen": "lynx-autolink-codegen",
     "format": "prettier --write .",
-    "lint": "eslint ."
+    "lint": "eslint .",
+    "test": "vitest run"
   },
   "peerDependencies": {
     "@lynx-js/react": "*"
@@ -33,7 +34,9 @@
     "globals": "^16.3.0",
     "prettier": "^3.6.2",
     "typescript": "~5.9.2",
-    "typescript-eslint": "^8.38.0"
+    "typescript-eslint": "^8.38.0",
+    "vite": "^6.1.0",
+    "vitest": "^3.2.4"
   },
   "engines": {
     "node": ">=18"
