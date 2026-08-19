@@ -32,13 +32,17 @@ const ICON_OPTIONS: IconOption[] = [
 
 interface Config {
   backButtonHidden: boolean;
-  tintColor: TintColorOption;
+  tintColorNormal: TintColorOption;
+  tintColorPressed: TintColorOption;
+  tintColorFocused: TintColorOption;
   icon: IconOption;
 }
 
 const DEFAULT_CONFIG: Config = {
   backButtonHidden: false,
-  tintColor: 'default',
+  tintColorNormal: 'default',
+  tintColorPressed: 'default',
+  tintColorFocused: 'default',
   icon: 'default',
 };
 
@@ -52,7 +56,7 @@ const ConfigContext = createContext<{
 
 function resolveTintColor(
   option: TintColorOption,
-): StackHeaderConfigPropsAndroid['backButtonTintColor'] {
+): StackHeaderConfigPropsAndroid['backButtonTintColorNormal'] {
   switch (option) {
     case 'purple':
       return '#9c27b0';
@@ -89,7 +93,9 @@ function buildHeaderConfig(config: Config): StackHeaderConfigProps {
     title: 'Back Button Test',
     backButtonHidden: config.backButtonHidden,
     android: {
-      backButtonTintColor: resolveTintColor(config.tintColor),
+      backButtonTintColorNormal: resolveTintColor(config.tintColorNormal),
+      backButtonTintColorPressed: resolveTintColor(config.tintColorPressed),
+      backButtonTintColorFocused: resolveTintColor(config.tintColorFocused),
       backButtonIcon: resolveIcon(config.icon),
     },
   };
@@ -137,9 +143,21 @@ function ConfigControls() {
         onValueChange={(v) => updateConfig('backButtonHidden', v)}
       />
       <SettingsPicker<TintColorOption>
-        label="tintColor"
-        value={config.tintColor}
-        onValueChange={(v) => updateConfig('tintColor', v)}
+        label="tintColorNormal"
+        value={config.tintColorNormal}
+        onValueChange={(v) => updateConfig('tintColorNormal', v)}
+        items={TINT_COLOR_OPTIONS}
+      />
+      <SettingsPicker<TintColorOption>
+        label="tintColorPressed"
+        value={config.tintColorPressed}
+        onValueChange={(v) => updateConfig('tintColorPressed', v)}
+        items={TINT_COLOR_OPTIONS}
+      />
+      <SettingsPicker<TintColorOption>
+        label="tintColorFocused"
+        value={config.tintColorFocused}
+        onValueChange={(v) => updateConfig('tintColorFocused', v)}
         items={TINT_COLOR_OPTIONS}
       />
       <SettingsPicker<IconOption>
@@ -168,6 +186,7 @@ function RootScreen() {
 
   return (
     <scroll-view
+      scroll-y
       style={{ width: '100%', height: '100%', backgroundColor: 'white' }}
     >
       <view style={{ padding: '16px', gap: '6px' }}>
@@ -185,6 +204,7 @@ function PushedScreen() {
 
   return (
     <scroll-view
+      scroll-y
       style={{ width: '100%', height: '100%', backgroundColor: 'white' }}
     >
       <view style={{ padding: '16px', gap: '6px' }}>

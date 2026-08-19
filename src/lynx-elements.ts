@@ -56,7 +56,9 @@ declare module "@lynx-js/types" {
       hidden?: boolean | undefined;
       transparent?: boolean | undefined;
       backButtonHidden?: boolean | undefined;
-      backButtonTintColor?: string | undefined;
+      backButtonTintColorNormal?: string | undefined;
+      backButtonTintColorPressed?: string | undefined;
+      backButtonTintColorFocused?: string | undefined;
       backButtonDrawableIconResourceName?: string | undefined;
       backButtonImageIconUri?: string | undefined;
       scrollFlagScroll?: boolean | undefined;
