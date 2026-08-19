@@ -47,7 +47,11 @@ internal class StackHeaderConfigComponent(
         internal set
     override var backButtonHidden: Boolean = false
         internal set
-    override var backButtonTintColor: Int? = null
+    override var backButtonTintColorNormal: Int? = null
+        internal set
+    override var backButtonTintColorPressed: Int? = null
+        internal set
+    override var backButtonTintColorFocused: Int? = null
         internal set
     override var backButtonIcon: Drawable? = null
         internal set
@@ -339,11 +343,21 @@ internal class StackHeaderConfigComponent(
         backButtonHidden = value == true
     }
 
-    // RNS receives an already-processed color Int from Fabric; on Lynx the prop
-    // arrives as a CSS color string.
-    @LynxProp(name = "backButtonTintColor")
-    fun setBackButtonTintColor(value: String?) {
-        backButtonTintColor = value?.let { runCatching { Color.parseColor(it) }.getOrNull() }
+    // RNS receives already-processed color Ints from Fabric; on Lynx the props
+    // arrive as CSS color strings.
+    @LynxProp(name = "backButtonTintColorNormal")
+    fun setBackButtonTintColorNormal(value: String?) {
+        backButtonTintColorNormal = value?.let { runCatching { Color.parseColor(it) }.getOrNull() }
+    }
+
+    @LynxProp(name = "backButtonTintColorPressed")
+    fun setBackButtonTintColorPressed(value: String?) {
+        backButtonTintColorPressed = value?.let { runCatching { Color.parseColor(it) }.getOrNull() }
+    }
+
+    @LynxProp(name = "backButtonTintColorFocused")
+    fun setBackButtonTintColorFocused(value: String?) {
+        backButtonTintColorFocused = value?.let { runCatching { Color.parseColor(it) }.getOrNull() }
     }
 
     @LynxProp(name = "backButtonDrawableIconResourceName")
