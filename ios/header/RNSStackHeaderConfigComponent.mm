@@ -1,10 +1,12 @@
 #import "RNSStackHeaderConfigComponent.h"
 #import "RNSShadowStateProxy.h"
+#import "RNSStackHeaderConfigEventEmitter.h"
 #import "RNSStackHeaderContentFactory.h"
 #import "RNSStackHeaderData.h"
 #import "RNSStackHeaderItemComponent.h"
 #import "RNSStackHeaderItemInvalidationDelegate.h"
 #import "RNSStackHeaderItemSpacerComponent.h"
+#import "RNSStackHeaderMenuEventsDelegate.h"
 #import "RNSStackHeaderConfigView.h"
 #import "RNSStackNavigationController.h"
 #import "RNSStackScreenComponent.h"
@@ -25,7 +27,8 @@ static void RNSAssertIsValidHeaderChild(id child)
               RNSStackHeaderItemSpacerComponent.class);
 }
 
-@interface RNSStackHeaderConfigComponent () <RNSStackHeaderItemInvalidationDelegate>
+@interface RNSStackHeaderConfigComponent () <RNSStackHeaderItemInvalidationDelegate,
+                                              RNSStackHeaderMenuEventsDelegate>
 @end
 
 @LynxElement("ls-stack-header-config")
@@ -38,6 +41,7 @@ static void RNSAssertIsValidHeaderChild(id child)
     BOOL _largeTitleEnabled;
 
     RNSShadowStateProxy *_Nonnull _shadowStateProxy;
+    RNSStackHeaderConfigEventEmitter *_Nullable _eventEmitter;
 }
 
 - (instancetype)init
@@ -127,6 +131,22 @@ static void RNSAssertIsValidHeaderChild(id child)
 - (void)headerItemDidInvalidate
 {
     [self submitCurrentDataIfMounted];
+}
+
+#pragma mark - RNSStackHeaderMenuEventsDelegate
+
+- (RNSStackHeaderConfigEventEmitter *)getEventEmitter
+{
+    if (!_eventEmitter && self.context) {
+        _eventEmitter = [[RNSStackHeaderConfigEventEmitter alloc] initWithEventEmitter:self.context.eventEmitter
+                                                                            targetSign:[self sign]];
+    }
+    return _eventEmitter;
+}
+
+- (void)didPressMenuItem:(NSString *)menuItemId
+{
+    [[self getEventEmitter] emitOnMenuItemPress:menuItemId];
 }
 
 #pragma mark - RNSViewFrameChangeDelegate
@@ -321,11 +341,13 @@ LYNX_PROP_SETTER("backButtonHidden", setBackButtonHidden, BOOL) {}
             switch (item.placement) {
                 case RNSHeaderItemPlacementLeading:
                     [leadingItems addObject:[RNSStackHeaderContentFactory barButtonItemForHeaderItem:item
-                                                                             withFrameChangeDelegate:self]];
+                                                                             withFrameChangeDelegate:self
+                                                                              withMenuEventsDelegate:self]];
                     break;
                 case RNSHeaderItemPlacementTrailing:
                     [trailingItems addObject:[RNSStackHeaderContentFactory barButtonItemForHeaderItem:item
-                                                                              withFrameChangeDelegate:self]];
+                                                                              withFrameChangeDelegate:self
+                                                                               withMenuEventsDelegate:self]];
                     break;
                 case RNSHeaderItemPlacementTitle:
                     if (item.customView != nil) {

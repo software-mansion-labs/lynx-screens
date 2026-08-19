@@ -35,4 +35,7 @@ export type {
   StackHeaderTitleCustomItemIOS,
   StackHeaderSpacerItemIOS,
   StackHeaderConfigCommandsIOS,
+  StackHeaderMenuIOS,
+  StackHeaderMenuItemIOS,
+  StackHeaderMenuElementIOS,
 } from './types/StackHeaderConfig';
