@@ -1,6 +1,6 @@
 source 'https://cdn.cocoapods.org/'
 
-platform :ios, '12.0'
+platform :ios, '15.1'
 
 plugin 'cocoapods-lynx-library'
 

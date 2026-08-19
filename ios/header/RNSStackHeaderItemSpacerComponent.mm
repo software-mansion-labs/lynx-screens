@@ -35,30 +35,21 @@
     return [[UIView alloc] init];
 }
 
-#pragma mark - Placement
+#pragma mark - RNSStackHeaderItemSpacerDataProviding
 
 - (RNSHeaderItemSpacerPlacement)placement
 {
     return _placement;
 }
 
-#pragma mark - Bar Button Item
-
-- (nonnull UIBarButtonItem *)makeBarButtonItem
+- (BOOL)isFlexible
 {
-    // The pre-iOS 14 system-item API is used so that no availability guards
-    // are needed (RNS uses +flexibleSpaceItem / +fixedSpaceItemOfWidth:).
-    if (_isFlexible) {
-        return [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFlexibleSpace
-                                                             target:nil
-                                                             action:nil];
-    }
+    return _isFlexible;
+}
 
-    UIBarButtonItem *item = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFixedSpace
-                                                                          target:nil
-                                                                          action:nil];
-    item.width = _width;
-    return item;
+- (CGFloat)width
+{
+    return _width;
 }
 
 #pragma mark - Props

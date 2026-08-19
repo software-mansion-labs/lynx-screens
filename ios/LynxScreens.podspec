@@ -11,7 +11,7 @@ Pod::Spec.new do |s|
   s.author = 'Software Mansion'
   s.source = { :path => '..' }
 
-  s.ios.deployment_target = '10.0'
+  s.ios.deployment_target = '15.1'
 
   # Building as a static framework gives the pod its own module, which the
   # modular_headers-based autolinking setup relies on.
