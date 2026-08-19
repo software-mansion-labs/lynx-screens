@@ -156,9 +156,14 @@ internal class StackHeaderConfigComponent(
         internal set
 
     override var toolbarMenu: StackHeaderToolbarMenuConfig
-        by Delegates.observable(StackHeaderToolbarMenuConfig(emptyList())) { _, old, new ->
+        by Delegates.observable(StackHeaderToolbarMenuConfig(emptyList(), emptyList())) { _, old, new ->
             if (old != new) invalidate(StackHeaderInvalidationFlags.TOOLBAR_MENU)
         }
+        internal set
+
+    override var toolbarMenuGroupDividerEnabled: Boolean by Delegates.observable(false) { _, old, new ->
+        if (old != new) invalidate(StackHeaderInvalidationFlags.TOOLBAR_MENU)
+    }
         internal set
 
     override val isRTL: Boolean
@@ -344,6 +349,13 @@ internal class StackHeaderConfigComponent(
 
     override fun onMenuItemClicked(id: String) {
         eventEmitter.emitOnToolbarMenuItemPress(id)
+    }
+
+    override fun onGroupSelectionChanged(
+        groupId: String,
+        selectedIds: List<String>,
+    ) {
+        eventEmitter.emitOnToolbarMenuGroupSelectionChange(groupId, selectedIds)
     }
 
     override fun onSubviewOriginChanged(
@@ -563,10 +575,16 @@ internal class StackHeaderConfigComponent(
         scrollFlagSnap = value == true
     }
 
+    @LynxProp(name = "toolbarMenuGroupDividerEnabled")
+    fun setToolbarMenuGroupDividerEnabled(value: Boolean?) {
+        toolbarMenuGroupDividerEnabled = value == true
+    }
+
     @LynxProp(name = "toolbarMenu")
     fun setToolbarMenu(value: ReadableMap?) {
-        toolbarMenu = StackHeaderToolbarMenuMapper.parseMenu(value)
-        toolbarMenuItemIconSourceMap = StackHeaderToolbarMenuMapper.collectIconSources(value)
+        val (menu, iconSources) = StackHeaderToolbarMenuMapper.parseMenu(value)
+        toolbarMenu = menu
+        toolbarMenuItemIconSourceMap = iconSources
     }
 
     // The Lynx counterpart of RNS's setToolbarMenuItemOptions view command,

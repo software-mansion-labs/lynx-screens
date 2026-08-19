@@ -13,7 +13,18 @@ internal class StackHeaderConfigEventEmitter(
         lynxContext.eventEmitter.sendCustomEvent(event)
     }
 
+    internal fun emitOnToolbarMenuGroupSelectionChange(
+        groupId: String,
+        selectedIds: List<String>,
+    ) {
+        val event = LynxCustomEvent(sign, EVENT_ON_TOOLBAR_MENU_GROUP_SELECTION_CHANGE)
+        event.addDetail("groupId", groupId)
+        event.addDetail("selectedIds", ArrayList(selectedIds))
+        lynxContext.eventEmitter.sendCustomEvent(event)
+    }
+
     companion object {
         private const val EVENT_ON_TOOLBAR_MENU_ITEM_PRESS = "OnToolbarMenuItemPress"
+        private const val EVENT_ON_TOOLBAR_MENU_GROUP_SELECTION_CHANGE = "OnToolbarMenuGroupSelectionChange"
     }
 }
