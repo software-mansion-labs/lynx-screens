@@ -13,7 +13,7 @@ import com.lynx.tasm.behavior.ui.UIGroup
 import com.lynxscreens.screens.screen.StackScreenComponent
 import java.lang.ref.WeakReference
 
-@LynxElement(name = "stack-host-native")
+@LynxElement(name = "ls-stack-host")
 internal class StackHostComponent(context: LynxContext) : UIGroup<StackHostView>(context), StackContainerDelegate, PatchFinishListener {
     internal val renderedScreens: ArrayList<StackScreenComponent> = arrayListOf()
     private lateinit var container: StackContainer

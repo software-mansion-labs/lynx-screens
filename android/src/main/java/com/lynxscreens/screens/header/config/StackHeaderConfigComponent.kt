@@ -27,7 +27,7 @@ import com.lynxscreens.screens.header.subview.StackHeaderSubviewType
 import java.lang.IllegalArgumentException
 import java.lang.ref.WeakReference
 
-@LynxElement(name = "stack-header-config-native")
+@LynxElement(name = "ls-stack-header-config")
 internal class StackHeaderConfigComponent(
     context: LynxContext,
 ) : UIGroup<StackHeaderConfigView>(context),

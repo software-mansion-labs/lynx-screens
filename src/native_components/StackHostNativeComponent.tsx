@@ -7,7 +7,7 @@ export const StackHostNativeComponent = ({
   children: NonNullable<Lynx.ViewProps['children']>;
 }) => {
   return (
-    <stack-host-native
+    <ls-stack-host
       style={{
         display: 'flex',
         flex: 1,
@@ -16,6 +16,6 @@ export const StackHostNativeComponent = ({
       }}
     >
       {children}
-    </stack-host-native>
+    </ls-stack-host>
   );
 };

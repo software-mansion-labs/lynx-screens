@@ -35,7 +35,7 @@ export const StackScreenNativeComponent = ({
   );
 
   return (
-    <stack-screen-native
+    <ls-stack-screen
       style={{
         position: 'absolute',
         left: 0,
@@ -57,6 +57,6 @@ export const StackScreenNativeComponent = ({
       preventNativeDismiss={preventNativeDismiss}
     >
       {children}
-    </stack-screen-native>
+    </ls-stack-screen>
   );
 };

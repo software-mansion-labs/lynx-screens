@@ -9,13 +9,13 @@ declare module "@lynx-js/types" {
   }>;
 
   interface IntrinsicElements extends Lynx.IntrinsicElements {
-    "stack-host-native": {
+    "ls-stack-host": {
       className?: string | undefined;
       children: ReactNode;
       id?: string | undefined;
       style?: string | Lynx.CSSProperties | undefined;
     };
-    "stack-screen-native": {
+    "ls-stack-screen": {
       className?: string | undefined;
       children: ReactNode;
       id?: string | undefined;
@@ -33,7 +33,7 @@ declare module "@lynx-js/types" {
       // Configuration
       preventNativeDismiss?: boolean | undefined;
     };
-    "stack-header-config-native": {
+    "ls-stack-header-config": {
       ref?: Ref<Lynx.NodesRef> | undefined;
       className?: string | undefined;
       children?: ReactNode | undefined;
@@ -71,7 +71,7 @@ declare module "@lynx-js/types" {
         | Lynx.EventHandler<Lynx.BaseEventOrig<{ id: string }>>
         | undefined;
     };
-    "stack-header-subview-native": {
+    "ls-stack-header-subview": {
       className?: string | undefined;
       children?: ReactNode | undefined;
       id?: string | undefined;

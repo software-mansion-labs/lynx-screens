@@ -7,7 +7,7 @@
 #import "RNSStackNavigationController.h"
 #import "RNSStackOperationCoordinator.h"
 
-@LynxElement("stack-host-native")
+@LynxElement("ls-stack-host")
 @implementation RNSStackHostComponent {
     RNSStackNavigationController *_Nonnull _stackNavigationController;
     RNSStackOperationCoordinator *_Nonnull _stackOperationCoordinator;

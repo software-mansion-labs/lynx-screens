@@ -11,7 +11,7 @@ import java.lang.IllegalArgumentException
 import java.lang.ref.WeakReference
 import kotlin.properties.Delegates
 
-@LynxElement(name = "stack-header-subview-native")
+@LynxElement(name = "ls-stack-header-subview")
 internal class StackHeaderSubviewComponent(
     context: LynxContext,
 ) : UIGroup<StackHeaderSubviewView>(context),
