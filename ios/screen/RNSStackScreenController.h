@@ -1,13 +1,14 @@
 #pragma once
 
 #import <UIKit/UIKit.h>
+#import "RNSContainerItem.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
 @class RNSStackScreenComponent;
 @class RNSStackScreenHeaderCoordinator;
 
-@interface RNSStackScreenController : UIViewController
+@interface RNSStackScreenController : UIViewController <RNSContainerItem>
 
 @property (nonatomic, strong, readonly, nonnull) RNSStackScreenHeaderCoordinator *headerCoordinator;
 

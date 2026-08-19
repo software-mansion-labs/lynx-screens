@@ -1,17 +1,49 @@
 #import "RNSStackScreenController.h"
 #import <Lynx/LynxLog.h>
+#import "RNSContainer.h"
+#import "RNSContainerItemSupport.h"
 #import "RNSStackScreenComponent.h"
 #import "RNSStackScreenHeaderCoordinator.h"
 
-@implementation RNSStackScreenController
+@implementation RNSStackScreenController {
+    RNSContainerItemSupport *_Nonnull _containerItemSupport;
+}
 
 - (instancetype)initWithComponent:(RNSStackScreenComponent *)component
 {
     if (self = [super initWithNibName:nil bundle:nil]) {
         _screenComponent = component;
         _headerCoordinator = [[RNSStackScreenHeaderCoordinator alloc] initWithScreenController:self];
+        _containerItemSupport = [RNSContainerItemSupport new];
     }
     return self;
+}
+
+#pragma mark - RNSContainerItem
+
+- (void)registerNestedContainer:(id<RNSContainer>)container
+{
+    [_containerItemSupport registerNestedContainer:container];
+}
+
+- (void)unregisterNestedContainer:(id<RNSContainer>)container
+{
+    [_containerItemSupport unregisterNestedContainer:container];
+}
+
+- (nullable id<RNSContainer>)resolveNestedContainer
+{
+    return [_containerItemSupport resolveNestedContainer];
+}
+
+- (nullable UIScrollView *)findContentScrollView
+{
+    // Divergence from RNS: no cached scroll view is passed - the ScrollViewMarker
+    // epic is not ported, so nothing registers a marked scroll view on the screen
+    // component. Resolution falls through to the nested container and the
+    // descendant-chain heuristic.
+    return [_containerItemSupport findContentScrollViewWithCachedScrollView:nil
+                                                              heuristicRoot:_screenComponent.view];
 }
 
 #pragma mark - Lifecycle Events
