@@ -4,13 +4,13 @@
 
 + (void)applyMenu:(RNSStackHeaderMenuData *)data
            toBarButtonItem:(UIBarButtonItem *)item
-    withMenuEventsDelegate:(id<RNSStackHeaderMenuEventsDelegate>)delegate
+    withHeaderEventsDelegate:(id<RNSStackHeaderEventsDelegate>)delegate
               stateTracker:(RNSStackHeaderMenuToggleStateTracker *)tracker
 {
 #if !TARGET_OS_TV || __TV_OS_VERSION_MAX_ALLOWED >= 170000
     if (@available(tvOS 17.0, *)) {
         item.menu = [self buildMenuFromData:data
-                        withMenuEventsDelegate:delegate
+                        withHeaderEventsDelegate:delegate
                                   stateTracker:tracker
                            singleSelectionRoot:nil
             initialSingleSelectionStateClaimed:NULL];
@@ -19,7 +19,7 @@
 }
 
 + (UIMenu *)buildMenuFromData:(RNSStackHeaderMenuData *)data
-                withMenuEventsDelegate:(id<RNSStackHeaderMenuEventsDelegate>)delegate
+                withHeaderEventsDelegate:(id<RNSStackHeaderEventsDelegate>)delegate
                           stateTracker:(RNSStackHeaderMenuToggleStateTracker *)tracker
                    singleSelectionRoot:(nullable RNSStackHeaderMenuData *)singleSelectionRoot
     initialSingleSelectionStateClaimed:(BOOL *)initialSingleSelectionStateClaimed
@@ -41,7 +41,7 @@
     NSMutableArray<UIMenuElement *> *elements = [NSMutableArray arrayWithCapacity:data.children.count];
     for (id<RNSStackHeaderMenuElement> child in data.children) {
         UIMenuElement *element = [self buildElementFromData:child
-                                     withMenuEventsDelegate:delegate
+                                     withHeaderEventsDelegate:delegate
                                                stateTracker:tracker
                                                  parentMenu:data
                                         singleSelectionRoot:resolvedRoot
@@ -55,7 +55,7 @@
 }
 
 + (nullable UIMenuElement *)buildElementFromData:(id<RNSStackHeaderMenuElement>)element
-                          withMenuEventsDelegate:(id<RNSStackHeaderMenuEventsDelegate>)delegate
+                          withHeaderEventsDelegate:(id<RNSStackHeaderEventsDelegate>)delegate
                                     stateTracker:(RNSStackHeaderMenuToggleStateTracker *)tracker
                                       parentMenu:(RNSStackHeaderMenuData *)parentMenu
                              singleSelectionRoot:(nullable RNSStackHeaderMenuData *)singleSelectionRoot
@@ -63,7 +63,7 @@
 {
     if ([element isKindOfClass:[RNSStackHeaderMenuData class]]) {
         return [self buildMenuFromData:(RNSStackHeaderMenuData *)element
-                        withMenuEventsDelegate:delegate
+                        withHeaderEventsDelegate:delegate
                                   stateTracker:tracker
                            singleSelectionRoot:singleSelectionRoot
             initialSingleSelectionStateClaimed:initialSingleSelectionStateClaimed];
@@ -91,11 +91,11 @@
                               withParentMenu:parentMenu
                          singleSelectionRoot:singleSelectionRoot
                           toggleStateTracker:tracker
-                          menuEventsDelegate:delegate];
+                          headerEventsDelegate:delegate];
         }
 
         // it effective type is not 'toggle', then it is a regular action button that triggers onPress instead
-        return [self buildActionFromData:itemData withMenuEventsDelegate:delegate];
+        return [self buildActionFromData:itemData withHeaderEventsDelegate:delegate];
     }
 
     return nil;
@@ -115,7 +115,7 @@
                                  withParentMenu:(RNSStackHeaderMenuData *)parentMenu
                             singleSelectionRoot:(nullable RNSStackHeaderMenuData *)singleSelectionRoot
                              toggleStateTracker:(RNSStackHeaderMenuToggleStateTracker *)tracker
-                             menuEventsDelegate:(id<RNSStackHeaderMenuEventsDelegate>)delegate
+                             headerEventsDelegate:(id<RNSStackHeaderEventsDelegate>)delegate
 {
     BOOL isItemToggledOn = [tracker getToggleStateForItemWithId:data.menuElementId
                                                    initialState:data.initialToggleState];
@@ -123,7 +123,7 @@
 
     NSString *eventMenuId = insideSingleSelection ? singleSelectionRoot.menuElementId : parentMenu.menuElementId;
 
-    __weak id<RNSStackHeaderMenuEventsDelegate> weakDelegate = delegate;
+    __weak id<RNSStackHeaderEventsDelegate> weakDelegate = delegate;
 
     UIAction *toggleAction = [UIAction
         actionWithTitle:data.title
@@ -160,9 +160,9 @@
 }
 
 + (nullable UIMenuElement *)buildActionFromData:(RNSStackHeaderMenuItemData *)data
-                         withMenuEventsDelegate:(id<RNSStackHeaderMenuEventsDelegate>)delegate
+                         withHeaderEventsDelegate:(id<RNSStackHeaderEventsDelegate>)delegate
 {
-    __weak id<RNSStackHeaderMenuEventsDelegate> weakDelegate = delegate;
+    __weak id<RNSStackHeaderEventsDelegate> weakDelegate = delegate;
 
     return [UIAction actionWithTitle:data.title
                                image:nil

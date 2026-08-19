@@ -136,8 +136,13 @@ declare module "@lynx-js/types" {
         | 'subtitle'
         | 'largeSubtitle'
         | undefined;
+      itemId?: string | undefined;
       title?: string | undefined;
       menu?: StackHeaderMenuAttr | undefined;
+      respondsToOnPress?: boolean | undefined;
+      bindOnHeaderItemPress?:
+        | Lynx.EventHandler<Lynx.BaseEventOrig<Record<string, never>>>
+        | undefined;
     };
     "ls-stack-header-item-spacer": {
       className?: string | undefined;

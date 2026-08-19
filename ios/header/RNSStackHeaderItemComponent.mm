@@ -1,4 +1,5 @@
 #import "RNSStackHeaderItemComponent.h"
+#import "RNSStackHeaderItemEventEmitter.h"
 #import "RNSStackHeaderMenuMapper.h"
 #import "RNSStackHeaderMenuToggleStateTracker.h"
 
@@ -12,10 +13,13 @@
 @implementation RNSStackHeaderItemComponent {
     RNSHeaderItemPlacement _placement;
     BOOL _didSetHeaderItemPlacement;
+    NSString *_Nullable _itemId;
     NSString *_Nullable _title;
     RNSStackHeaderMenuData *_Nullable _menu;
     RNSStackHeaderMenuToggleStateTracker *_Nullable _menuToggleStateTracker;
+    BOOL _respondsToOnPress;
     BOOL _needsUpdate;
+    RNSStackHeaderItemEventEmitter *_Nullable _eventEmitter;
 }
 
 - (instancetype)init
@@ -28,12 +32,31 @@
 
 - (void)resetProps
 {
+    _itemId = nil;
     _title = nil;
     _menu = nil;
     _menuToggleStateTracker = nil;
     _placement = RNSHeaderItemPlacementTrailing;
     _didSetHeaderItemPlacement = NO;
+    _respondsToOnPress = NO;
     _needsUpdate = NO;
+}
+
+// Adaptation: RNS creates the codegen-backed emitter eagerly and refreshes it
+// in updateEventEmitter; on Lynx the emitter is resolved lazily from the
+// context (same pattern as the config component).
+- (RNSStackHeaderItemEventEmitter *)getEventEmitter
+{
+    if (!_eventEmitter && self.context) {
+        _eventEmitter = [[RNSStackHeaderItemEventEmitter alloc] initWithEventEmitter:self.context.eventEmitter
+                                                                          targetSign:[self sign]];
+    }
+    return _eventEmitter;
+}
+
+- (void)emitOnPress
+{
+    [[self getEventEmitter] emitOnPress];
 }
 
 - (UIView *)createView
@@ -57,6 +80,11 @@
 
 #pragma mark - RNSStackHeaderItemDataProviding
 
+- (nullable NSString *)itemId
+{
+    return _itemId;
+}
+
 - (nullable NSString *)title
 {
     return _title;
@@ -77,6 +105,11 @@
     // Adaptation: on Lynx the item's painting view (not the component itself)
     // is what gets reparented into the navigation bar.
     return self.children.count > 0 ? self.view : nil;
+}
+
+- (BOOL)respondsToOnPress
+{
+    return _respondsToOnPress;
 }
 
 #pragma mark - Layout
@@ -151,12 +184,29 @@ LYNX_PROP_SETTER("placement", setPlacement, NSString *) {
     }
 }
 
+LYNX_PROP_SETTER("itemId", setItemId, NSString *) {
+    if (requestReset || value.length == 0) {
+        value = nil;
+    }
+    _itemId = value;
+}
+
 LYNX_PROP_SETTER("title", setTitle, NSString *) {
     if (requestReset) {
         value = nil;
     }
     if (_title != value && ![_title isEqualToString:value]) {
         _title = value;
+        _needsUpdate = YES;
+    }
+}
+
+LYNX_PROP_SETTER("respondsToOnPress", setRespondsToOnPress, BOOL) {
+    if (requestReset) {
+        value = NO;
+    }
+    if (_respondsToOnPress != value) {
+        _respondsToOnPress = value;
         _needsUpdate = YES;
     }
 }

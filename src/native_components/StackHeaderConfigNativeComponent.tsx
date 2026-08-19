@@ -170,7 +170,12 @@ function makeItemViewFromItem(
   const { id, ...rest } = item;
 
   return (
-    <StackHeaderItemNativeComponent key={id} placement={placement} {...rest} />
+    <StackHeaderItemNativeComponent
+      key={id}
+      itemId={id}
+      placement={placement}
+      {...rest}
+    />
   );
 }
 

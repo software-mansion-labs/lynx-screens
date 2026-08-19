@@ -1,5 +1,6 @@
-import React from 'react';
+import React, { useCallback } from 'react';
 import type { ReactElement } from '@lynx-js/react';
+import type { BaseEventOrig, EventHandler } from '@lynx-js/types';
 import type {
   StackHeaderMenuElementIOS,
   StackHeaderMenuIOS,
@@ -14,9 +15,11 @@ export type StackHeaderItemPlacement =
 
 export type StackHeaderItemProps = {
   placement: StackHeaderItemPlacement;
+  itemId?: string | undefined;
   title?: string | undefined;
   render?: (() => ReactElement) | undefined;
   menu?: StackHeaderMenuIOS | undefined;
+  onPress?: (() => void) | undefined;
 };
 
 type StackHeaderMenuItemAttr = {
@@ -64,10 +67,17 @@ function parseMenuElementToAttr(
 
 export const StackHeaderItemNativeComponent = ({
   placement,
+  itemId,
   title,
   render,
   menu,
+  onPress,
 }: StackHeaderItemProps) => {
+  const handlePress: EventHandler<BaseEventOrig<Record<string, never>>> =
+    useCallback(() => {
+      onPress?.();
+    }, [onPress]);
+
   return (
     <ls-stack-header-item
       style={{
@@ -76,8 +86,13 @@ export const StackHeaderItemNativeComponent = ({
         top: 0,
       }}
       placement={placement}
+      itemId={itemId}
       title={title}
       menu={menu && (parseMenuElementToAttr(menu) as StackHeaderMenuAttr)}
+      // We need to tell iOS that we want the handler to be attached only when we actually require it
+      // because doing so makes the menu appear on long press instead of tap
+      respondsToOnPress={!!onPress}
+      bindOnHeaderItemPress={handlePress}
     >
       {render?.()}
     </ls-stack-header-item>
