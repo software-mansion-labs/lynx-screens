@@ -30,5 +30,9 @@ export type {
   PlatformIconAndroid,
   // iOS
   StackHeaderConfigPropsIOS,
+  StackHeaderInlineItemIOS,
+  StackHeaderInlineCustomItemIOS,
+  StackHeaderTitleCustomItemIOS,
+  StackHeaderSpacerItemIOS,
   StackHeaderConfigCommandsIOS,
 } from './types/StackHeaderConfig';

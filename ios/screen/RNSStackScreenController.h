@@ -5,8 +5,11 @@
 NS_ASSUME_NONNULL_BEGIN
 
 @class RNSStackScreenComponent;
+@class RNSStackScreenHeaderCoordinator;
 
 @interface RNSStackScreenController : UIViewController
+
+@property (nonatomic, strong, readonly, nonnull) RNSStackScreenHeaderCoordinator *headerCoordinator;
 
 /**
  * Divergence from RNS (which keeps the component view private): exposed so that

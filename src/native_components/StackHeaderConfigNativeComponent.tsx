@@ -10,18 +10,118 @@ import type {
   StackHeaderConfigProps,
   StackHeaderConfigPropsAndroid,
   StackHeaderConfigRef,
+  StackHeaderInlineCustomItemIOS,
+  StackHeaderInlineItemIOS,
+  StackHeaderSpacerItemIOS,
+  StackHeaderTitleCustomItemIOS,
   StackHeaderToolbarMenuItemOptionsAndroid,
   StackHeaderTypeAndroid,
 } from '../types/StackHeaderConfig.js';
 import { StackHeaderSubviewNativeComponent } from './StackHeaderSubviewNativeComponent.js';
+import {
+  StackHeaderItemNativeComponent,
+  type StackHeaderItemPlacement,
+} from './StackHeaderItemNativeComponent.js';
+import {
+  StackHeaderItemSpacerNativeComponent,
+  type StackHeaderItemSpacerPlacement,
+} from './StackHeaderItemSpacerNativeComponent.js';
 
+// RNS splits the header config into platform files resolved at build time; a
+// Lynx bundle serves both platforms, so the split happens at runtime instead.
 const StackHeaderConfigNativeComponentInner = (
   props: StackHeaderConfigProps,
   forwardedRef: Ref<StackHeaderConfigRef>,
-) => {
+) =>
+  SystemInfo.platform === 'iOS' ? (
+    <StackHeaderConfigIOS {...props} forwardedRef={forwardedRef} />
+  ) : (
+    <StackHeaderConfigAndroid {...props} forwardedRef={forwardedRef} />
+  );
+
+type PlatformInnerProps = StackHeaderConfigProps & {
+  forwardedRef: Ref<StackHeaderConfigRef>;
+};
+
+const StackHeaderConfigIOS = (props: PlatformInnerProps) => {
+  // android props are safely dropped
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const { android, ios, forwardedRef, ...baseProps } = props;
+
+  // No iOS commands exist yet, but resolve the ref so consumers can hold it.
+  useImperativeHandle(forwardedRef, () => ({}));
+
+  const {
+    leadingItems,
+    trailingItems,
+    titleItem,
+    subtitleItem,
+    largeSubtitleItem,
+    largeTitle,
+    largeSubtitle,
+    largeTitleEnabled,
+  } = ios ?? {};
+
+  return (
+    <ls-stack-header-config
+      style={{
+        position: 'absolute',
+        left: 0,
+        top: 0,
+      }}
+      {...baseProps}
+      largeTitle={largeTitle}
+      largeSubtitle={largeSubtitle}
+      largeTitleEnabled={!!largeTitleEnabled}
+    >
+      {leadingItems?.map((item) => makeItemViewFromItem(item, 'leading'))}
+      {titleItem && makeItemViewFromItem(titleItem, 'title')}
+      {subtitleItem && makeItemViewFromItem(subtitleItem, 'subtitle')}
+      {largeSubtitleItem &&
+        makeItemViewFromItem(largeSubtitleItem, 'largeSubtitle')}
+      {trailingItems?.map((item) => makeItemViewFromItem(item, 'trailing'))}
+    </ls-stack-header-config>
+  );
+};
+
+function makeItemViewFromItem(
+  item:
+    | StackHeaderInlineItemIOS
+    | StackHeaderInlineCustomItemIOS
+    | StackHeaderTitleCustomItemIOS
+    | StackHeaderSpacerItemIOS,
+  placement: StackHeaderItemPlacement,
+) {
+  if ('type' in item && item.type === 'spacer') {
+    const { key, ...rest } = item;
+
+    if (!(placement === 'leading' || placement === 'trailing')) {
+      console.warn(
+        `[Stack] Invalid placement for spacer: "${placement}", defaulting to "trailing"`,
+      );
+      placement = 'trailing';
+    }
+
+    return (
+      <StackHeaderItemSpacerNativeComponent
+        key={key}
+        placement={placement as StackHeaderItemSpacerPlacement}
+        {...rest}
+      />
+    );
+  }
+
+  const { key, ...rest } = item;
+
+  return (
+    <StackHeaderItemNativeComponent key={key} placement={placement} {...rest} />
+  );
+}
+
+const StackHeaderConfigAndroid = (props: PlatformInnerProps) => {
   // ios props are safely dropped
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const { android, ios, ...baseProps } = props;
+  const { android, ios, forwardedRef, ...baseProps } = props;
 
   const ref = useHeaderConfigRef(forwardedRef);
 

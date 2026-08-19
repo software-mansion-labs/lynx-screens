@@ -1,13 +1,13 @@
 #import "RNSStackScreenComponent.h"
+#import "RNSStackHeaderConfigComponent.h"
 #import "RNSStackHostComponent.h"
 #import "RNSStackScreenController.h"
 #import "RNSStackScreenEventEmitter.h"
+#import "RNSStackScreenHeaderCoordinator.h"
 
 #import <Lynx/LynxComponentRegistry.h>
 #import <Lynx/LynxLog.h>
 #import <Lynx/LynxPropsProcessor.h>
-
-#import "LynxScreens-Swift.h"
 
 @LynxElement("ls-stack-screen")
 @implementation RNSStackScreenComponent {
@@ -81,6 +81,16 @@ LYNX_PROP_SETTER("screenKey", setScreenKey, NSString *) {
 
 - (void)propsDidUpdate{
     [self finalizeUpdates];
+}
+
+#pragma mark - Children Lifecycle
+
+- (void)removeChild:(id)child atIndex:(NSInteger)index
+{
+    if ([child isKindOfClass:RNSStackHeaderConfigComponent.class]) {
+        [_controller.headerCoordinator clearHeaderConfiguration];
+    }
+    [super removeChild:child atIndex:index];
 }
 
 - (void)finalizeUpdates
