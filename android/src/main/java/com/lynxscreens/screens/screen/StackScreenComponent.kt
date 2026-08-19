@@ -9,7 +9,7 @@ import com.lynx.tasm.behavior.ui.LynxBaseUI
 import com.lynx.tasm.behavior.ui.UIGroup
 import com.lynx.tasm.event.LynxCustomEvent
 import com.lynxscreens.screens.common.ShadowStateProxy
-import com.lynxscreens.screens.header.config.OnHeaderConfigAttachListener
+import com.lynxscreens.screens.header.config.OnHeaderConfigurationAttachListener
 import com.lynxscreens.screens.header.config.StackHeaderConfigComponent
 import com.lynxscreens.screens.host.StackHostComponent
 import java.lang.IllegalArgumentException
@@ -66,17 +66,29 @@ internal class StackScreenComponent(context: LynxContext) : UIGroup<StackScreenV
     internal var headerConfig: StackHeaderConfigComponent? = null
         private set
 
-    internal var onHeaderConfigAttachListener: WeakReference<OnHeaderConfigAttachListener>? = null
+    private var onHeaderConfigurationAttachListener: WeakReference<OnHeaderConfigurationAttachListener>? = null
+
+    internal fun registerHeaderConfigAttachListener(listener: OnHeaderConfigurationAttachListener) {
+        check(onHeaderConfigurationAttachListener?.get() == null) {
+            "[RNScreens] Attempted to register header config attach listener before previous listener was cleared."
+        }
+        onHeaderConfigurationAttachListener = WeakReference(listener)
+        headerConfig?.let { listener.onHeaderConfigAttached(it, it) }
+    }
+
+    internal fun clearHeaderConfigAttachListener() {
+        onHeaderConfigurationAttachListener = null
+    }
 
     internal fun attachHeaderConfig(header: StackHeaderConfigComponent) {
         headerConfig = header
-        onHeaderConfigAttachListener?.get()?.onHeaderConfigAttach(header)
+        onHeaderConfigurationAttachListener?.get()?.onHeaderConfigAttached(header, header)
     }
 
     internal fun detachHeaderConfig(header: StackHeaderConfigComponent) {
         if (headerConfig === header) {
             headerConfig = null
-            onHeaderConfigAttachListener?.get()?.onHeaderConfigAttach(null)
+            onHeaderConfigurationAttachListener?.get()?.onHeaderConfigAttached(null, null)
         }
     }
 
