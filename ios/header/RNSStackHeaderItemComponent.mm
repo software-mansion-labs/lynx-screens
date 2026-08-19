@@ -1,6 +1,4 @@
 #import "RNSStackHeaderItemComponent.h"
-#import "RNSDefines.h"
-#import "RNSStackHeaderItemWrapperView.h"
 
 #import <Lynx/LynxComponentRegistry.h>
 #import <Lynx/LynxLog.h>
@@ -51,88 +49,18 @@
     return _placement;
 }
 
-- (BOOL)hasCustomView
+#pragma mark - RNSStackHeaderItemDataProviding
+
+- (nullable NSString *)label
 {
-    return self.children.count > 0;
+    return _label;
 }
 
-#pragma mark - Bar Button Item
-
-- (nonnull UIView *)makeWrappedViewWithFrameChangeDelegate:(id<RNSViewFrameChangeDelegate>)delegate
+- (nullable UIView *)customView
 {
-    // The wrapper view is delegating the state update outside the view
-    // and we expect that delegate to call viewFrameDidChange from outside.
-    // This is needed for iOS 18 where there is no other way to sync all child elements
-    // when one updates its side in a way that impacts the layout of others
-    // (on iOS 26, this would work with just attaching self here).
-    RNSStackHeaderItemWrapperView *wrapperView = [[RNSStackHeaderItemWrapperView alloc] initWithDelegate:delegate];
-    wrapperView.translatesAutoresizingMaskIntoConstraints = NO;
-    [wrapperView addSubview:self.view];
-
-    [NSLayoutConstraint activateConstraints:@[
-        [self.view.leadingAnchor constraintEqualToAnchor:wrapperView.leadingAnchor],
-        [self.view.trailingAnchor constraintEqualToAnchor:wrapperView.trailingAnchor],
-        [self.view.topAnchor constraintEqualToAnchor:wrapperView.topAnchor],
-        [self.view.bottomAnchor constraintEqualToAnchor:wrapperView.bottomAnchor],
-    ]];
-
-    return wrapperView;
-}
-
-#if RNS_IPHONE_OS_VERSION_AVAILABLE(26_0)
-- (nonnull UIView *)makeWrappedInlineItemViewForIOS26WithFrameChangeDelegate:(id<RNSViewFrameChangeDelegate>)delegate
-{
-    // Starting from iOS 26, UIBarButtonItem's customView is stretched to have at least 36 width.
-    // To mitigate this, we add a wrapper view that will center the item inside of itself.
-    RNSStackHeaderItemWrapperView *wrapperView = [[RNSStackHeaderItemWrapperView alloc] initWithDelegate:delegate];
-    wrapperView.translatesAutoresizingMaskIntoConstraints = NO;
-    // self.view has already opted out of default constraints with `translatesAutoresizingMaskIntoConstraints = NO`
-    [wrapperView addSubview:self.view];
-
-    [self.view.centerXAnchor constraintEqualToAnchor:wrapperView.centerXAnchor].active = YES;
-    [self.view.centerYAnchor constraintEqualToAnchor:wrapperView.centerYAnchor].active = YES;
-
-    // To prevent UIKit from stretching subviews to all available width, we need to:
-    // 1. Set width of wrapperView to match the header item BUT when
-    //    the item's width is smaller than minimal required 36 width, it breaks
-    //    UIKit's constraint. That's why we need to lower the priority of the constraint.
-    NSLayoutConstraint *widthEqual = [wrapperView.widthAnchor constraintEqualToAnchor:self.view.widthAnchor];
-    widthEqual.priority = UILayoutPriorityDefaultHigh;
-    widthEqual.active = YES;
-
-    NSLayoutConstraint *heightEqual = [wrapperView.heightAnchor constraintEqualToAnchor:self.view.heightAnchor];
-    heightEqual.priority = UILayoutPriorityDefaultHigh;
-    heightEqual.active = YES;
-
-    // 2. Set content hugging priority for the header item
-    [self.view setContentHuggingPriority:UILayoutPriorityRequired forAxis:UILayoutConstraintAxisHorizontal];
-    [self.view setContentHuggingPriority:UILayoutPriorityRequired forAxis:UILayoutConstraintAxisVertical];
-
-    // 3. Set compression resistance to prevent UIKit from shrinking the item below its intrinsic size.
-    [self.view setContentCompressionResistancePriority:UILayoutPriorityRequired
-                                               forAxis:UILayoutConstraintAxisVertical];
-    [self.view setContentCompressionResistancePriority:UILayoutPriorityRequired
-                                               forAxis:UILayoutConstraintAxisHorizontal];
-
-    return wrapperView;
-}
-#endif // RNS_IPHONE_OS_VERSION_AVAILABLE(26_0)
-
-- (nonnull UIBarButtonItem *)makeBarButtonItemWithFrameChangeDelegate:(id<RNSViewFrameChangeDelegate>)delegate
-{
-    // Similarly to makeWrappedViewWithFrameChangeDelegate, we're attaching outside delegate here.
-    // See the reasoning in the aforementioned function.
-    if (self.hasCustomView) {
-#if RNS_IPHONE_OS_VERSION_AVAILABLE(26_0)
-        if (@available(iOS 26.0, *)) {
-            return [[UIBarButtonItem alloc]
-                initWithCustomView:[self makeWrappedInlineItemViewForIOS26WithFrameChangeDelegate:delegate]];
-        }
-#endif // RNS_IPHONE_OS_VERSION_AVAILABLE(26_0)
-        return [[UIBarButtonItem alloc] initWithCustomView:[self makeWrappedViewWithFrameChangeDelegate:delegate]];
-    }
-
-    return [[UIBarButtonItem alloc] initWithTitle:_label style:UIBarButtonItemStylePlain target:nil action:nil];
+    // Adaptation: on Lynx the item's painting view (not the component itself)
+    // is what gets reparented into the navigation bar.
+    return self.children.count > 0 ? self.view : nil;
 }
 
 #pragma mark - Layout

@@ -3,28 +3,26 @@
 #import <Lynx/LynxUI.h>
 #import <UIKit/UIKit.h>
 
-#import "RNSHeaderItemPlacement.h"
+#import "RNSStackHeaderItemDataProviding.h"
 #import "RNSStackHeaderItemInvalidationDelegate.h"
 #import "RNSStackHeaderItemView.h"
-#import "RNSViewFrameChangeDelegate.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
 /**
  * Counterpart of RNS RNSStackHeaderItemComponentView. A configuration-only
  * element: its view is never mounted into the config's view hierarchy -
- * the header config converts it to a UIBarButtonItem (or a wrapped
- * title/subtitle view) which UIKit places in the navigation bar.
+ * the header config converts it (through RNSStackHeaderContentFactory) to a
+ * UIBarButtonItem or a wrapped title/subtitle view which UIKit places in the
+ * navigation bar.
  */
-@interface RNSStackHeaderItemComponent : LynxUI <RNSStackHeaderItemView *>
-
-@property (nonatomic, weak, nullable) id<RNSStackHeaderItemInvalidationDelegate> invalidationDelegate;
+@interface RNSStackHeaderItemComponent : LynxUI <RNSStackHeaderItemView *> <RNSStackHeaderItemDataProviding>
 
 @property (nonatomic, readonly) RNSHeaderItemPlacement placement;
-@property (nonatomic, readonly) BOOL hasCustomView;
+@property (nonatomic, readonly, nullable) NSString *label;
+@property (nonatomic, readonly, nullable) UIView *customView;
 
-- (nonnull UIBarButtonItem *)makeBarButtonItemWithFrameChangeDelegate:(id<RNSViewFrameChangeDelegate>)delegate;
-- (nonnull UIView *)makeWrappedViewWithFrameChangeDelegate:(id<RNSViewFrameChangeDelegate>)delegate;
+@property (nonatomic, weak, nullable) id<RNSStackHeaderItemInvalidationDelegate> invalidationDelegate;
 
 @end
 

@@ -43,11 +43,9 @@
                      forController:(nonnull RNSStackScreenController *)controller
 {
 #if !TARGET_OS_TV
-    if (@available(iOS 11.0, *)) {
-        controller.navigationItem.largeTitleDisplayMode = data.largeTitleEnabled
-            ? UINavigationItemLargeTitleDisplayModeAlways
-            : UINavigationItemLargeTitleDisplayModeNever;
-    }
+    controller.navigationItem.largeTitleDisplayMode = data.largeTitleEnabled
+        ? UINavigationItemLargeTitleDisplayModeAlways
+        : UINavigationItemLargeTitleDisplayModeNever;
 #endif // !TARGET_OS_TV
 }
 

@@ -12,9 +12,7 @@
 - (void)initializeNavigationBarOfNavigationController:(nonnull UINavigationController *)navigationController
 {
 #if !TARGET_OS_TV
-    if (@available(iOS 11.0, *)) {
-        navigationController.navigationBar.prefersLargeTitles = YES;
-    }
+    navigationController.navigationBar.prefersLargeTitles = YES;
 #endif // !TARGET_OS_TV
 }
 
