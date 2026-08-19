@@ -3,9 +3,12 @@ package com.lynxscreens.screens.host
 import android.annotation.SuppressLint
 import android.content.Context
 import android.util.Log
+import android.view.ViewGroup
 import android.widget.FrameLayout
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
+import com.lynxscreens.screens.common.container.Container
+import com.lynxscreens.screens.common.container.ParentContainerItemRegistry
 import com.lynxscreens.screens.ext.isMeasured
 import com.lynxscreens.screens.helpers.FragmentManagerHelper
 import com.lynxscreens.screens.helpers.ViewIdGenerator
@@ -18,6 +21,7 @@ internal class StackContainer(
     context: Context,
     private val delegate: WeakReference<StackContainerDelegate>,
 ) : FrameLayout(context),
+    Container,
     FragmentManager.OnBackStackChangedListener {
     private var fragmentManager: FragmentManager? = null
 
@@ -28,6 +32,8 @@ internal class StackContainer(
      * Will crash in case parent does not implement StackContainerParent interface.
      */
     private fun containerParentOrNull(): StackContainerParent? = this.parent as StackContainerParent?
+
+    private val parentContainerRegistry = ParentContainerItemRegistry()
 
     /**
      * Describes most up-to-date view of the stack. It might be different from
@@ -52,6 +58,7 @@ internal class StackContainer(
         Log.d(TAG, "StackContainer [$id] attached to window")
         super.onAttachedToWindow()
 
+        parentContainerRegistry.attach(this)
         setupFragmentManger()
 
         // Following line works with a couple of assumptions.
@@ -72,6 +79,7 @@ internal class StackContainer(
         super.onDetachedFromWindow()
         requireFragmentManager().removeOnBackStackChangedListener(this)
         fragmentManager = null
+        parentContainerRegistry.detach(this)
     }
 
     internal fun setupFragmentManger() {
@@ -215,6 +223,18 @@ internal class StackContainer(
     }
 
     /**
+     * Computes top fragment from FragmentManager's state.
+     * This one does not query the `stackModel`!
+     *
+     * Might return `null` if the stack is empty.
+     */
+    private fun determineTopFragment(): StackScreenFragment? =
+        requireFragmentManager()
+            .fragments
+            .filterIsInstance<StackScreenFragment>()
+            .lastOrNull()
+
+    /**
      * If this.isLaidOut == false, then SpecialEffectsController won't perform animations / transitions.
      * This function tries to ensure that the container is laid out if it already has layout information.
      */
@@ -259,6 +279,16 @@ internal class StackContainer(
 
         layout(left, top, right, bottom)
     }
+
+    // region Container
+
+    override fun resolveCurrentContentScrollView(): ViewGroup? =
+        determineTopFragment()
+            ?.stackScreen
+            ?.view
+            ?.findContentScrollView()
+
+    // endregion
 
     companion object {
         const val TAG = "StackContainer"

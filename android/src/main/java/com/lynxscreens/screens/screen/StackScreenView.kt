@@ -1,16 +1,29 @@
 package com.lynxscreens.screens.screen
 
 import android.annotation.SuppressLint
+import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import com.lynx.tasm.behavior.LynxContext
 import com.lynx.tasm.behavior.ui.view.AndroidView
 import com.lynxscreens.screens.common.FragmentProviding
+import com.lynxscreens.screens.common.container.Container
+import com.lynxscreens.screens.common.container.ContainerItem
+import com.lynxscreens.screens.common.container.ContainerItemSupport
 import com.lynxscreens.screens.ext.findFragmentOrNull
 
+// Adaptation: RNS implements ContainerItem on StackScreen, which is both the
+// prop holder and the Android view; on Lynx those roles are split and the
+// container protocol walks the native view hierarchy, so ContainerItem lives
+// on the screen's view. Divergence from RNS: the ScrollViewSeeking
+// conformance is omitted - the ScrollViewMarker epic is not ported, so the
+// content scroll view is only resolvable via the nested container or the
+// descendant-chain heuristic.
 @SuppressLint("ViewConstructor") // should never be restored
 class StackScreenView(
     private val lynxContext: LynxContext,
-) : AndroidView(lynxContext), FragmentProviding {
+) : AndroidView(lynxContext), FragmentProviding, ContainerItem {
+    private val containerItemSupport = ContainerItemSupport()
+
     internal var onLaidOut: ((width: Int, height: Int) -> Unit)? = null
 
     override fun onLayout(
@@ -27,4 +40,12 @@ class StackScreenView(
     override fun getAssociatedFragment(): Fragment? = this.findFragmentOrNull()?.also {
         check(it is StackScreenFragment) { "[RNScreens] Unexpected fragment type: ${it.javaClass.simpleName}"}
     }
+
+    override fun registerNestedContainer(container: Container) = containerItemSupport.registerNestedContainer(container)
+
+    override fun unregisterNestedContainer(container: Container) = containerItemSupport.unregisterNestedContainer(container)
+
+    override fun resolveNestedContainer(): Container? = containerItemSupport.resolveNestedContainer()
+
+    override fun findContentScrollView(): ViewGroup? = containerItemSupport.findContentScrollView(this)
 }
