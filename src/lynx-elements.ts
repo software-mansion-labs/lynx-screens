@@ -80,6 +80,12 @@ declare module "@lynx-js/types" {
               | 'ifRoomWithText'
               | 'never'
               | undefined;
+            drawableIconResourceName?: string | undefined;
+            imageIconUri?: string | undefined;
+            iconTintColorNormal?: string | undefined;
+            iconTintColorPressed?: string | undefined;
+            iconTintColorFocused?: string | undefined;
+            iconTintColorDisabled?: string | undefined;
           }>
         | undefined;
       bindOnToolbarMenuItemClicked?:
