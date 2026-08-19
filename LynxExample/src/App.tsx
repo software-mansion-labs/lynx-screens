@@ -10,7 +10,7 @@ export function App(props: { onRender?: () => void }) {
         height: '100%',
       }}
     >
-      <Tests.TestStackToolbarMenuDisabledAndroid />
+      <Tests.TestStackToolbarMenuTitleAndroid />
     </page>
   );
 }
