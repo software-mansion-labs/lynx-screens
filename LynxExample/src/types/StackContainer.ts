@@ -1,5 +1,9 @@
 import React from 'react';
-import type { StackScreenProps } from 'lynx-screens';
+import type {
+  StackHeaderConfigProps,
+  StackHeaderConfigRef,
+  StackScreenProps,
+} from 'lynx-screens';
 
 export type {
   StackScreenActivityMode,
@@ -13,7 +17,10 @@ export type {
 export type StackRouteOptions = Omit<
   StackScreenProps,
   'children' | 'activityMode' | 'screenKey'
->;
+> & {
+  headerConfig?: StackHeaderConfigProps | undefined;
+  headerConfigRef?: React.Ref<StackHeaderConfigRef> | undefined;
+};
 
 /**
  * Blueprint for a route.
@@ -24,9 +31,10 @@ export type StackRouteConfig = {
   options: StackRouteOptions;
 };
 
-export type StackRoute = StackRouteConfig & {
+export type StackRoute = Omit<StackRouteConfig, 'Component'> & {
   activityMode: StackScreenProps['activityMode'];
   routeKey: StackScreenProps['screenKey'];
+  isMarkedForDismissal: boolean; // whether this route is during or after dismissal process
 };
 
 /// StackContainer props

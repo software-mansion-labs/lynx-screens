@@ -10,7 +10,7 @@ export type OnDismissEventPayload = Readonly<{
 }>;
 
 export type StackScreenProps = {
-  children?: Lynx.ViewProps['children'];
+  children?: Lynx.ViewProps['children'] | undefined;
 
   // Control
   activityMode: StackScreenActivityMode;
@@ -30,13 +30,13 @@ export type StackScreenProps = {
     | Lynx.EventHandler<Lynx.BaseEventOrig<EmptyEventPayload>>
     | undefined;
 
-  onDismiss?: (screenKey: string) => void;
-  onNativeDismiss?: (screenKey: string) => void;
+  onDismiss?: ((screenKey: string) => void) | undefined;
+  onNativeDismiss?: ((screenKey: string) => void) | undefined;
 
   onNativeDismissPrevented?:
     | Lynx.EventHandler<Lynx.BaseEventOrig<EmptyEventPayload>>
     | undefined;
 
   // Configuration
-  preventNativeDismiss?: boolean;
+  preventNativeDismiss?: boolean | undefined;
 };

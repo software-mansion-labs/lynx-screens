@@ -27,6 +27,8 @@ dependencies {
     kapt("org.lynxsdk.lynx:lynx-processor:4.0.1")
 
     implementation("androidx.coordinatorlayout:coordinatorlayout:1.2.0")
+    // Image engine of Lynx's standard image-service setup; used by helpers/ImageLoader.
+    implementation("com.facebook.fresco:fresco:2.3.0")
     implementation("androidx.fragment:fragment-ktx:1.8.9")
     implementation("androidx.appcompat:appcompat:1.7.1")
     implementation("androidx.transition:transition-ktx:1.7.0")

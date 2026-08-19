@@ -7,9 +7,11 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.transition.Slide
+import com.lynxscreens.screens.header.StackHeaderCoordinatorLayout
 
 internal class StackScreenFragment(
     internal val stackScreen: StackScreenComponent,
+    private val canNavigateBack: Boolean,
 ) : Fragment() {
     private var screenLifecycleEventEmitter: StackScreenAppearanceEventsEmitter? = null
 
@@ -43,7 +45,7 @@ internal class StackScreenFragment(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?,
-    ): View = stackScreen.view
+    ): View = StackHeaderCoordinatorLayout(requireContext(), stackScreen, canNavigateBack)
 
     override fun onViewCreated(
         view: View,
@@ -54,6 +56,11 @@ internal class StackScreenFragment(
     }
 
     override fun onDestroyView() {
+        val coordinatorLayout = view
+        check(coordinatorLayout is StackHeaderCoordinatorLayout) {
+            "[RNScreens] Unexpected fragment view type: $view"
+        }
+        coordinatorLayout.tearDown()
         super.onDestroyView()
         screenLifecycleEventEmitter = null
     }

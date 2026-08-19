@@ -1,5 +1,6 @@
 #import "RNSStackScreenComponent.h"
 #import "RNSStackHostComponent.h"
+#import "RNSStackScreenController.h"
 #import "RNSStackScreenEventEmitter.h"
 
 #import <Lynx/LynxComponentRegistry.h>
@@ -30,8 +31,9 @@
 {
     [self resetProps];
     [self setupController];
-    
+
     _hasUpdatedActivityMode = NO;
+    _isNativelyDismissed = NO;
 }
 
 - (void)resetProps
