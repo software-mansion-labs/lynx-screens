@@ -62,6 +62,11 @@ internal class ShadowStateProxy(
     private fun kickLynxViewLayoutPass() {
         val lynxView = lynxContext.lynxView ?: return
         lynxView.post {
+            // View.measure short-circuits (skips onMeasure) when the specs are unchanged
+            // and no layout was requested - but it is exactly LynxView.onMeasure that
+            // consumes the engine's pending layout tick (ViewLayoutTick.triggerLayout).
+            // Force the flag so the pass actually runs.
+            lynxView.forceLayout()
             lynxView.measure(
                 View.MeasureSpec.makeMeasureSpec(lynxView.width, View.MeasureSpec.EXACTLY),
                 View.MeasureSpec.makeMeasureSpec(lynxView.height, View.MeasureSpec.EXACTLY),

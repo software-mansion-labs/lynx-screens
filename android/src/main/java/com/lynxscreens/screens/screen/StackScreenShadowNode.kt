@@ -25,7 +25,7 @@ import com.lynxscreens.screens.common.ShadowStateUpdating
  * by its own custom shadow node (e.g. StackHeaderConfigShadowNode) is NOT a NativeLayoutNodeRef,
  * but the engine routes the measurement to its custom measure func all the same.
  */
-@LynxShadowNode(tagName = "stack-screen-native")
+@LynxShadowNode(tagName = "ls-stack-screen")
 internal class StackScreenShadowNode :
     ShadowNode(),
     CustomMeasureFunc,
@@ -49,6 +49,12 @@ internal class StackScreenShadowNode :
         this.contentOffsetY = contentOffsetY
         this.frameWidth = frameWidth
         this.frameHeight = frameHeight
+
+        // The measurement constraints for the children depend on the screen frame, so their
+        // cached measurements must be invalidated along with ours.
+        for (index in 0 until childCount) {
+            layoutNodeManager.markDirty(getChildAt(index).signature)
+        }
 
         resetIsDirty()
         markDirty()
