@@ -8,7 +8,7 @@ import {
 import type {
   StackHeaderConfigRef,
   StackHeaderToolbarMenuElementAndroid,
-  StackHeaderToolbarMenuItemOptionsAndroid,
+  StackHeaderToolbarMenuElementOptionsAndroid,
   StackHeaderToolbarMenuItemShowAsActionAndroid,
 } from 'lynx-screens';
 import {
@@ -163,12 +163,12 @@ function MainScreen() {
   );
 
   const sendCommand = useCallback(() => {
-    const options: StackHeaderToolbarMenuItemOptionsAndroid = {
+    const options: StackHeaderToolbarMenuElementOptionsAndroid = {
       ...(cmdShowAsAction !== 'no change' && {
         showAsAction: resolveShowAsAction(cmdShowAsAction),
       }),
     };
-    headerConfigRef.current?.android?.setToolbarMenuItemOptions(
+    headerConfigRef.current?.android?.setToolbarMenuElementOptions(
       cmdTargetId,
       options,
     );

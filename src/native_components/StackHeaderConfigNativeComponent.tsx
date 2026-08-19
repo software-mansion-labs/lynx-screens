@@ -21,7 +21,7 @@ import type {
   StackHeaderToolbarMenuGroupAndroid,
   StackHeaderToolbarMenuItemAndroid,
   StackHeaderToolbarMenuItemBaseAndroid,
-  StackHeaderToolbarMenuItemOptionsAndroid,
+  StackHeaderToolbarMenuElementOptionsAndroid,
   StackHeaderTypeAndroid,
   SupportsMenuIOS,
 } from '../types/StackHeaderConfig.js';
@@ -290,7 +290,7 @@ function useHeaderConfigRef(forwardedRef: Ref<StackHeaderConfigRef>) {
 
   useImperativeHandle(forwardedRef, () => ({
     android: {
-      setToolbarMenuItemOptions: (id, options) => {
+      setToolbarMenuElementOptions: (id, options) => {
         if (!ref.current) {
           console.warn(
             '[RNScreens] Reference to native header config component has not been updated yet.',
@@ -302,10 +302,10 @@ function useHeaderConfigRef(forwardedRef: Ref<StackHeaderConfigRef>) {
         // a UI method invocation through the NodesRef.
         ref.current
           .invoke({
-            method: 'setToolbarMenuItemOptions',
+            method: 'setToolbarMenuElementOptions',
             params: {
               id,
-              options: parseToolbarMenuItemOptionsToParams(options),
+              options: parseToolbarMenuElementOptionsToParams(options),
             },
           })
           .exec();
@@ -345,6 +345,7 @@ type StackHeaderToolbarMenuElementAttr = {
   groupId?: string | undefined;
   itemType?: 'action' | 'toggle' | 'automatic' | undefined;
   initialToggleState?: boolean | undefined;
+  menuTitle?: string | undefined;
   groups?: StackHeaderToolbarMenuGroupAttr[] | undefined;
   children?: StackHeaderToolbarMenuElementAttr[] | undefined;
 };
@@ -605,14 +606,14 @@ function parseBaseItemToNativeProps({
   };
 }
 
-function parseToolbarMenuItemOptionsToParams(
-  options: StackHeaderToolbarMenuItemOptionsAndroid,
+function parseToolbarMenuElementOptionsToParams(
+  options: StackHeaderToolbarMenuElementOptionsAndroid,
 ): Record<string, unknown> {
   return Object.fromEntries(
     Object.entries(options).flatMap(([key, value]): [string, unknown][] => {
       if (key === 'icon') {
         const iconValue =
-          value as StackHeaderToolbarMenuItemOptionsAndroid['icon'];
+          value as StackHeaderToolbarMenuElementOptionsAndroid['icon'];
 
         // Explicit `undefined` means "reset the icon". The native side treats
         // an absent key as "no change", so to clear the icon we must send every

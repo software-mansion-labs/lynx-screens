@@ -18,7 +18,7 @@ import com.lynxscreens.screens.header.config.StackHeaderDelegate
 import com.lynxscreens.screens.header.config.StackHeaderInvalidationFlags
 import com.lynxscreens.screens.header.subview.StackHeaderSubviewProviding
 import com.lynxscreens.screens.header.toolbar.StackHeaderToolbarMenuGroupMetadata
-import com.lynxscreens.screens.header.toolbar.StackHeaderToolbarMenuItemOptions
+import com.lynxscreens.screens.header.toolbar.StackHeaderToolbarMenuElementOptions
 import com.lynxscreens.screens.screen.StackScreenComponent
 
 @SuppressLint("ViewConstructor")
@@ -65,12 +65,12 @@ internal class StackHeaderCoordinatorLayout(
         object : StackHeaderConfigurationObserver {
             override fun onConfigChanged(config: StackHeaderConfigurationProviding) = processUpdate(config)
 
-            override fun onMenuItemUpdated(
+            override fun onMenuElementUpdated(
                 id: String,
-                options: StackHeaderToolbarMenuItemOptions,
+                options: StackHeaderToolbarMenuElementOptions,
             ) {
                 val toolbar = appBarLayout?.toolbar ?: return
-                applicator.updateToolbarMenuItem(toolbar, toolbarMenuForwardIdMap, id, options)
+                applicator.updateToolbarMenuElement(toolbar, toolbarMenuForwardIdMap, id, options)
                 if (options.checked != null) {
                     handleGroupItemStateChange(toolbar, id, options.checked)
                 }

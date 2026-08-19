@@ -20,7 +20,7 @@ import com.lynxscreens.screens.header.subview.StackHeaderSubviewComponent
 import com.lynxscreens.screens.header.subview.StackHeaderSubviewType
 import com.lynxscreens.screens.header.toolbar.StackHeaderToolbarMenuConfig
 import com.lynxscreens.screens.header.toolbar.StackHeaderToolbarMenuItemIconSource
-import com.lynxscreens.screens.header.toolbar.StackHeaderToolbarMenuItemOptions
+import com.lynxscreens.screens.header.toolbar.StackHeaderToolbarMenuElementOptions
 import com.lynxscreens.screens.header.toolbar.StackHeaderToolbarMenuMapper
 import com.lynxscreens.screens.header.toolbar.StackHeaderToolbarUpdate
 import com.lynxscreens.screens.helpers.IconResolution
@@ -209,8 +209,8 @@ internal class StackHeaderConfigComponent(
     // Last resolved icon per menu item id. Unlike every other field on this config — which
     // mirrors a single prop — this cache deliberately merges resolved icons from BOTH sources
     // that can set a menu item icon: the `toolbarMenu` prop
-    // (resolveToolbarMenuItemIconsIfNeeded) and the imperative `setToolbarMenuItemOptions`
-    // UI method (dispatchMenuItemUpdate). It is necessary to ensure consistency.
+    // (resolveToolbarMenuItemIconsIfNeeded) and the imperative `setToolbarMenuElementOptions`
+    // UI method (dispatchMenuElementUpdate). It is necessary to ensure consistency.
     private var toolbarMenuItemIcons = mapOf<String, Drawable?>()
 
     internal fun resolveToolbarMenuItemIconsIfNeeded() {
@@ -391,20 +391,20 @@ internal class StackHeaderConfigComponent(
      * resolved first and all options — including the icon — are delivered together in a single
      * update, so the change is applied atomically once the (possibly async) image has loaded.
      */
-    internal fun dispatchMenuItemUpdate(
+    internal fun dispatchMenuElementUpdate(
         id: String,
-        options: StackHeaderToolbarMenuItemOptions,
+        options: StackHeaderToolbarMenuElementOptions,
         iconSource: StackHeaderToolbarMenuItemIconSource?,
     ) {
         if (iconSource == null) {
-            configObserver?.onMenuItemUpdated(id, options)
+            configObserver?.onMenuElementUpdated(id, options)
             return
         }
 
         val resolver = toolbarMenuItemIconResolvers[id]
         if (resolver == null) {
-            Log.w(TAG, "[RNScreens] Unable to find icon resolver for menu item $id.")
-            configObserver?.onMenuItemUpdated(id, options)
+            Log.w(TAG, "[RNScreens] Unable to find icon resolver for menu element $id.")
+            configObserver?.onMenuElementUpdated(id, options)
             return
         }
 
@@ -419,7 +419,7 @@ internal class StackHeaderConfigComponent(
                         StackHeaderToolbarUpdate.from(result.drawable)
                     }
                 }
-            configObserver?.onMenuItemUpdated(id, options.copy(icon = icon))
+            configObserver?.onMenuElementUpdated(id, options.copy(icon = icon))
         }
     }
 
@@ -587,10 +587,10 @@ internal class StackHeaderConfigComponent(
         toolbarMenuItemIconSourceMap = iconSources
     }
 
-    // The Lynx counterpart of RNS's setToolbarMenuItemOptions view command,
+    // The Lynx counterpart of RNS's setToolbarMenuElementOptions view command,
     // invoked via NodesRef.invoke from JS.
     @LynxUIMethod
-    fun setToolbarMenuItemOptions(
+    fun setToolbarMenuElementOptions(
         params: ReadableMap,
         callback: Callback,
     ) {
@@ -604,10 +604,10 @@ internal class StackHeaderConfigComponent(
             callback.invoke(LynxUIMethodConstants.PARAM_INVALID)
             return
         }
-        dispatchMenuItemUpdate(
+        dispatchMenuElementUpdate(
             id,
-            StackHeaderToolbarMenuMapper.parseMenuItemOptions(options),
-            StackHeaderToolbarMenuMapper.parseMenuItemIconSource(options),
+            StackHeaderToolbarMenuMapper.parseMenuElementOptions(options),
+            StackHeaderToolbarMenuMapper.parseMenuElementIconSource(options),
         )
         callback.invoke(LynxUIMethodConstants.SUCCESS)
     }
