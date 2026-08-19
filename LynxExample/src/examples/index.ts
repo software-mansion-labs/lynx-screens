@@ -7,6 +7,7 @@ export { default as TestStackBackButtonAndroid } from './TestStackBackButtonAndr
 export { default as TestStackSimpleNav } from './TestStackSimpleNav';
 export { default as TestStackToolbarMenuCommandsAndroid } from './TestStackToolbarMenuCommandsAndroid';
 export { default as TestStackToolbarMenuShowAsActionAndroid } from './TestStackToolbarMenuShowAsActionAndroid';
+export { default as TestStackToolbarMenuIconAndroid } from './TestStackToolbarMenuIconAndroid';
 export { default as TestStackSubviewsAndroid } from './TestStackSubviewsAndroid';
 export { default as TestStackSubviewsIOS } from './TestStackSubviewsIOS';
 export { default as TestStackHeaderMenuIOS } from './TestStackHeaderMenuIOS';

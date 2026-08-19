@@ -18,6 +18,7 @@ import type {
   StackHeaderTypeAndroid,
 } from '../types/StackHeaderConfig.js';
 import { StackHeaderSubviewNativeComponent } from './StackHeaderSubviewNativeComponent.js';
+import { parseAndroidIconToNativeProps } from '../shared/index.js';
 import {
   StackHeaderItemNativeComponent,
   type StackHeaderItemPlacement,
@@ -136,10 +137,13 @@ const StackHeaderConfigAndroid = (props: PlatformInnerProps) => {
     scrollFlagEnterAlwaysCollapsed,
     scrollFlagExitUntilCollapsed,
     scrollFlagSnap,
+    toolbarMenuItems,
     onToolbarMenuItemClicked,
     ...filteredAndroidProps
   } = android ?? {};
 
+  const parsedToolbarMenuItems =
+    parseToolbarMenuItemsToNativeProps(toolbarMenuItems);
   const backButtonIconProps = parseBackButtonIconToNativeProps(backButtonIcon);
   const scrollFlagProps = resolveScrollFlags(filteredAndroidProps.type, {
     scrollFlagScroll,
@@ -161,6 +165,7 @@ const StackHeaderConfigAndroid = (props: PlatformInnerProps) => {
       }}
       {...baseProps}
       {...filteredAndroidProps}
+      toolbarMenuItems={parsedToolbarMenuItems}
       {...backButtonIconProps}
       {...scrollFlagProps}
       hasBackgroundSubview={backgroundSubview != null}
@@ -228,12 +233,39 @@ function useHeaderConfigRef(forwardedRef: Ref<StackHeaderConfigRef>) {
   return ref;
 }
 
-// Doesn't support nested props.
+function parseToolbarMenuItemsToNativeProps(
+  items: StackHeaderConfigPropsAndroid['toolbarMenuItems'],
+) {
+  // RNS additionally routes the tint colors through processColor; on Lynx the
+  // CSS color strings are parsed natively.
+  return items?.map(({ icon, ...rest }) => ({
+    ...rest,
+    ...parseAndroidIconToNativeProps(icon),
+  }));
+}
+
 function parseToolbarMenuItemOptionsToParams(
   options: StackHeaderToolbarMenuItemOptionsAndroid,
 ): Record<string, unknown> {
   return Object.fromEntries(
-    Object.entries(options).map(([key, value]) => {
+    Object.entries(options).flatMap(([key, value]): [string, unknown][] => {
+      if (key === 'icon') {
+        const iconValue =
+          value as StackHeaderToolbarMenuItemOptionsAndroid['icon'];
+
+        // Explicit `undefined` means "reset the icon". The native side treats
+        // an absent key as "no change", so to clear the icon we must send every
+        // native icon key explicitly as `null`.
+        if (iconValue === undefined) {
+          return [
+            ['imageIconUri', null],
+            ['drawableIconResourceName', null],
+          ];
+        }
+
+        return Object.entries(parseAndroidIconToNativeProps(iconValue));
+      }
+
       if (
         typeof value === 'object' &&
         value !== null &&
@@ -243,10 +275,12 @@ function parseToolbarMenuItemOptionsToParams(
       }
 
       return [
-        key,
-        // We need to replace explicit `undefined` with `null`
-        // so that we're able to read that information on the native side.
-        value === undefined ? null : value,
+        [
+          key,
+          // We need to replace explicit `undefined` with `null`
+          // so that we're able to read that information on the native side.
+          value === undefined ? null : value,
+        ],
       ];
     }),
   );
