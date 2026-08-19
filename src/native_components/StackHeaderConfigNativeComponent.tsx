@@ -146,7 +146,7 @@ function makeItemViewFromItem(
   placement: StackHeaderItemPlacement,
 ) {
   if ('type' in item && item.type === 'spacer') {
-    const { key, ...rest } = item;
+    const { id, ...rest } = item;
 
     if (!(placement === 'leading' || placement === 'trailing')) {
       console.warn(
@@ -157,17 +157,17 @@ function makeItemViewFromItem(
 
     return (
       <StackHeaderItemSpacerNativeComponent
-        key={key}
+        key={id}
         placement={placement as StackHeaderItemSpacerPlacement}
         {...rest}
       />
     );
   }
 
-  const { key, ...rest } = item;
+  const { id, ...rest } = item;
 
   return (
-    <StackHeaderItemNativeComponent key={key} placement={placement} {...rest} />
+    <StackHeaderItemNativeComponent key={id} placement={placement} {...rest} />
   );
 }
 

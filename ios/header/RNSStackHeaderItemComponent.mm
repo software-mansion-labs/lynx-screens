@@ -12,7 +12,7 @@
 @implementation RNSStackHeaderItemComponent {
     RNSHeaderItemPlacement _placement;
     BOOL _didSetHeaderItemPlacement;
-    NSString *_Nullable _label;
+    NSString *_Nullable _title;
     RNSStackHeaderMenuData *_Nullable _menu;
     RNSStackHeaderMenuToggleStateTracker *_Nullable _menuToggleStateTracker;
     BOOL _needsUpdate;
@@ -28,7 +28,7 @@
 
 - (void)resetProps
 {
-    _label = nil;
+    _title = nil;
     _menu = nil;
     _menuToggleStateTracker = nil;
     _placement = RNSHeaderItemPlacementTrailing;
@@ -57,9 +57,9 @@
 
 #pragma mark - RNSStackHeaderItemDataProviding
 
-- (nullable NSString *)label
+- (nullable NSString *)title
 {
-    return _label;
+    return _title;
 }
 
 - (nullable RNSStackHeaderMenuData *)menu
@@ -151,12 +151,12 @@ LYNX_PROP_SETTER("placement", setPlacement, NSString *) {
     }
 }
 
-LYNX_PROP_SETTER("label", setLabel, NSString *) {
+LYNX_PROP_SETTER("title", setTitle, NSString *) {
     if (requestReset) {
         value = nil;
     }
-    if (_label != value && ![_label isEqualToString:value]) {
-        _label = value;
+    if (_title != value && ![_title isEqualToString:value]) {
+        _title = value;
         _needsUpdate = YES;
     }
 }

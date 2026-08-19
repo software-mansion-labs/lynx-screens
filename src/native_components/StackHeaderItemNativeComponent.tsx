@@ -14,7 +14,7 @@ export type StackHeaderItemPlacement =
 
 export type StackHeaderItemProps = {
   placement: StackHeaderItemPlacement;
-  label?: string | undefined;
+  title?: string | undefined;
   render?: (() => ReactElement) | undefined;
   menu?: StackHeaderMenuIOS | undefined;
 };
@@ -64,7 +64,7 @@ function parseMenuElementToAttr(
 
 export const StackHeaderItemNativeComponent = ({
   placement,
-  label,
+  title,
   render,
   menu,
 }: StackHeaderItemProps) => {
@@ -76,7 +76,7 @@ export const StackHeaderItemNativeComponent = ({
         top: 0,
       }}
       placement={placement}
-      label={label}
+      title={title}
       menu={menu && (parseMenuElementToAttr(menu) as StackHeaderMenuAttr)}
     >
       {render?.()}
