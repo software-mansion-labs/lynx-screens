@@ -130,7 +130,7 @@ declare module "@lynx-js/types" {
         | 'subtitle'
         | 'largeSubtitle'
         | undefined;
-      label?: string | undefined;
+      title?: string | undefined;
       menu?: StackHeaderMenuAttr | undefined;
     };
     "ls-stack-header-item-spacer": {

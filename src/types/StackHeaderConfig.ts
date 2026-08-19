@@ -599,8 +599,8 @@ export type StackHeaderMenuElementIOS =
   | StackHeaderMenuItemIOS;
 
 export interface StackHeaderBaseItemIOS {
-  key: string;
-  label?: string | undefined;
+  id: string;
+  title?: string | undefined;
 }
 
 export interface SupportsMenuIOS {
@@ -614,20 +614,20 @@ export interface StackHeaderInlineItemIOS
 }
 
 export interface StackHeaderInlineCustomItemIOS extends SupportsMenuIOS {
-  key: string;
+  id: string;
   type: 'item';
   render: () => ReactElement;
 }
 
 interface StackHeaderFixedSpacerItemIOS {
-  key: string;
+  id: string;
   type: 'spacer';
   sizing: 'fixed';
   width: number;
 }
 
 interface StackHeaderFlexibleSpacerItemIOS {
-  key: string;
+  id: string;
   type: 'spacer';
   sizing: 'flexible';
 }
@@ -637,7 +637,7 @@ export type StackHeaderSpacerItemIOS =
   | StackHeaderFlexibleSpacerItemIOS;
 
 export interface StackHeaderTitleCustomItemIOS {
-  key: string;
+  id: string;
   render: () => ReactElement;
 }
 

@@ -128,13 +128,13 @@ function buildHeaderConfig(config: Config): StackHeaderConfigProps | undefined {
     length: config.leadingItemsCount,
   }).map((_, i) => ({
     type: 'item',
-    key: `leading-${i}`,
+    id: `leading-${i}`,
     render: () => <ResizingItem />,
   }));
   if (leadingItems.length > 1) {
     leadingItems.splice(1, 0, {
       type: 'spacer',
-      key: 'spacer-leading-1',
+      id: 'spacer-leading-1',
       sizing: 'fixed',
       width: 100,
     });
@@ -144,13 +144,13 @@ function buildHeaderConfig(config: Config): StackHeaderConfigProps | undefined {
     NonNullable<StackHeaderConfigProps['ios']>['trailingItems']
   > = Array.from({ length: config.trailingItemsCount }).map((_, i) => ({
     type: 'item',
-    key: `trailing-${i}`,
+    id: `trailing-${i}`,
     render: () => <ResizingItem />,
   }));
   if (trailingItems.length > 1) {
     trailingItems.splice(1, 0, {
       type: 'spacer',
-      key: 'spacer-trailing-1',
+      id: 'spacer-trailing-1',
       sizing: 'fixed',
       width: 100,
     });
@@ -167,21 +167,21 @@ function buildHeaderConfig(config: Config): StackHeaderConfigProps | undefined {
       titleItem:
         config.title === 'view'
           ? {
-              key: 'title',
+              id: 'title',
               render: () => <LargeHorizontalItem />,
             }
           : undefined,
       subtitleItem:
         config.subtitle === 'view'
           ? {
-              key: 'subtitle',
+              id: 'subtitle',
               render: () => <SmallHorizontalItem />,
             }
           : undefined,
       largeSubtitleItem:
         config.largeSubtitle === 'view'
           ? {
-              key: 'largeSubtitle',
+              id: 'largeSubtitle',
               render: () => <LargeHorizontalItem />,
             }
           : undefined,
