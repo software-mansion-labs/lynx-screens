@@ -23,7 +23,7 @@ internal class StackHeaderSubviewComponent(
         StackHeaderSubviewCollapseMode.OFF,
     ) { _, oldValue, newValue ->
         if (oldValue != newValue) {
-            onStackHeaderSubviewChangeListener?.get()?.onStackHeaderSubviewChange()
+            onStackHeaderSubviewChangeListener?.get()?.onStackHeaderSubviewChanged()
         }
     }
 
@@ -37,7 +37,7 @@ internal class StackHeaderSubviewComponent(
     // No shadow node is registered for the subview - the stored offset would only be
     // needed to correct Fabric-mounted frames on RN; on Lynx the Toolbar positions the
     // subview view natively. The proxy call is kept for parity with RNS.
-    override fun updateContentOriginOffset(
+    internal fun updateContentOriginOffset(
         x: Int,
         y: Int,
     ) {

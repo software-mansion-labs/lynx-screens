@@ -6,12 +6,8 @@ interface StackHeaderSubviewProviding {
     val type: StackHeaderSubviewType
     val collapseMode: StackHeaderSubviewCollapseMode
 
-    // Named `view` in RNS; renamed because LynxUI's final Java getView() clashes
-    // with a Kotlin interface property of that name.
+    // Divergence from RNS (where the subview component IS the Android view):
+    // on Lynx the component and its painting view are separate objects, and
+    // `view` clashes with LynxUI's final getView() - hence `subviewView`.
     val subviewView: View
-
-    fun updateContentOriginOffset(
-        x: Int,
-        y: Int,
-    )
 }

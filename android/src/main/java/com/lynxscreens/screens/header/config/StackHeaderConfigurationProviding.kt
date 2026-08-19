@@ -4,7 +4,7 @@ import android.graphics.drawable.Drawable
 import com.lynxscreens.screens.header.subview.StackHeaderSubviewProviding
 import com.lynxscreens.screens.header.toolbar.StackHeaderToolbarMenuItemConfig
 
-interface StackHeaderConfigProviding {
+interface StackHeaderConfigurationProviding {
     val type: StackHeaderType
     val title: String
     val hidden: Boolean
@@ -24,18 +24,11 @@ interface StackHeaderConfigProviding {
     val trailingSubview: StackHeaderSubviewProviding?
     val backgroundSubview: StackHeaderSubviewProviding?
     val toolbarMenuItems: List<StackHeaderToolbarMenuItemConfig>
-
     val isRTL: Boolean
 
-    fun updateHeaderFrame(
-        width: Int,
-        height: Int,
-        contentOffsetY: Int,
-    )
+    val invalidationFlags: StackHeaderInvalidationFlags
 
-    fun onMenuItemClick(id: String)
+    fun clearInvalidationFlags(flags: StackHeaderInvalidationFlags)
 
-    fun setDelegate(delegate: StackHeaderConfigDelegate)
-
-    fun removeDelegate(delegate: StackHeaderConfigDelegate)
+    fun setConfigurationObserver(observer: StackHeaderConfigurationObserver?)
 }
