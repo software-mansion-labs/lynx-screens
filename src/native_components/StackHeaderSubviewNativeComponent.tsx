@@ -7,7 +7,7 @@ export const StackHeaderSubviewNativeComponent = ({
   collapseMode,
 }: StackHeaderSubviewProps) => {
   return (
-    <stack-header-subview-native
+    <ls-stack-header-subview
       style={
         type === 'background'
           ? {
@@ -27,6 +27,6 @@ export const StackHeaderSubviewNativeComponent = ({
       collapseMode={collapseMode}
     >
       {children}
-    </stack-header-subview-native>
+    </ls-stack-header-subview>
   );
 };

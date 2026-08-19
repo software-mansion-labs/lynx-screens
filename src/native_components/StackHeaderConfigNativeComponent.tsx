@@ -50,7 +50,7 @@ const StackHeaderConfigNativeComponentInner = (
   });
 
   return (
-    <stack-header-config-native
+    <ls-stack-header-config
       ref={ref}
       style={{
         position: 'absolute',
@@ -93,7 +93,7 @@ const StackHeaderConfigNativeComponentInner = (
           {trailingSubview.render()}
         </StackHeaderSubviewNativeComponent>
       )}
-    </stack-header-config-native>
+    </ls-stack-header-config>
   );
 };
 

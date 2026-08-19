@@ -33,7 +33,7 @@ declare module "@lynx-js/types" {
       // Configuration
       preventNativeDismiss?: boolean | undefined;
     };
-    "stack-header-config-native": {
+    "ls-stack-header-config": {
       ref?: Ref<Lynx.NodesRef> | undefined;
       className?: string | undefined;
       children?: ReactNode | undefined;
@@ -71,7 +71,7 @@ declare module "@lynx-js/types" {
         | Lynx.EventHandler<Lynx.BaseEventOrig<{ id: string }>>
         | undefined;
     };
-    "stack-header-subview-native": {
+    "ls-stack-header-subview": {
       className?: string | undefined;
       children?: ReactNode | undefined;
       id?: string | undefined;

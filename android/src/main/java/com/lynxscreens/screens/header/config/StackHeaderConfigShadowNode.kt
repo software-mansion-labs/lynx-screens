@@ -27,7 +27,7 @@ import com.lynxscreens.screens.common.ShadowStateUpdating
  * offsetting the Lynx layout would double-shift them. RNS needs the offset only to correct
  * Fabric-mounted frames.
  */
-@LynxShadowNode(tagName = "stack-header-config-native")
+@LynxShadowNode(tagName = "ls-stack-header-config")
 internal class StackHeaderConfigShadowNode :
     ShadowNode(),
     CustomMeasureFunc,
