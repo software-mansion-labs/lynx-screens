@@ -34,6 +34,7 @@ declare module "@lynx-js/types" {
     id: string;
     title?: string | undefined;
     hidden?: boolean | undefined;
+    disabled?: boolean | undefined;
     showAsAction?:
       | 'always'
       | 'alwaysWithText'

@@ -326,6 +326,7 @@ type StackHeaderToolbarMenuElementAttr = {
   id: string;
   title?: string | undefined;
   hidden?: boolean | undefined;
+  disabled?: boolean | undefined;
   showAsAction?:
     | 'always'
     | 'alwaysWithText'

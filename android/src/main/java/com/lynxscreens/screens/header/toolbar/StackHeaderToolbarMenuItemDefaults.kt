@@ -9,6 +9,7 @@ package com.lynxscreens.screens.header.toolbar
 internal object StackHeaderToolbarMenuItemDefaults {
     const val TITLE: String = ""
     const val HIDDEN: Boolean = false
+    const val DISABLED: Boolean = false
     val SHOW_AS_ACTION: StackHeaderToolbarMenuItemShowAsAction = StackHeaderToolbarMenuItemShowAsAction.NEVER
     val ICON_TINT_COLOR_NORMAL: Int? = null
     val ICON_TINT_COLOR_PRESSED: Int? = null
