@@ -20,6 +20,7 @@ internal class StackContainer(
 ) : FrameLayout(context),
     FragmentManager.OnBackStackChangedListener {
     private var fragmentManager: FragmentManager? = null
+    private var hasResolvedFragmentManager = false
 
     private fun requireFragmentManager(): FragmentManager =
         checkNotNull(fragmentManager) { "[RNScreens] Attempt to use nullish FragmentManager" }
@@ -52,7 +53,10 @@ internal class StackContainer(
         Log.d(TAG, "StackContainer [$id] attached to window")
         super.onAttachedToWindow()
 
-        setupFragmentManger()
+        if (!setupFragmentManager()) {
+            Log.d(TAG, "StackContainer [$id] skipped setup for a detached host fragment")
+            return
+        }
 
         // Following line works with a couple of assumptions.
         // First, that this view is laid out by our parent view, which is a component view.
@@ -70,17 +74,24 @@ internal class StackContainer(
 
     override fun onDetachedFromWindow() {
         super.onDetachedFromWindow()
-        requireFragmentManager().removeOnBackStackChangedListener(this)
+        fragmentManager?.removeOnBackStackChangedListener(this)
         fragmentManager = null
     }
 
-    internal fun setupFragmentManger() {
-        fragmentManager =
-            checkNotNull(FragmentManagerHelper.findFragmentManagerForView(this)) {
-                "[RNScreens] Nullish fragment manager - can't run container operations"
-            }.also {
-                it.addOnBackStackChangedListener(this)
+    private fun setupFragmentManager(): Boolean {
+        val resolvedFragmentManager = FragmentManagerHelper.findFragmentManagerForView(this)
+        if (resolvedFragmentManager == null) {
+            check(hasResolvedFragmentManager) {
+                "[RNScreens] Nullish fragment manager during initial StackContainer attachment"
             }
+            return false
+        }
+
+        hasResolvedFragmentManager = true
+        fragmentManager = resolvedFragmentManager.also {
+            it.addOnBackStackChangedListener(this)
+        }
+        return true
     }
 
     /**
@@ -91,7 +102,8 @@ internal class StackContainer(
         // the call because we don't have valid fragmentManager yet.
         // Update will be eventually executed in onAttachedToWindow().
         if (hasPendingOperations && isAttachedToWindow) {
-            performOperations(requireFragmentManager())
+            val currentFragmentManager = fragmentManager ?: return
+            performOperations(currentFragmentManager)
         }
     }
 
