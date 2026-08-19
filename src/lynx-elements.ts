@@ -5,11 +5,13 @@ declare module "@lynx-js/types" {
   type EmptyEventPayload = Record<string, never>;
 
   type StackHeaderMenuItemAttr = {
+    id: string;
     type: 'menuItem';
     title?: string | undefined;
   };
 
   type StackHeaderMenuAttr = {
+    id: string;
     type: 'menu';
     title?: string | undefined;
     children: (StackHeaderMenuAttr | StackHeaderMenuItemAttr)[];
@@ -92,6 +94,9 @@ declare module "@lynx-js/types" {
         | undefined;
       bindOnToolbarMenuItemClicked?:
         | Lynx.EventHandler<Lynx.BaseEventOrig<{ id: string }>>
+        | undefined;
+      bindOnMenuItemPress?:
+        | Lynx.EventHandler<Lynx.BaseEventOrig<{ menuItemId: string }>>
         | undefined;
     };
     "ls-stack-header-subview": {

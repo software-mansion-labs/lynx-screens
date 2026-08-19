@@ -425,34 +425,43 @@ export interface StackHeaderConfigPropsAndroid {
     | undefined;
 }
 
-export interface StackHeaderMenuItem {
+export interface StackHeaderMenuItemIOS {
+  id: string;
   type: 'menuItem';
   title?: string | undefined;
+  onPress?: () => void | undefined;
 }
 
-export interface StackHeaderMenu {
+export interface StackHeaderMenuIOS {
+  id: string;
   type: 'menu';
   title?: string | undefined;
-  children: StackHeaderMenuElement[];
+  children: StackHeaderMenuElementIOS[];
 }
 
-export type StackHeaderMenuElement = StackHeaderMenu | StackHeaderMenuItem;
+export type StackHeaderMenuElementIOS =
+  | StackHeaderMenuIOS
+  | StackHeaderMenuItemIOS;
 
 export interface StackHeaderBaseItemIOS {
   key: string;
   label?: string | undefined;
 }
 
-export interface StackHeaderInlineItemIOS extends StackHeaderBaseItemIOS {
-  type: 'item';
-  menu?: StackHeaderMenu | undefined;
+export interface SupportsMenuIOS {
+  menu?: StackHeaderMenuIOS | undefined;
 }
 
-export interface StackHeaderInlineCustomItemIOS {
+export interface StackHeaderInlineItemIOS
+  extends StackHeaderBaseItemIOS,
+    SupportsMenuIOS {
+  type: 'item';
+}
+
+export interface StackHeaderInlineCustomItemIOS extends SupportsMenuIOS {
   key: string;
   type: 'item';
   render: () => ReactElement;
-  menu?: StackHeaderMenu | undefined;
 }
 
 interface StackHeaderFixedSpacerItemIOS {

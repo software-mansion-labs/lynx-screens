@@ -26,7 +26,9 @@
         }
     }
 
-    return [[RNSStackHeaderMenuData alloc] initWithTitle:[self stringForKey:@"title" in:dict] children:children];
+    return [[RNSStackHeaderMenuData alloc] initWithId:[self stringForKey:@"id" in:dict]
+                                                title:[self stringForKey:@"title" in:dict]
+                                             children:children];
 }
 
 + (nullable id<RNSStackHeaderMenuElement>)elementFromDictionary:(nullable id)dictionary
@@ -41,7 +43,8 @@
         return [self menuFromDictionary:dict];
     } else if ([type isEqual:@"menuItem"]) {
         [RNSStackHeaderMenuMapper validateMenuItemKeys:dict];
-        return [[RNSStackHeaderMenuItemData alloc] initWithTitle:[self stringForKey:@"title" in:dict]];
+        return [[RNSStackHeaderMenuItemData alloc] initWithId:[self stringForKey:@"id" in:dict]
+                                                        title:[self stringForKey:@"title" in:dict]];
     }
 
     return nil;
@@ -52,20 +55,23 @@
 + (void)validateMenuKeys:(NSDictionary *)dict
 {
     for (NSString *key in dict) {
-        NSAssert([key isEqualToString:@"type"] || [key isEqualToString:@"title"] || [key isEqualToString:@"children"],
+        NSAssert([key isEqualToString:@"id"] || [key isEqualToString:@"type"] || [key isEqualToString:@"title"] ||
+                     [key isEqualToString:@"children"],
                  @"[RNScreens] Invalid key \"%@\" found in menu",
                  key);
     }
     NSAssert(dict[@"children"], @"[RNScreens] missing key \"children\" in menu");
+    NSAssert(dict[@"id"], @"[RNScreens] missing id on one of menu elements");
 }
 
 + (void)validateMenuItemKeys:(NSDictionary *)dict
 {
     for (NSString *key in dict) {
-        NSAssert([key isEqualToString:@"type"] || [key isEqualToString:@"title"],
+        NSAssert([key isEqualToString:@"id"] || [key isEqualToString:@"type"] || [key isEqualToString:@"title"],
                  @"[RNScreens] Invalid key \"%@\" found in menu item",
                  key);
     }
+    NSAssert(dict[@"id"], @"[RNScreens] missing id on one of menu elements");
 }
 
 + (nullable NSString *)stringForKey:(NSString *)key in:(NSDictionary *)dict

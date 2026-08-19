@@ -1,10 +1,11 @@
 import {
   forwardRef,
+  useCallback,
   useImperativeHandle,
   useRef,
   type Ref,
 } from '@lynx-js/react';
-import type { NodesRef } from '@lynx-js/types';
+import type { BaseEventOrig, EventHandler, NodesRef } from '@lynx-js/types';
 import type {
   PlatformIconAndroid,
   StackHeaderConfigProps,
@@ -16,7 +17,9 @@ import type {
   StackHeaderTitleCustomItemIOS,
   StackHeaderToolbarMenuItemOptionsAndroid,
   StackHeaderTypeAndroid,
+  SupportsMenuIOS,
 } from '../types/StackHeaderConfig.js';
+import { findMenuElementByIdInItems } from './utils.js';
 import { StackHeaderSubviewNativeComponent } from './StackHeaderSubviewNativeComponent.js';
 import { parseAndroidIconToNativeProps } from '../shared/index.js';
 import {
@@ -63,6 +66,25 @@ const StackHeaderConfigIOS = (props: PlatformInnerProps) => {
     largeTitleEnabled,
   } = ios ?? {};
 
+  const handleMenuItemPress: EventHandler<
+    BaseEventOrig<{ menuItemId: string }>
+  > = useCallback(
+    (event) => {
+      const items: SupportsMenuIOS[] = Array.of(
+        ...(leadingItems ?? []).filter((it) => it && it.type === 'item'),
+        ...(trailingItems ?? []).filter((it) => it && it.type === 'item'),
+      );
+      const menuElement = findMenuElementByIdInItems(
+        items,
+        event.detail.menuItemId,
+      );
+      if (menuElement && menuElement.type === 'menuItem') {
+        menuElement.onPress?.();
+      }
+    },
+    [leadingItems, trailingItems],
+  );
+
   return (
     <ls-stack-header-config
       style={{
@@ -74,6 +96,7 @@ const StackHeaderConfigIOS = (props: PlatformInnerProps) => {
       largeTitle={largeTitle}
       largeSubtitle={largeSubtitle}
       largeTitleEnabled={!!largeTitleEnabled}
+      bindOnMenuItemPress={handleMenuItemPress}
     >
       {leadingItems?.map((item) => makeItemViewFromItem(item, 'leading'))}
       {titleItem && makeItemViewFromItem(titleItem, 'title')}

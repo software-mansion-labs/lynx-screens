@@ -1,10 +1,12 @@
-import { useLayoutEffect, useMemo, useState } from '@lynx-js/react';
+import { useCallback, useLayoutEffect, useMemo, useState } from '@lynx-js/react';
 import type { StackHeaderConfigProps } from 'lynx-screens';
 import { LongText, SettingsButton } from '../components/SettingsControls';
 import { StackContainer } from '../components/StackContainer';
 import { useStackNavigationContext } from '../hooks/useStackNavigationContext';
 
 // Port of RNS single-feature-tests/stack-v5/test-stack-header-menu-ios.
+// Adaptation: the RNS example reports onPress through a Toast; a
+// "Last clicked" text is used instead (no toast component in this app).
 
 const DEFAULT_TRAILING_ITEMS_COUNT = 2;
 
@@ -53,7 +55,10 @@ function PressableWithFeedback({
   );
 }
 
-function buildHeaderConfig(trailingItemsCount: number): StackHeaderConfigProps {
+function buildHeaderConfig(
+  trailingItemsCount: number,
+  showClicked: (text: string) => void,
+): StackHeaderConfigProps {
   const trailingItems: NonNullable<
     NonNullable<StackHeaderConfigProps['ios']>['trailingItems']
   > = Array.from({ length: trailingItemsCount }).map((_, i) => ({
@@ -66,15 +71,37 @@ function buildHeaderConfig(trailingItemsCount: number): StackHeaderConfigProps {
     }),
     menu: {
       type: 'menu',
+      id: `menu-${i}`,
       children: [
-        { type: 'menuItem', title: `Item ${i}.1` },
-        { type: 'menuItem', title: `Item ${i}.2` },
         {
+          id: `subitem-${i}-1`,
+          type: 'menuItem',
+          title: `Item ${i}.1`,
+          onPress: () => showClicked(`Clicked Item ${i}.1`),
+        },
+        {
+          id: `subitem-${i}-2`,
+          type: 'menuItem',
+          title: `Item ${i}.2`,
+          onPress: () => showClicked(`Clicked Item ${i}.2`),
+        },
+        {
+          id: `submenu-${i}`,
           type: 'menu',
           title: `Submenu ${i}`,
           children: [
-            { type: 'menuItem', title: `Nested ${i}.1` },
-            { type: 'menuItem', title: `Nested ${i}.2` },
+            {
+              id: `subsubitem-${i}-1`,
+              type: 'menuItem',
+              title: `Nested ${i}.1`,
+              onPress: () => showClicked(`Clicked Nested ${i}.1`),
+            },
+            {
+              id: `subsubitem-${i}-2`,
+              type: 'menuItem',
+              title: `Nested ${i}.2`,
+              onPress: () => showClicked(`Clicked Nested ${i}.2`),
+            },
           ],
         },
       ],
@@ -94,11 +121,17 @@ function ConfigScreen() {
   const [trailingItemsCount, setTrailingItemsCount] = useState<number>(
     DEFAULT_TRAILING_ITEMS_COUNT,
   );
+  const [lastClicked, setLastClicked] = useState<string | null>(null);
+
+  const showClicked = useCallback(
+    (text: string) => setLastClicked(text),
+    [],
+  );
 
   const { setRouteOptions, routeKey } = navigation;
   const headerConfig = useMemo(
-    () => buildHeaderConfig(trailingItemsCount),
-    [trailingItemsCount],
+    () => buildHeaderConfig(trailingItemsCount, showClicked),
+    [trailingItemsCount, showClicked],
   );
 
   useLayoutEffect(() => {
@@ -124,6 +157,9 @@ function ConfigScreen() {
           label={`Toggle trailing items count (${trailingItemsCount}/4)`}
           onTap={() => setTrailingItemsCount((count) => (count + 1) % 5)}
         />
+        <text style={{ color: 'black', fontSize: '15px' }}>
+          Last clicked: {lastClicked ?? '—'}
+        </text>
         <LongText paragraphs={10} />
       </view>
     </scroll-view>
