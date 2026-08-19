@@ -1,7 +1,7 @@
 package com.lynxscreens.screens.header.config
 
 @JvmInline
-value class StackHeaderInvalidationFlags(
+internal value class StackHeaderInvalidationFlags(
     val raw: Int,
 ) {
     companion object {

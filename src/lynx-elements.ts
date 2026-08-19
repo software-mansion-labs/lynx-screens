@@ -24,6 +24,27 @@ declare module "@lynx-js/types" {
     isNativeDismiss: boolean;
   }>;
 
+  type StackHeaderToolbarMenuElementAttr = {
+    type: 'menuItem' | 'menu';
+    id: string;
+    title?: string | undefined;
+    hidden?: boolean | undefined;
+    showAsAction?:
+      | 'always'
+      | 'alwaysWithText'
+      | 'ifRoom'
+      | 'ifRoomWithText'
+      | 'never'
+      | undefined;
+    drawableIconResourceName?: string | undefined;
+    imageIconUri?: string | undefined;
+    iconTintColorNormal?: string | undefined;
+    iconTintColorPressed?: string | undefined;
+    iconTintColorFocused?: string | undefined;
+    iconTintColorDisabled?: string | undefined;
+    children?: StackHeaderToolbarMenuElementAttr[] | undefined;
+  };
+
   interface IntrinsicElements extends Lynx.IntrinsicElements {
     "ls-stack-host": {
       className?: string | undefined;
@@ -75,27 +96,12 @@ declare module "@lynx-js/types" {
       largeTitle?: string | undefined;
       largeSubtitle?: string | undefined;
       largeTitleEnabled?: boolean | undefined;
-      toolbarMenuItems?:
-        | Array<{
-            id: string;
-            title?: string | undefined;
-            hidden?: boolean | undefined;
-            showAsAction?:
-              | 'always'
-              | 'alwaysWithText'
-              | 'ifRoom'
-              | 'ifRoomWithText'
-              | 'never'
-              | undefined;
-            drawableIconResourceName?: string | undefined;
-            imageIconUri?: string | undefined;
-            iconTintColorNormal?: string | undefined;
-            iconTintColorPressed?: string | undefined;
-            iconTintColorFocused?: string | undefined;
-            iconTintColorDisabled?: string | undefined;
-          }>
+      toolbarMenu?:
+        | {
+            children?: StackHeaderToolbarMenuElementAttr[] | undefined;
+          }
         | undefined;
-      bindOnToolbarMenuItemClicked?:
+      bindOnToolbarMenuItemPress?:
         | Lynx.EventHandler<Lynx.BaseEventOrig<{ id: string }>>
         | undefined;
       bindOnMenuItemPress?:

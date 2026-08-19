@@ -2,7 +2,7 @@ package com.lynxscreens.screens.header.toolbar
 
 import android.graphics.drawable.Drawable
 
-data class StackHeaderToolbarMenuItemConfig(
+internal data class StackHeaderToolbarMenuItemConfig(
     val id: String,
     val title: String,
     val hidden: Boolean,

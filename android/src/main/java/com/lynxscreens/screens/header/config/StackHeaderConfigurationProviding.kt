@@ -2,9 +2,9 @@ package com.lynxscreens.screens.header.config
 
 import android.graphics.drawable.Drawable
 import com.lynxscreens.screens.header.subview.StackHeaderSubviewProviding
-import com.lynxscreens.screens.header.toolbar.StackHeaderToolbarMenuItemConfig
+import com.lynxscreens.screens.header.toolbar.StackHeaderToolbarMenuConfig
 
-interface StackHeaderConfigurationProviding {
+internal interface StackHeaderConfigurationProviding {
     val type: StackHeaderType
     val title: String
     val hidden: Boolean
@@ -23,7 +23,7 @@ interface StackHeaderConfigurationProviding {
     val centerSubview: StackHeaderSubviewProviding?
     val trailingSubview: StackHeaderSubviewProviding?
     val backgroundSubview: StackHeaderSubviewProviding?
-    val toolbarMenuItems: List<StackHeaderToolbarMenuItemConfig>
+    val toolbarMenu: StackHeaderToolbarMenuConfig
     val isRTL: Boolean
 
     val invalidationFlags: StackHeaderInvalidationFlags
