@@ -8,12 +8,15 @@ declare module "@lynx-js/types" {
     id: string;
     type: 'menuItem';
     title?: string | undefined;
+    itemType?: 'action' | 'toggle' | 'automatic' | undefined;
+    initialToggleState?: boolean | undefined;
   };
 
   type StackHeaderMenuAttr = {
     id: string;
     type: 'menu';
     title?: string | undefined;
+    singleSelection?: boolean | undefined;
     children: (StackHeaderMenuAttr | StackHeaderMenuItemAttr)[];
   };
 
@@ -97,6 +100,14 @@ declare module "@lynx-js/types" {
         | undefined;
       bindOnMenuItemPress?:
         | Lynx.EventHandler<Lynx.BaseEventOrig<{ menuItemId: string }>>
+        | undefined;
+      bindOnMenuSelectionChange?:
+        | Lynx.EventHandler<
+            Lynx.BaseEventOrig<{
+              menuId: string;
+              selectedMenuItemIds: string[];
+            }>
+          >
         | undefined;
     };
     "ls-stack-header-subview": {

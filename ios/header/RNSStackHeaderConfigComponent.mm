@@ -149,6 +149,13 @@ static void RNSAssertIsValidHeaderChild(id child)
     [[self getEventEmitter] emitOnMenuItemPress:menuItemId];
 }
 
+- (void)didChangeSelectionForMenu:(NSString *)menuId selectedMenuItemIds:(NSArray<NSString *> *)selectedIds
+{
+    [[self getEventEmitter] emitOnMenuSelectionChange:menuId selectedMenuItemIds:selectedIds];
+    // UIKit doesn't update UIAction.state after tap — rebuild menu so tracker state is reflected
+    [self submitCurrentDataIfMounted];
+}
+
 #pragma mark - RNSViewFrameChangeDelegate
 
 - (void)viewFrameDidChange:(nonnull UINavigationBar *)navigationBar

@@ -31,4 +31,24 @@
     return YES;
 }
 
+- (BOOL)emitOnMenuSelectionChange:(NSString *)menuId selectedMenuItemIds:(NSArray<NSString *> *)selectedIds
+{
+    LynxEventEmitter *eventEmitter = _eventEmitter;
+    if (eventEmitter == nil) {
+        LLogWarn(@"[RNScreens] Skipped OnMenuSelectionChange event emission due to nullish emitter");
+        return NO;
+    }
+
+    // Adaptation: the payload crosses to JS as the event detail dictionary -
+    // no std::string/std::vector conversion like in the RNS codegen emitter.
+    LynxCustomEvent *event = [[LynxDetailEvent alloc] initWithName:@"OnMenuSelectionChange"
+                                                        targetSign:_sign
+                                                            detail:@{
+                                                                @"menuId" : menuId,
+                                                                @"selectedMenuItemIds" : selectedIds,
+                                                            }];
+    [eventEmitter dispatchCustomEvent:event];
+    return YES;
+}
+
 @end
