@@ -7,13 +7,13 @@ internal class StackHeaderConfigEventEmitter(
     private val lynxContext: LynxContext,
     private val sign: Int,
 ) {
-    internal fun emitOnToolbarMenuItemClicked(id: String) {
-        val event = LynxCustomEvent(sign, EVENT_ON_TOOLBAR_MENU_ITEM_CLICKED)
+    internal fun emitOnToolbarMenuItemPress(id: String) {
+        val event = LynxCustomEvent(sign, EVENT_ON_TOOLBAR_MENU_ITEM_PRESS)
         event.addDetail("id", id)
         lynxContext.eventEmitter.sendCustomEvent(event)
     }
 
     companion object {
-        private const val EVENT_ON_TOOLBAR_MENU_ITEM_CLICKED = "OnToolbarMenuItemClicked"
+        private const val EVENT_ON_TOOLBAR_MENU_ITEM_PRESS = "OnToolbarMenuItemPress"
     }
 }

@@ -16,6 +16,9 @@ import type {
   StackHeaderInlineItemIOS,
   StackHeaderSpacerItemIOS,
   StackHeaderTitleCustomItemIOS,
+  StackHeaderToolbarMenuBaseAndroid,
+  StackHeaderToolbarMenuElementAndroid,
+  StackHeaderToolbarMenuItemBaseAndroid,
   StackHeaderToolbarMenuItemOptionsAndroid,
   StackHeaderTypeAndroid,
   SupportsMenuIOS,
@@ -189,13 +192,22 @@ const StackHeaderConfigAndroid = (props: PlatformInnerProps) => {
     scrollFlagEnterAlwaysCollapsed,
     scrollFlagExitUntilCollapsed,
     scrollFlagSnap,
-    toolbarMenuItems,
-    onToolbarMenuItemClicked,
+    toolbarMenu,
     ...filteredAndroidProps
   } = android ?? {};
 
-  const parsedToolbarMenuItems =
-    parseToolbarMenuItemsToNativeProps(toolbarMenuItems);
+  const parsedToolbarMenu = parseToolbarMenuToNativeProps(toolbarMenu);
+  const handleToolbarMenuItemPress: EventHandler<
+    BaseEventOrig<{ id: string }>
+  > = (event) => {
+    const element = findToolbarMenuElementById(
+      toolbarMenu?.children,
+      event.detail.id,
+    );
+    if (element?.type === 'menuItem') {
+      element.onPress?.();
+    }
+  };
   const backButtonIconProps = parseBackButtonIconToNativeProps(backButtonIcon);
   const scrollFlagProps = resolveScrollFlags(filteredAndroidProps.type, {
     scrollFlagScroll,
@@ -217,11 +229,11 @@ const StackHeaderConfigAndroid = (props: PlatformInnerProps) => {
       }}
       {...baseProps}
       {...filteredAndroidProps}
-      toolbarMenuItems={parsedToolbarMenuItems}
+      toolbarMenu={parsedToolbarMenu}
+      bindOnToolbarMenuItemPress={handleToolbarMenuItemPress}
       {...backButtonIconProps}
       {...scrollFlagProps}
       hasBackgroundSubview={backgroundSubview != null}
-      bindOnToolbarMenuItemClicked={onToolbarMenuItemClicked}
     >
       {/*
         Please note that the order of the subviews MUST match
@@ -285,15 +297,89 @@ function useHeaderConfigRef(forwardedRef: Ref<StackHeaderConfigRef>) {
   return ref;
 }
 
-function parseToolbarMenuItemsToNativeProps(
-  items: StackHeaderConfigPropsAndroid['toolbarMenuItems'],
+type StackHeaderToolbarMenuElementAttr = {
+  type: 'menuItem' | 'menu';
+  id: string;
+  title?: string | undefined;
+  hidden?: boolean | undefined;
+  showAsAction?:
+    | 'always'
+    | 'alwaysWithText'
+    | 'ifRoom'
+    | 'ifRoomWithText'
+    | 'never'
+    | undefined;
+  drawableIconResourceName?: string | undefined;
+  imageIconUri?: string | undefined;
+  iconTintColorNormal?: string | undefined;
+  iconTintColorPressed?: string | undefined;
+  iconTintColorFocused?: string | undefined;
+  iconTintColorDisabled?: string | undefined;
+  children?: StackHeaderToolbarMenuElementAttr[] | undefined;
+};
+
+function findToolbarMenuElementById(
+  elements: StackHeaderToolbarMenuElementAndroid[] | undefined,
+  id: string,
+): StackHeaderToolbarMenuElementAndroid | null {
+  if (!elements) {
+    return null;
+  }
+  for (const element of elements) {
+    if (element.id === id) {
+      return element;
+    }
+    if (element.type === 'menu') {
+      const found = findToolbarMenuElementById(element.children, id);
+      if (found) {
+        return found;
+      }
+    }
+  }
+  return null;
+}
+
+function parseToolbarMenuToNativeProps(
+  menu: StackHeaderToolbarMenuBaseAndroid | undefined,
 ) {
+  if (!menu?.children?.length) {
+    return undefined;
+  }
+  return {
+    children: menu.children.map(parseElementToNativeProps),
+  };
+}
+
+function parseElementToNativeProps(
+  element: StackHeaderToolbarMenuElementAndroid,
+): StackHeaderToolbarMenuElementAttr {
+  if (element.type === 'menu') {
+    const { type, children, ...baseProps } = element;
+    return {
+      type,
+      ...parseBaseItemToNativeProps(baseProps),
+      children: children?.map(parseElementToNativeProps),
+    };
+  }
+
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const { type, onPress, ...baseProps } = element;
+  return {
+    type,
+    ...parseBaseItemToNativeProps(baseProps),
+  };
+}
+
+function parseBaseItemToNativeProps({
+  icon,
+  ...rest
+}: Omit<StackHeaderToolbarMenuItemBaseAndroid, 'children' | 'type'>) {
   // RNS additionally routes the tint colors through processColor; on Lynx the
   // CSS color strings are parsed natively.
-  return items?.map(({ icon, ...rest }) => ({
+  return {
     ...rest,
     ...parseAndroidIconToNativeProps(icon),
-  }));
+  };
 }
 
 function parseToolbarMenuItemOptionsToParams(

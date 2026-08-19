@@ -7,6 +7,7 @@ import {
 } from '@lynx-js/react';
 import type {
   StackHeaderConfigRef,
+  StackHeaderToolbarMenuElementAndroid,
   StackHeaderToolbarMenuItemOptionsAndroid,
   StackHeaderToolbarMenuItemShowAsActionAndroid,
 } from 'lynx-screens';
@@ -69,14 +70,25 @@ const ITEM_TITLES: Record<IdOption, string> = {
   'item-3': 'Item Number Three',
 };
 
-function buildItems(slots: Slots) {
+function buildItems(slots: Slots): StackHeaderToolbarMenuElementAndroid[] {
   return slots
     .filter((s) => s.include)
     .map(({ id, showAsAction }) => ({
+      type: 'menuItem',
       id,
       title: ITEM_TITLES[id],
       showAsAction: resolveShowAsAction(showAsAction),
     }));
+}
+
+function withOnPress(
+  items: ReturnType<typeof buildItems>,
+  onPress: (id: string) => void,
+) {
+  return items.map((item) => ({
+    ...item,
+    onPress: () => onPress(item.id),
+  }));
 }
 
 function updateSlotAt(
@@ -99,7 +111,7 @@ export default function App(props: { onRender?: () => void }) {
           options: {
             headerConfig: {
               title: HEADER_TITLE,
-              android: { toolbarMenuItems: buildItems(DEFAULT_SLOTS) },
+              android: { toolbarMenu: { children: buildItems(DEFAULT_SLOTS) } },
             },
           },
         },
@@ -124,8 +136,9 @@ function MainScreen() {
       headerConfig: {
         title: HEADER_TITLE,
         android: {
-          toolbarMenuItems: buildItems(DEFAULT_SLOTS),
-          onToolbarMenuItemClicked: (event) => setLastClicked(event.detail.id),
+          toolbarMenu: {
+            children: withOnPress(buildItems(DEFAULT_SLOTS), setLastClicked),
+          },
         },
       },
       headerConfigRef,
@@ -139,9 +152,9 @@ function MainScreen() {
         headerConfig: {
           title: HEADER_TITLE,
           android: {
-            toolbarMenuItems: buildItems(next),
-            onToolbarMenuItemClicked: (event) =>
-              setLastClicked(event.detail.id),
+            toolbarMenu: {
+              children: withOnPress(buildItems(next), setLastClicked),
+            },
           },
         },
       });

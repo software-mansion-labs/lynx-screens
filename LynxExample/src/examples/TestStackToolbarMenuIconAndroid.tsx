@@ -9,6 +9,7 @@ import type {
   PlatformIconAndroid,
   StackHeaderConfigRef,
   StackHeaderToolbarMenuItemAndroid,
+  StackHeaderToolbarMenuElementAndroid,
   StackHeaderToolbarMenuItemOptionsAndroid,
 } from 'lynx-screens';
 import searchIcon from '../assets/search_black.png';
@@ -120,6 +121,7 @@ function buildItems(slots: Slots): StackHeaderToolbarMenuItemAndroid[] {
   return slots
     .filter((s) => s.include)
     .map((s) => ({
+      type: 'menuItem',
       id: s.id,
       title: ITEM_TITLES[s.id],
       showAsAction: s.showAsAction,
@@ -129,6 +131,16 @@ function buildItems(slots: Slots): StackHeaderToolbarMenuItemAndroid[] {
       iconTintColorFocused: resolveTintColor(s.tintColorFocused),
       iconTintColorDisabled: resolveTintColor(s.tintColorDisabled),
     }));
+}
+
+function withOnPress(
+  items: ReturnType<typeof buildItems>,
+  onPress: (id: string) => void,
+): StackHeaderToolbarMenuElementAndroid[] {
+  return items.map((item) => ({
+    ...item,
+    onPress: () => onPress(item.id),
+  }));
 }
 
 function updateSlotAt(
@@ -151,7 +163,7 @@ export default function App(props: { onRender?: () => void }) {
           options: {
             headerConfig: {
               title: HEADER_TITLE,
-              android: { toolbarMenuItems: buildItems(DEFAULT_SLOTS) },
+              android: { toolbarMenu: { children: buildItems(DEFAULT_SLOTS) } },
             },
           },
         },
@@ -183,8 +195,9 @@ function MainScreen() {
       headerConfig: {
         title: HEADER_TITLE,
         android: {
-          toolbarMenuItems: buildItems(DEFAULT_SLOTS),
-          onToolbarMenuItemClicked: (event) => setLastClicked(event.detail.id),
+          toolbarMenu: {
+            children: withOnPress(buildItems(DEFAULT_SLOTS), setLastClicked),
+          },
         },
       },
       headerConfigRef,
@@ -198,9 +211,9 @@ function MainScreen() {
         headerConfig: {
           title: HEADER_TITLE,
           android: {
-            toolbarMenuItems: buildItems(next),
-            onToolbarMenuItemClicked: (event) =>
-              setLastClicked(event.detail.id),
+            toolbarMenu: {
+              children: withOnPress(buildItems(next), setLastClicked),
+            },
           },
         },
       });

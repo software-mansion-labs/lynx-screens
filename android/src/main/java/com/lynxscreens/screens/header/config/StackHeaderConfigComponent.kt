@@ -6,9 +6,7 @@ import android.graphics.drawable.Drawable
 import android.util.LayoutDirection
 import android.util.Log
 import com.lynx.react.bridge.Callback
-import com.lynx.react.bridge.ReadableArray
 import com.lynx.react.bridge.ReadableMap
-import com.lynx.react.bridge.ReadableType
 import com.lynx.tasm.behavior.LynxContext
 import com.lynx.tasm.behavior.LynxElement
 import com.lynx.tasm.behavior.LynxProp
@@ -20,11 +18,10 @@ import com.lynxscreens.screens.common.ShadowStateProxy
 import com.lynxscreens.screens.header.subview.OnStackHeaderSubviewChangeListener
 import com.lynxscreens.screens.header.subview.StackHeaderSubviewComponent
 import com.lynxscreens.screens.header.subview.StackHeaderSubviewType
-import com.lynxscreens.screens.header.toolbar.StackHeaderToolbarMenuItemConfig
-import com.lynxscreens.screens.header.toolbar.StackHeaderToolbarMenuItemDefaults
+import com.lynxscreens.screens.header.toolbar.StackHeaderToolbarMenuConfig
 import com.lynxscreens.screens.header.toolbar.StackHeaderToolbarMenuItemIconSource
 import com.lynxscreens.screens.header.toolbar.StackHeaderToolbarMenuItemOptions
-import com.lynxscreens.screens.header.toolbar.StackHeaderToolbarMenuItemShowAsAction
+import com.lynxscreens.screens.header.toolbar.StackHeaderToolbarMenuMapper
 import com.lynxscreens.screens.header.toolbar.StackHeaderToolbarUpdate
 import com.lynxscreens.screens.helpers.IconResolution
 import com.lynxscreens.screens.helpers.IconResolver
@@ -158,8 +155,8 @@ internal class StackHeaderConfigComponent(
     }
         internal set
 
-    override var toolbarMenuItems: List<StackHeaderToolbarMenuItemConfig>
-        by Delegates.observable(emptyList()) { _, old, new ->
+    override var toolbarMenu: StackHeaderToolbarMenuConfig
+        by Delegates.observable(StackHeaderToolbarMenuConfig(emptyList())) { _, old, new ->
             if (old != new) invalidate(StackHeaderInvalidationFlags.TOOLBAR_MENU)
         }
         internal set
@@ -206,7 +203,7 @@ internal class StackHeaderConfigComponent(
 
     // Last resolved icon per menu item id. Unlike every other field on this config — which
     // mirrors a single prop — this cache deliberately merges resolved icons from BOTH sources
-    // that can set a menu item icon: the `toolbarMenuItems` prop array
+    // that can set a menu item icon: the `toolbarMenu` prop
     // (resolveToolbarMenuItemIconsIfNeeded) and the imperative `setToolbarMenuItemOptions`
     // UI method (dispatchMenuItemUpdate). It is necessary to ensure consistency.
     private var toolbarMenuItemIcons = mapOf<String, Drawable?>()
@@ -244,15 +241,10 @@ internal class StackHeaderConfigComponent(
         id: String,
         icon: Drawable?,
     ) {
-        val currentItems = toolbarMenuItems
-        val itemIndex = currentItems.indexOfFirst { it.id == id }
-        if (itemIndex == -1) return
-
-        val item = currentItems[itemIndex]
-        if (item.icon != icon) {
-            val newItems = currentItems.toMutableList()
-            newItems[itemIndex] = item.copy(icon = icon)
-            toolbarMenuItems = newItems
+        val currentMenu = toolbarMenu
+        val updated = currentMenu.updateItemIcon(id, icon)
+        if (updated !== currentMenu) {
+            toolbarMenu = updated
             if (!isInsidePropsUpdate) {
                 flushUpdates()
             }
@@ -351,7 +343,7 @@ internal class StackHeaderConfigComponent(
     }
 
     override fun onMenuItemClicked(id: String) {
-        eventEmitter.emitOnToolbarMenuItemClicked(id)
+        eventEmitter.emitOnToolbarMenuItemPress(id)
     }
 
     override fun onSubviewOriginChanged(
@@ -571,57 +563,10 @@ internal class StackHeaderConfigComponent(
         scrollFlagSnap = value == true
     }
 
-    @LynxProp(name = "toolbarMenuItems")
-    fun setToolbarMenuItems(value: ReadableArray?) {
-        val sourceMap = mutableMapOf<String, StackHeaderToolbarMenuItemIconSource>()
-
-        toolbarMenuItems =
-            value?.let { array ->
-                (0 until array.size()).map { i ->
-                    val item = requireNotNull(array.getMap(i))
-                    val id = item.requireNotNullString("id")
-
-                    sourceMap[id] =
-                        StackHeaderToolbarMenuItemIconSource(
-                            item.getString("drawableIconResourceName")
-                                ?: StackHeaderToolbarMenuItemDefaults.DRAWABLE_ICON_RESOURCE_NAME,
-                            item.getString("imageIconUri") ?: StackHeaderToolbarMenuItemDefaults.IMAGE_ICON_URI,
-                        )
-
-                    StackHeaderToolbarMenuItemConfig(
-                        id = id,
-                        title = item.readString("title", StackHeaderToolbarMenuItemDefaults.TITLE),
-                        hidden = item.readBoolean("hidden", StackHeaderToolbarMenuItemDefaults.HIDDEN),
-                        showAsAction =
-                            item.readShowAsActionEnum(
-                                "showAsAction",
-                                StackHeaderToolbarMenuItemDefaults.SHOW_AS_ACTION,
-                            ),
-                        icon = null,
-                        iconTintColorNormal =
-                            item.readColor(
-                                "iconTintColorNormal",
-                                StackHeaderToolbarMenuItemDefaults.ICON_TINT_COLOR_NORMAL,
-                            ),
-                        iconTintColorPressed =
-                            item.readColor(
-                                "iconTintColorPressed",
-                                StackHeaderToolbarMenuItemDefaults.ICON_TINT_COLOR_PRESSED,
-                            ),
-                        iconTintColorFocused =
-                            item.readColor(
-                                "iconTintColorFocused",
-                                StackHeaderToolbarMenuItemDefaults.ICON_TINT_COLOR_FOCUSED,
-                            ),
-                        iconTintColorDisabled =
-                            item.readColor(
-                                "iconTintColorDisabled",
-                                StackHeaderToolbarMenuItemDefaults.ICON_TINT_COLOR_DISABLED,
-                            ),
-                    )
-                }
-            } ?: emptyList()
-        toolbarMenuItemIconSourceMap = sourceMap
+    @LynxProp(name = "toolbarMenu")
+    fun setToolbarMenu(value: ReadableMap?) {
+        toolbarMenu = StackHeaderToolbarMenuMapper.parseMenu(value)
+        toolbarMenuItemIconSourceMap = StackHeaderToolbarMenuMapper.collectIconSources(value)
     }
 
     // The Lynx counterpart of RNS's setToolbarMenuItemOptions view command,
@@ -637,24 +582,14 @@ internal class StackHeaderConfigComponent(
             return
         }
         val options = params.getMap("options")
+        if (options == null) {
+            callback.invoke(LynxUIMethodConstants.PARAM_INVALID)
+            return
+        }
         dispatchMenuItemUpdate(
             id,
-            StackHeaderToolbarMenuItemOptions(
-                title = options?.readNullableStringUpdate("title", StackHeaderToolbarMenuItemDefaults.TITLE),
-                hidden = options?.readNullableBooleanUpdate("hidden", StackHeaderToolbarMenuItemDefaults.HIDDEN),
-                showAsAction =
-                    options?.readNullableShowAsActionEnumUpdate(
-                        "showAsAction",
-                        StackHeaderToolbarMenuItemDefaults.SHOW_AS_ACTION,
-                    ),
-                // The icon is resolved asynchronously and filled in by dispatchMenuItemUpdate.
-                icon = null,
-                iconTintColorNormal = options?.readNullableColorUpdate("iconTintColorNormal"),
-                iconTintColorPressed = options?.readNullableColorUpdate("iconTintColorPressed"),
-                iconTintColorFocused = options?.readNullableColorUpdate("iconTintColorFocused"),
-                iconTintColorDisabled = options?.readNullableColorUpdate("iconTintColorDisabled"),
-            ),
-            options?.readIconSource(),
+            StackHeaderToolbarMenuMapper.parseMenuItemOptions(options),
+            StackHeaderToolbarMenuMapper.parseMenuItemIconSource(options),
         )
         callback.invoke(LynxUIMethodConstants.SUCCESS)
     }
@@ -665,119 +600,3 @@ internal class StackHeaderConfigComponent(
         private const val TAG = "StackHeaderConfigComponent"
     }
 }
-
-private fun ReadableMap.requireNotNullString(key: String): String =
-    requireNotNull(this.getString(key)) {
-        "[RNScreens] toolbarMenuItem $key property must not be null."
-    }
-
-// Helpers for regular props (null/not defined -> default)
-private fun ReadableMap.readString(
-    key: String,
-    default: String,
-): String = if (!this.hasKey(key) || this.isNull(key)) default else this.getString(key) ?: default
-
-private fun ReadableMap.readBoolean(
-    key: String,
-    default: Boolean,
-): Boolean = if (!this.hasKey(key) || this.isNull(key)) default else this.getBoolean(key)
-
-private fun ReadableMap.readShowAsActionEnum(
-    key: String,
-    default: StackHeaderToolbarMenuItemShowAsAction,
-): StackHeaderToolbarMenuItemShowAsAction {
-    val stringValue = this.getString(key) ?: return default
-    return toMenuItemShowAsActionEnum(stringValue)
-}
-
-private fun ReadableMap.readColor(
-    key: String,
-    default: Int?,
-): Int? = if (!this.hasKey(key) || this.isNull(key)) default else parseColor(key)
-
-// RNS receives already-processed color Ints from Fabric; on Lynx the props
-// arrive as CSS color strings (a Number is accepted too for robustness).
-private fun ReadableMap.parseColor(key: String): Int? =
-    try {
-        when (getType(key)) {
-            ReadableType.Number -> getInt(key)
-            ReadableType.String -> getString(key)?.let { Color.parseColor(it) }
-            else -> null
-        }
-    } catch (e: Exception) {
-        Log.w("StackHeaderConfigComponent", "[RNScreens] Could not parse color for key '$key': ${e.message}")
-        null
-    }
-
-// Helpers for UI-method updates. Each key has three states:
-// - not defined -> null         (no change)
-// - null        -> default      (reset to default)
-// - value       -> value
-//
-// A plain `T?` return can encode this only when the field's default is non-null,
-// so `null` unambiguously means "no change". Fields whose default is null (the
-// tint colors) must return `StackHeaderToolbarUpdate<T>?` instead, to tell "no
-// change" (null) apart from "reset" (Reset).
-private fun ReadableMap.readNullableStringUpdate(
-    key: String,
-    default: String,
-): String? =
-    when {
-        !this.hasKey(key) -> null
-        this.isNull(key) -> default
-        else -> this.getString(key) ?: default
-    }
-
-private fun ReadableMap.readNullableBooleanUpdate(
-    key: String,
-    default: Boolean,
-): Boolean? =
-    when {
-        !this.hasKey(key) -> null
-        this.isNull(key) -> default
-        else -> this.getBoolean(key)
-    }
-
-private fun ReadableMap.readNullableShowAsActionEnumUpdate(
-    key: String,
-    default: StackHeaderToolbarMenuItemShowAsAction,
-): StackHeaderToolbarMenuItemShowAsAction? =
-    when {
-        !this.hasKey(key) -> null
-        this.isNull(key) -> default
-        else ->
-            this.getString(key)?.let {
-                toMenuItemShowAsActionEnum(it)
-            } ?: default
-    }
-
-// Assumes null is the default color.
-private fun ReadableMap.readNullableColorUpdate(key: String): StackHeaderToolbarUpdate<Int>? =
-    when {
-        !this.hasKey(key) -> null
-        this.isNull(key) -> StackHeaderToolbarUpdate.Reset
-        else -> StackHeaderToolbarUpdate.from(parseColor(key))
-    }
-
-// The icon is composed of two JS keys that together form one source. It is
-// "mentioned" iff at least one key is present; mentioned but empty (both null)
-// means "clear", which the resolver turns into a Reset.
-private fun ReadableMap.readIconSource(): StackHeaderToolbarMenuItemIconSource? {
-    if (!this.hasKey("drawableIconResourceName") && !this.hasKey("imageIconUri")) {
-        return null
-    }
-    return StackHeaderToolbarMenuItemIconSource(
-        drawableIconResourceName = this.getString("drawableIconResourceName"),
-        imageIconUri = this.getString("imageIconUri"),
-    )
-}
-
-private fun toMenuItemShowAsActionEnum(value: String): StackHeaderToolbarMenuItemShowAsAction =
-    when (value) {
-        "always" -> StackHeaderToolbarMenuItemShowAsAction.ALWAYS
-        "alwaysWithText" -> StackHeaderToolbarMenuItemShowAsAction.ALWAYS_WITH_TEXT
-        "ifRoom" -> StackHeaderToolbarMenuItemShowAsAction.IF_ROOM
-        "ifRoomWithText" -> StackHeaderToolbarMenuItemShowAsAction.IF_ROOM_WITH_TEXT
-        "never" -> StackHeaderToolbarMenuItemShowAsAction.NEVER
-        else -> throw IllegalArgumentException("[RNScreens] Invalid value for StackHeaderToolbarMenuItemShowAsAction: $value.")
-    }

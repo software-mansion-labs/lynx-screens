@@ -208,12 +208,12 @@ internal class StackHeaderCoordinatorLayout(
             if (provider.invalidationFlags.containsAny(StackHeaderInvalidationFlags.TOOLBAR_MENU)) {
                 val (forwardIdMap, reverseIdMap) =
                     applicator.generateToolbarMenuItemMappings(
-                        provider.toolbarMenuItems,
+                        provider.toolbarMenu,
                     )
 
                 applicator.rebuildToolbarMenu(
                     appBar.toolbar,
-                    provider.toolbarMenuItems,
+                    provider.toolbarMenu,
                     forwardIdMap,
                     reverseIdMap,
                 ) { id -> currentDelegate?.onMenuItemClicked(id) }

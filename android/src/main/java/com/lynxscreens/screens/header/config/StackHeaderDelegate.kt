@@ -2,7 +2,7 @@ package com.lynxscreens.screens.header.config
 
 import com.lynxscreens.screens.header.subview.StackHeaderSubviewType
 
-interface StackHeaderDelegate {
+internal interface StackHeaderDelegate {
     fun onHeaderFrameChanged(
         width: Int,
         height: Int,

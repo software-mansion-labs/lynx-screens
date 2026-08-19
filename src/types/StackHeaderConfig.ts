@@ -1,5 +1,4 @@
 import type { ReactElement, ReactNode } from '@lynx-js/react';
-import type * as Lynx from '@lynx-js/types';
 
 // copied from react-native-screens/src/components/gamma/stack/header/*.types.ts
 
@@ -92,54 +91,57 @@ export type StackHeaderToolbarMenuItemShowAsActionAndroid =
   | 'ifRoomWithText'
   | 'never';
 
-export interface StackHeaderToolbarMenuItemAndroid {
+export interface StackHeaderToolbarMenuItemBaseAndroid {
   /**
-   * @summary Unique identifier of the menu item.
+   * @summary Unique identifier of the menu element.
    *
    * @platform android
    */
   id: string;
   /**
-   * @summary Title of the menu item.
+   * @summary Title of the menu element.
    *
    * @platform android
    */
   title?: string | undefined;
   /**
-   * @summary Specifies if the menu item should be hidden.
+   * @summary Specifies if the menu element should be hidden.
    *
    * @default false
    * @platform android
    */
   hidden?: boolean | undefined;
   /**
-   * @summary Specifies whether the item should be displayed as a button in the
-   * Toolbar.
+   * @summary Specifies whether the element should be displayed as a button in
+   * the Toolbar.
    *
+   * @description
    * The following values are available:
-   * - `always` - always displays the item as a button in the Toolbar,
-   * - `alwaysWithText` - always displays the item as a button in the Toolbar,
-   *   forcing the text label to be visible even if an icon is provided,
-   * - `ifRoom` - displays the item as a button in the Toolbar only if the
+   * - `always` - always displays the element as a button in the Toolbar,
+   * - `alwaysWithText` - always displays the element as a button in the
+   *   Toolbar, forcing the text label to be visible even if an icon is
+   *   provided,
+   * - `ifRoom` - displays the element as a button in the Toolbar only if the
    *   system determines there is sufficient space,
-   * - `ifRoomWithText` - displays the item as a button in the Toolbar if the
-   *   system determines there is sufficient space, forcing the text label to
-   *   be visible even if an icon is provided,
-   * - `never` - never displays the item as a button in the Toolbar; it will be
-   *   placed in the overflow menu instead.
+   * - `ifRoomWithText` - displays the element as a button in the Toolbar if
+   *   the system determines there is sufficient space, forcing the text label
+   *   to be visible even if an icon is provided,
+   * - `never` - never displays the element as a button in the Toolbar; it
+   *   will be placed in the overflow menu instead.
    *
    * @remarks
    * Due to native limitations, the width limit for the `ifRoom` options is
-   * determined during the initial render and will not adapt to subsequent layout
-   * or orientation changes.
+   * determined during the initial render and will not adapt to subsequent
+   * layout or orientation changes.
    *
    * @default never
    * @platform android
    */
   showAsAction?: StackHeaderToolbarMenuItemShowAsActionAndroid | undefined;
   /**
-   * @summary Specifies the icon for the menu item.
+   * @summary Specifies the icon for the menu element.
    *
+   * @description
    * Supported values:
    * - `{ type: 'imageSource', uri }`
    *   Uses an image from the provided URI.
@@ -153,63 +155,100 @@ export interface StackHeaderToolbarMenuItemAndroid {
    *   Remarks: Requires passing a drawable to resources via Android Studio.
    *
    * @remarks
-   * The icon will be visible only if the menu item is shown in the Toolbar.
+   * The icon will be visible only if the menu element is shown in the
+   * Toolbar.
    *
    * @platform android
    */
   icon?: PlatformIconAndroid | undefined;
   /**
-   * @summary Specifies the tint color to apply to the menu item icon.
+   * @summary Specifies the tint color to apply to the menu element icon.
    *
    * @platform android
    */
   iconTintColorNormal?: string | undefined;
   /**
-   * @summary Specifies the tint color to apply to the menu item icon when item
-   * is pressed.
+   * @summary Specifies the tint color to apply to the menu element icon when
+   * it is pressed.
    *
    * @remarks
    * Due to native platform limitations, if you set this prop, you must also
-   * provide `iconTintColorNormal`. Otherwise, the icon will become transparent.
+   * provide `iconTintColorNormal`. Otherwise, the icon will become
+   * transparent.
    *
    * @platform android
    */
   iconTintColorPressed?: string | undefined;
   /**
-   * @summary Specifies the tint color to apply to the menu item icon when item
-   * is focused (e.g. by keyboard navigation).
+   * @summary Specifies the tint color to apply to the menu element icon when
+   * it is focused (e.g. by keyboard navigation).
    *
    * @remarks
    * Due to native platform limitations, if you set this prop, you must also
-   * provide `iconTintColorNormal`. Otherwise, the icon will become transparent.
+   * provide `iconTintColorNormal`. Otherwise, the icon will become
+   * transparent.
    *
    * @platform android
    */
   iconTintColorFocused?: string | undefined;
   /**
-   * @summary Specifies the tint color to apply to the menu item icon when item
-   * is disabled.
+   * @summary Specifies the tint color to apply to the menu element icon when
+   * it is disabled.
    *
    * @remarks
-   * Disabling menu item isn't currently supported.
+   * Disabling menu elements isn't currently supported.
    *
    * Due to native platform limitations, if you set this prop, you must also
-   * provide `iconTintColorNormal`. Otherwise, the icon will become transparent.
+   * provide `iconTintColorNormal`. Otherwise, the icon will become
+   * transparent.
    *
    * @platform android
    */
   iconTintColorDisabled?: string | undefined;
 }
 
-export type StackHeaderToolbarMenuItemClickedEventPayload = {
+export interface StackHeaderToolbarMenuItemAndroid
+  extends StackHeaderToolbarMenuItemBaseAndroid {
   /**
-   * @summary ID of the clicked menu item.
+   * @summary Marks this object as a menu item.
+   *
+   * @platform android
    */
-  id: string;
-};
+  type: 'menuItem';
+  /**
+   * @summary Callback invoked when the menu item is clicked.
+   *
+   * @platform android
+   */
+  onPress?: (() => void) | undefined;
+}
+
+export interface StackHeaderToolbarMenuBaseAndroid {
+  /**
+   * @summary Menu elements displayed in the toolbar menu.
+   *
+   * @platform android
+   */
+  children?: StackHeaderToolbarMenuElementAndroid[];
+}
+
+export interface StackHeaderToolbarMenuAndroid
+  extends StackHeaderToolbarMenuItemBaseAndroid,
+    StackHeaderToolbarMenuBaseAndroid {
+  /**
+   * @summary Marks this object as a submenu.
+   *
+   * @platform android
+   */
+  type: 'menu';
+}
+
+export type StackHeaderToolbarMenuElementAndroid =
+  | StackHeaderToolbarMenuItemAndroid
+  | StackHeaderToolbarMenuAndroid;
 
 export type StackHeaderToolbarMenuItemOptionsAndroid = Partial<
-  Omit<StackHeaderToolbarMenuItemAndroid, 'id'>
+  Omit<StackHeaderToolbarMenuItemBaseAndroid, 'id'>
 >;
 
 export interface StackHeaderConfigCommandsAndroid {
@@ -401,9 +440,10 @@ export interface StackHeaderConfigPropsAndroid {
    */
   scrollFlagSnap?: boolean | undefined;
   /**
-   * @summary Menu items displayed in the toolbar menu.
+   * @summary Toolbar menu configuration.
    *
-   * This prop serves as initial configuration of the toolbar menu items. If you
+   * @description
+   * This prop serves as initial configuration of the toolbar menu. If you
    * want to change some property in runtime, use `setToolbarMenuItemOptions`
    * view command.
    *
@@ -412,17 +452,7 @@ export interface StackHeaderConfigPropsAndroid {
    *
    * @platform android
    */
-  toolbarMenuItems?: StackHeaderToolbarMenuItemAndroid[] | undefined;
-  /**
-   * @summary Callback invoked when a toolbar menu item is clicked.
-   *
-   * @platform android
-   */
-  onToolbarMenuItemClicked?:
-    | Lynx.EventHandler<
-        Lynx.BaseEventOrig<StackHeaderToolbarMenuItemClickedEventPayload>
-      >
-    | undefined;
+  toolbarMenu?: StackHeaderToolbarMenuBaseAndroid | undefined;
 }
 
 /**
