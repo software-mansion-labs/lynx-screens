@@ -1,4 +1,5 @@
 #import "RNSStackHostComponent.h"
+#import "RNSContainerHelpers.h"
 #import "RNSStackScreenComponent.h"
 
 #import <Lynx/LynxComponentRegistry.h>
@@ -44,8 +45,14 @@
 - (void)viewDidMoveToWindow
 {
     LLogInfo(@"[RNScreens] StackHost [%ld] attached to window", (long)self.view.tag);
-    [self lynxAddControllerToClosestParent:_stackNavigationController];
-    [self setupViewConstraintsForController:_stackNavigationController];
+    if (self.view.window != nil && _stackNavigationController.parentViewController == nil) {
+        BOOL mountResult = [RNSContainerHelpers addChildViewController:_stackNavigationController
+                                              toViewControllerManaging:self.view.superview
+                                                     withContainerView:self.view];
+        if (mountResult) {
+            [self setupViewConstraintsForController:_stackNavigationController];
+        }
+    }
 }
 
 #pragma mark - Communication with StackScreen
@@ -136,46 +143,8 @@
     }
 }
 
-- (UIViewController *)lynxViewControllerForView:(UIView *)view
-{
-    UIResponder *responder = [view nextResponder];
-    while (responder) {
-        if ([responder isKindOfClass:[UIViewController class]]) {
-            return (UIViewController *)responder;
-        }
-        responder = [responder nextResponder];
-    }
-    return nil;
-}
-
-- (void)lynxAddControllerToClosestParent:(UIViewController *)controller
-{
-    NSAssert(controller != nil, @"[RNScreens] Attempt to move to a nullish controller");
-    if (!controller.parentViewController) {
-        UIView *parentView = self.view.superview;
-        while (parentView) {
-            UIViewController *vc = [self lynxViewControllerForView:parentView];
-            if (vc) {
-                [vc addChildViewController:controller];
-                [self.view addSubview:controller.view];
-                controller.view.frame = self.view.bounds;
-                [controller didMoveToParentViewController:vc];
-                break;
-            }
-            parentView = parentView.superview;
-        }
-        return;
-    }
-}
-
 - (void)setupViewConstraintsForController:(nonnull UIViewController *)controller
 {
-    if (controller.view.superview != self.view) {
-        // lynxAddControllerToClosestParent did not attach the controller yet -
-        // constraints would have no common ancestor.
-        return;
-    }
-
     // Enable auto-layout to ensure valid size of stack controller view.
     controller.view.translatesAutoresizingMaskIntoConstraints = NO;
     [NSLayoutConstraint activateConstraints:@[
