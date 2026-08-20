@@ -2,7 +2,7 @@ package com.lynxscreens.screens.header.config
 
 import android.graphics.drawable.Drawable
 import com.lynxscreens.screens.header.subview.StackHeaderSubviewProviding
-import com.lynxscreens.screens.header.toolbar.StackHeaderToolbarMenuConfig
+import com.lynxscreens.screens.header.toolbar.model.StackHeaderToolbarMenuConfig
 
 internal interface StackHeaderConfigurationProviding {
     val type: StackHeaderType

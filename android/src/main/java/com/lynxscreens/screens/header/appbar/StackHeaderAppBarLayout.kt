@@ -1,4 +1,4 @@
-package com.lynxscreens.screens.header
+package com.lynxscreens.screens.header.appbar
 
 import android.annotation.SuppressLint
 import android.content.Context
