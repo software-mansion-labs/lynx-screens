@@ -504,6 +504,7 @@ internal class StackHeaderApplicator(
     ) {
         options.title?.let { menuItem.title = it }
         options.hidden?.let { menuItem.isVisible = !it }
+        options.disabled?.let { menuItem.isEnabled = !it }
         options.showAsAction?.let { menuItem.setShowAsAction(it.toNativeShowAsAction()) }
 
         // checked is intentionally not handled here. The coordinator layout manages it in
@@ -597,6 +598,7 @@ internal class StackHeaderApplicator(
         StackHeaderToolbarMenuItemOptions(
             title = title,
             hidden = hidden,
+            disabled = disabled,
             showAsAction = showAsAction,
             icon = StackHeaderToolbarUpdate.from(icon),
             iconTintColorNormal = StackHeaderToolbarUpdate.from(iconTintColorNormal),
