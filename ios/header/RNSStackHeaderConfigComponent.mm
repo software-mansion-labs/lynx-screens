@@ -4,6 +4,8 @@
 #import "RNSStackHeaderConfigEventEmitter.h"
 #import "RNSStackHeaderItemComponent.h"
 #import "RNSStackHeaderItemSpacerComponent.h"
+#import "RNSStackHeaderMenuFinder.h"
+#import "RNSStackHeaderMenuUpdateOptions.h"
 #import "RNSStackHeaderConfigView.h"
 #import "RNSStackNavigationController.h"
 #import "RNSStackScreenComponent.h"
@@ -13,6 +15,7 @@
 #import <Lynx/LynxComponentRegistry.h>
 #import <Lynx/LynxLog.h>
 #import <Lynx/LynxPropsProcessor.h>
+#import <Lynx/LynxUIMethodProcessor.h>
 
 static void RNSAssertIsValidHeaderChild(id child)
 {
@@ -168,6 +171,19 @@ static void RNSAssertIsValidHeaderChild(id child)
     [coordinator reapplyMenuForItemWithId:itemId];
 }
 
+/**
+ * Same as headerItemDidInvalidateWithId, but handles view commands and doesn't reset the tracker
+ */
+- (void)headerItemMenuDidUpdateFromCommandWithId:(NSString *)itemId
+{
+    if (itemId == nil) {
+        LLogWarn(@"[RNScreens] headerItemMenuDidUpdateFromCommandWithId called with nil id, will run full header rebuild");
+        [[self headerCoordinator] rebuild];
+        return;
+    }
+    [[self headerCoordinator] reapplyMenuForItemWithId:itemId];
+}
+
 - (void)headerItemSpacerDidInvalidate
 {
     [[self headerCoordinator] rebuild];
@@ -281,6 +297,134 @@ LYNX_PROP_SETTER("backButtonHidden", setBackButtonHidden, BOOL) {}
 {
     [super propsDidUpdate];
     [[self headerCoordinator] applyConfigProperties];
+}
+
+#pragma mark - Commands
+
+// The Lynx counterparts of RNS's setMenuItemOptions / setMenuOptions view
+// commands, invoked via NodesRef.invoke from JS. Adaptation: the options
+// object arrives directly under the "options" key of the params map (RNS
+// unwraps a codegen array wrapper instead), and the target id under
+// "menuElementId".
+LYNX_UI_METHOD(setMenuItemOptions) {
+    NSString *menuItemId =
+        [params[@"menuElementId"] isKindOfClass:[NSString class]] ? params[@"menuElementId"] : nil;
+    NSDictionary *dict = [self extractOptionsDict:params];
+    if (menuItemId == nil || dict == nil) {
+        callback(kUIMethodParamInvalid, nil);
+        return;
+    }
+
+    RNSMenuElementLocator *locator = [RNSStackHeaderMenuFinder findMenuElementWithId:menuItemId
+                                                                       inHeaderItems:[self headerItems]];
+    if (locator == nil) {
+        LLogWarn(@"[RNScreens] setMenuItemOptions: element with id \"%@\" not found", menuItemId);
+        callback(kUIMethodSuccess, nil);
+        return;
+    }
+    if (![locator.searchResult.element isKindOfClass:[RNSStackHeaderMenuItemData class]]) {
+        LLogWarn(@"[RNScreens] setMenuItemOptions: element \"%@\" is a menu, expected menuItem", menuItemId);
+        callback(kUIMethodSuccess, nil);
+        return;
+    }
+
+    RNSMenuItemUpdateOptions *updateOptions = [RNSMenuItemUpdateOptions fromDictionary:dict];
+    RNSStackHeaderMenuItemData *oldItemData = (RNSStackHeaderMenuItemData *)locator.searchResult.element;
+    RNSStackHeaderMenuItemData *newItemData = [RNSMenuItemUpdateOptions applyOptions:updateOptions
+                                                                          toMenuItem:oldItemData];
+
+    if (updateOptions.hasToggleState) {
+        BOOL isToggle = oldItemData.itemType == RNSMenuItemTypeToggle ||
+            (oldItemData.itemType == RNSMenuItemTypeAutomatic && locator.headerItem.menu != nil &&
+             [RNSStackHeaderMenuFinder singleSelectionRootForElementWithId:menuItemId
+                                                                    inMenu:locator.headerItem.menu] != nil);
+        if (isToggle) {
+            [[self headerCoordinator] setToggleState:updateOptions.toggleState
+                                    forMenuElementId:menuItemId
+                                          withItemId:locator.headerItem.itemId
+                                          parentMenu:locator.searchResult.parentMenu];
+        }
+    }
+
+    switch (locator.position) {
+        case RNSMenuElementPositionItem:
+            NSAssert([locator.headerItem isKindOfClass:RNSStackHeaderItemComponent.class],
+                     @"[RNScreens] headerItem is expected to be of type RNSStackHeaderItemComponent");
+            [static_cast<RNSStackHeaderItemComponent *>(locator.headerItem)
+                updateMenuElementWithId:menuItemId
+                            withElement:newItemData
+                             parentMenu:locator.searchResult.parentMenu];
+            break;
+        case RNSMenuElementPositionTitle:
+        case RNSMenuElementPositionOverflow:
+            // TODO: handle title menu and overflow menu
+            break;
+    }
+    callback(kUIMethodSuccess, nil);
+}
+
+LYNX_UI_METHOD(setMenuOptions) {
+    NSString *menuElementId =
+        [params[@"menuElementId"] isKindOfClass:[NSString class]] ? params[@"menuElementId"] : nil;
+    NSDictionary *dict = [self extractOptionsDict:params];
+    if (menuElementId == nil || dict == nil) {
+        callback(kUIMethodParamInvalid, nil);
+        return;
+    }
+
+    RNSMenuElementLocator *locator = [RNSStackHeaderMenuFinder findMenuElementWithId:menuElementId
+                                                                       inHeaderItems:[self headerItems]];
+    if (locator == nil) {
+        LLogWarn(@"[RNScreens] setMenuOptions: element with id \"%@\" not found", menuElementId);
+        callback(kUIMethodSuccess, nil);
+        return;
+    }
+    if (![locator.searchResult.element isKindOfClass:[RNSStackHeaderMenuData class]]) {
+        LLogWarn(@"[RNScreens] setMenuOptions: element \"%@\" is a menuItem, expected menu", menuElementId);
+        callback(kUIMethodSuccess, nil);
+        return;
+    }
+
+    RNSMenuUpdateOptions *updateOptions = [RNSMenuUpdateOptions fromDictionary:dict];
+    RNSStackHeaderMenuData *oldMenuItem = (RNSStackHeaderMenuData *)locator.searchResult.element;
+    RNSStackHeaderMenuData *newMenuItem = [RNSMenuUpdateOptions applyOptions:updateOptions toMenu:oldMenuItem];
+
+    switch (locator.position) {
+        case RNSMenuElementPositionItem:
+            NSAssert([locator.headerItem isKindOfClass:RNSStackHeaderItemComponent.class],
+                     @"[RNScreens] headerItem is expected to be of type RNSStackHeaderItemComponent");
+            [static_cast<RNSStackHeaderItemComponent *>(locator.headerItem)
+                updateMenuElementWithId:menuElementId
+                            withElement:newMenuItem
+                             parentMenu:locator.searchResult.parentMenu];
+            break;
+        case RNSMenuElementPositionTitle:
+        case RNSMenuElementPositionOverflow:
+            // TODO: handle title menu and overflow menu
+            break;
+    }
+    callback(kUIMethodSuccess, nil);
+}
+
+- (nullable NSDictionary *)extractOptionsDict:(NSDictionary *)params
+{
+    id options = params[@"options"];
+    if (![options isKindOfClass:[NSDictionary class]]) {
+        return nil;
+    }
+    NSDictionary *dict = (NSDictionary *)options;
+    return dict.count > 0 ? dict : nil;
+}
+
+- (NSArray<RNSStackHeaderItemComponent *> *)headerItems
+{
+    NSMutableArray<RNSStackHeaderItemComponent *> *items = [NSMutableArray new];
+    for (LynxUI *child in self.children) {
+        if ([child isKindOfClass:RNSStackHeaderItemComponent.class]) {
+            [items addObject:(RNSStackHeaderItemComponent *)child];
+        }
+    }
+    return items;
 }
 
 #pragma mark - Hit testing

@@ -1,6 +1,7 @@
 #import "RNSStackHeaderItemComponent.h"
 #import "RNSStackHeaderIconMapper.h"
 #import "RNSStackHeaderItemEventEmitter.h"
+#import "RNSStackHeaderMenuCoordinator.h"
 #import "RNSStackHeaderMenuMapper.h"
 
 #import <Lynx/LynxComponentRegistry.h>
@@ -34,14 +35,44 @@
 - (void)resetProps
 {
     _itemId = nil;
-    _title = nil;
-    _icon = nil;
-    _menu = nil;
+    [self setTitleProp:nil];
+    [self setIconProp:nil];
+    [self setMenuProp:nil];
     _placement = RNSHeaderItemPlacementTrailing;
     _didSetHeaderItemPlacement = NO;
     _respondsToOnPress = NO;
     _needsUpdate = NO;
     _menuDidChange = NO;
+}
+
+- (void)setTitleProp:(NSString *)titleProp
+{
+    _titleProp = titleProp;
+    _title = titleProp;
+}
+
+- (void)setIconProp:(RNSStackHeaderIconData *)iconProp
+{
+    _iconProp = iconProp;
+    _icon = iconProp;
+}
+
+- (void)setMenuProp:(RNSStackHeaderMenuData *)menuProp
+{
+    _menuProp = menuProp;
+    _menu = menuProp;
+}
+
+- (void)updateMenuElementWithId:(NSString *)elementId
+                    withElement:(id<RNSStackHeaderMenuElement>)newElement
+                     parentMenu:(nullable RNSStackHeaderMenuData *)parentMenu
+{
+    if (parentMenu == nil) {
+        _menu = (RNSStackHeaderMenuData *)newElement;
+    } else {
+        _menu = [RNSStackHeaderMenuCoordinator menu:_menu replacingChildWithId:elementId withElement:newElement];
+    }
+    [_invalidationDelegate headerItemMenuDidUpdateFromCommandWithId:_itemId];
 }
 
 // Adaptation: RNS creates the codegen-backed emitter eagerly and refreshes it
@@ -198,7 +229,7 @@ LYNX_PROP_SETTER("title", setTitle, NSString *) {
         value = nil;
     }
     if (_title != value && ![_title isEqualToString:value]) {
-        _title = value;
+        [self setTitleProp:value];
         _needsUpdate = YES;
     }
 }
@@ -207,7 +238,7 @@ LYNX_PROP_SETTER("icon", setIcon, NSDictionary *) {
     if (requestReset) {
         value = nil;
     }
-    _icon = [RNSStackHeaderIconMapper iconFromDictionary:value];
+    [self setIconProp:[RNSStackHeaderIconMapper iconFromDictionary:value]];
     _needsUpdate = YES;
 }
 
@@ -227,7 +258,7 @@ LYNX_PROP_SETTER("menu", setMenu, NSDictionary *) {
     }
     // Adaptation: Lynx delivers the prop as a plain NSDictionary - no
     // folly::dynamic conversion is needed.
-    _menu = [RNSStackHeaderMenuMapper menuFromDictionary:value];
+    [self setMenuProp:[RNSStackHeaderMenuMapper menuFromDictionary:value]];
     _menuDidChange = YES;
 }
 

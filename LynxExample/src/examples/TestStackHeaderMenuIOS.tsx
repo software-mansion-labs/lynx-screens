@@ -1,6 +1,22 @@
-import { useCallback, useLayoutEffect, useMemo, useState } from '@lynx-js/react';
-import type { StackHeaderConfigProps } from 'lynx-screens';
-import { LongText, SettingsButton } from '../components/SettingsControls';
+import {
+  useCallback,
+  useLayoutEffect,
+  useMemo,
+  useRef,
+  useState,
+} from '@lynx-js/react';
+import type {
+  StackHeaderConfigProps,
+  StackHeaderConfigRef,
+  StackHeaderMenuItemOptionsIOS,
+  StackHeaderMenuOptionsIOS,
+} from 'lynx-screens';
+import {
+  Heading,
+  LongText,
+  SettingsButton,
+  SettingsPicker,
+} from '../components/SettingsControls';
 import { StackContainer } from '../components/StackContainer';
 import { useStackNavigationContext } from '../hooks/useStackNavigationContext';
 
@@ -9,7 +25,64 @@ import { useStackNavigationContext } from '../hooks/useStackNavigationContext';
 // through a Toast; a "Last clicked" text is used instead (no toast component
 // in this app).
 
+const ACTION_IDS = [
+  'subitem-1-1',
+  'toggle-1-1',
+  'toggle-1-2',
+  'toggle-1-3',
+  'radio-1-1',
+  'radio-1-2',
+  'radio-1-3',
+] as const;
+type ActionId = (typeof ACTION_IDS)[number];
+
+const MENU_IDS = ['menu-1', 'submenu-1', 'subsubmenu-1'] as const;
+type MenuId = (typeof MENU_IDS)[number];
+
+const TITLE_OPTIONS = [
+  'no change',
+  'Changed',
+  'New Title',
+  'undefined',
+] as const;
+type TitleOption = (typeof TITLE_OPTIONS)[number];
+
+const ICON_OPTIONS = [
+  'no change',
+  'star.fill',
+  'heart.fill',
+  'bell.fill',
+  'undefined',
+] as const;
+type IconOption = (typeof ICON_OPTIONS)[number];
+
+const TOGGLE_STATE_OPTIONS = ['no change', 'true', 'false'] as const;
+type ToggleStateOption = (typeof TOGGLE_STATE_OPTIONS)[number];
+
 const DEFAULT_TRAILING_ITEMS_COUNT = 2;
+const NO_CHANGE = 'NO_CHANGE';
+
+function resolveTitle(
+  option: TitleOption,
+): StackHeaderMenuItemOptionsIOS['title'] | typeof NO_CHANGE {
+  if (option === 'no change') return NO_CHANGE;
+  return option === 'undefined' ? undefined : option;
+}
+
+function resolveIcon(
+  option: IconOption,
+): StackHeaderMenuItemOptionsIOS['icon'] | typeof NO_CHANGE {
+  if (option === 'no change') return NO_CHANGE;
+  if (option === 'undefined') return undefined;
+  return { type: 'sfSymbol', name: option };
+}
+
+function resolveToggleState(
+  option: ToggleStateOption,
+): boolean | undefined | typeof NO_CHANGE {
+  if (option === 'no change') return NO_CHANGE;
+  return option === 'true';
+}
 
 // Adaptation: RNS examples rely on UIKit's automatic scroll-view content
 // inset (contentInsetAdjustmentBehavior="automatic") to start content below
@@ -164,6 +237,8 @@ function ConfigScreen() {
     [],
   );
 
+  const headerConfigRef = useRef<StackHeaderConfigRef>(null);
+
   const { setRouteOptions, routeKey } = navigation;
   const headerConfig = useMemo(
     () => buildHeaderConfig(trailingItemsCount, showClicked, keepsMenuPresented),
@@ -173,8 +248,42 @@ function ConfigScreen() {
   useLayoutEffect(() => {
     setRouteOptions(routeKey, {
       headerConfig,
+      headerConfigRef,
     });
   }, [headerConfig, setRouteOptions, routeKey]);
+
+  const [actionId, setActionId] = useState<ActionId>('subitem-1-1');
+  const [actionTitle, setActionTitle] = useState<TitleOption>('no change');
+  const [actionIcon, setActionIcon] = useState<IconOption>('no change');
+  const [actionToggle, setActionToggle] =
+    useState<ToggleStateOption>('no change');
+
+  const [menuId, setMenuId] = useState<MenuId>('submenu-1');
+  const [menuTitle, setMenuTitle] = useState<TitleOption>('no change');
+  const [menuIcon, setMenuIcon] = useState<IconOption>('no change');
+
+  const sendActionCommand = useCallback(() => {
+    const options: StackHeaderMenuItemOptionsIOS = {};
+    const resolvedTitle = resolveTitle(actionTitle);
+    if (resolvedTitle !== NO_CHANGE) options.title = resolvedTitle;
+    const resolvedIcon = resolveIcon(actionIcon);
+    if (resolvedIcon !== NO_CHANGE) options.icon = resolvedIcon;
+    const resolvedToggleState = resolveToggleState(actionToggle);
+    if (resolvedToggleState !== NO_CHANGE)
+      options.toggleState = resolvedToggleState;
+
+    headerConfigRef.current?.ios?.setMenuItemOptions(actionId, options);
+  }, [actionId, actionTitle, actionIcon, actionToggle]);
+
+  const sendMenuCommand = useCallback(() => {
+    const options: StackHeaderMenuOptionsIOS = {};
+    const resolvedTitle = resolveTitle(menuTitle);
+    if (resolvedTitle !== NO_CHANGE) options.title = resolvedTitle;
+    const resolvedIcon = resolveIcon(menuIcon);
+    if (resolvedIcon !== NO_CHANGE) options.icon = resolvedIcon;
+
+    headerConfigRef.current?.ios?.setMenuOptions(menuId, options);
+  }, [menuId, menuTitle, menuIcon]);
 
   return (
     <scroll-view
@@ -197,6 +306,57 @@ function ConfigScreen() {
           label={`keepsMenuPresented: ${keepsMenuPresented}`}
           onTap={() => setKeepsMenuPresented((prev) => !prev)}
         />
+
+        <Heading label="setMenuItemOptions (Menu 1)" />
+        <SettingsPicker<ActionId>
+          label="target id"
+          value={actionId}
+          items={[...ACTION_IDS]}
+          onValueChange={setActionId}
+        />
+        <SettingsPicker<TitleOption>
+          label="title"
+          value={actionTitle}
+          items={[...TITLE_OPTIONS]}
+          onValueChange={setActionTitle}
+        />
+        <SettingsPicker<IconOption>
+          label="icon"
+          value={actionIcon}
+          items={[...ICON_OPTIONS]}
+          onValueChange={setActionIcon}
+        />
+        <SettingsPicker<ToggleStateOption>
+          label="toggleState"
+          value={actionToggle}
+          items={[...TOGGLE_STATE_OPTIONS]}
+          onValueChange={setActionToggle}
+        />
+        <SettingsButton
+          label="Send setMenuItemOptions"
+          onTap={sendActionCommand}
+        />
+
+        <Heading label="setMenuOptions (Menu 1)" />
+        <SettingsPicker<MenuId>
+          label="target id"
+          value={menuId}
+          items={[...MENU_IDS]}
+          onValueChange={setMenuId}
+        />
+        <SettingsPicker<TitleOption>
+          label="title"
+          value={menuTitle}
+          items={[...TITLE_OPTIONS]}
+          onValueChange={setMenuTitle}
+        />
+        <SettingsPicker<IconOption>
+          label="icon"
+          value={menuIcon}
+          items={[...ICON_OPTIONS]}
+          onValueChange={setMenuIcon}
+        />
+        <SettingsButton label="Send setMenuOptions" onTap={sendMenuCommand} />
         <text style={{ color: 'black', fontSize: '15px' }}>
           Last clicked: {lastClicked ?? '—'}
         </text>

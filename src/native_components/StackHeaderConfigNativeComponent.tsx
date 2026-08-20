@@ -21,6 +21,8 @@ import type {
   StackHeaderToolbarMenuGroupAndroid,
   StackHeaderToolbarMenuItemAndroid,
   StackHeaderToolbarMenuItemBaseAndroid,
+  StackHeaderMenuItemOptionsIOS,
+  StackHeaderMenuOptionsIOS,
   StackHeaderToolbarMenuElementOptionsAndroid,
   StackHeaderToolbarMenuElementUpdateAndroid,
   StackHeaderTypeAndroid,
@@ -59,8 +61,54 @@ const StackHeaderConfigIOS = (props: PlatformInnerProps) => {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const { android, ios, forwardedRef, ...baseProps } = props;
 
-  // No iOS commands exist yet, but resolve the ref so consumers can hold it.
-  useImperativeHandle(forwardedRef, () => ({}));
+  const nativeRef = useRef<NodesRef>(null);
+
+  useImperativeHandle(forwardedRef, () => ({
+    ios: {
+      setMenuItemOptions: (
+        menuElementId: string,
+        options: StackHeaderMenuItemOptionsIOS,
+      ) => {
+        if (!nativeRef.current) {
+          console.warn(
+            '[RNScreens] Reference to native header config component has not been updated yet.',
+          );
+          return;
+        }
+        // RNS dispatches a Fabric view command here; the Lynx counterpart is
+        // a UI method invocation through the NodesRef.
+        nativeRef.current
+          .invoke({
+            method: 'setMenuItemOptions',
+            params: {
+              menuElementId,
+              options: parseMenuElementOptionsToNativeIOS(options),
+            },
+          })
+          .exec();
+      },
+      setMenuOptions: (
+        menuElementId: string,
+        options: StackHeaderMenuOptionsIOS,
+      ) => {
+        if (!nativeRef.current) {
+          console.warn(
+            '[RNScreens] Reference to native header config component has not been updated yet.',
+          );
+          return;
+        }
+        nativeRef.current
+          .invoke({
+            method: 'setMenuOptions',
+            params: {
+              menuElementId,
+              options: parseMenuElementOptionsToNativeIOS(options),
+            },
+          })
+          .exec();
+      },
+    },
+  }));
 
   const {
     leadingItems,
@@ -121,6 +169,7 @@ const StackHeaderConfigIOS = (props: PlatformInnerProps) => {
 
   return (
     <ls-stack-header-config
+      ref={nativeRef}
       style={{
         position: 'absolute',
         left: 0,
@@ -285,6 +334,34 @@ const StackHeaderConfigAndroid = (props: PlatformInnerProps) => {
     </ls-stack-header-config>
   );
 };
+
+// Adaptation: RNS resolves require() icon assets via resolveAssetSources
+// here; Lynx icons are plain uri objects and pass through as data.
+function parseMenuElementOptionsToNativeIOS(
+  options: StackHeaderMenuItemOptionsIOS | StackHeaderMenuOptionsIOS,
+): Record<string, unknown> {
+  return Object.fromEntries(
+    Object.entries(options).flatMap(([key, value]): [string, unknown][] => {
+      if (
+        key !== 'icon' &&
+        typeof value === 'object' &&
+        value !== null &&
+        !Array.isArray(value)
+      ) {
+        throw new Error(`[RNScreens] Unexpected nested object.`);
+      }
+
+      return [
+        [
+          key,
+          // We need to replace explicit `undefined` with `null`
+          // so that we're able to read that information on the native side.
+          value === undefined ? null : value,
+        ],
+      ];
+    }),
+  );
+}
 
 function useHeaderConfigRef(forwardedRef: Ref<StackHeaderConfigRef>) {
   const ref = useRef<NodesRef>(null);
