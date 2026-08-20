@@ -1,12 +1,8 @@
 #import "RNSStackHeaderConfigComponent.h"
 #import "RNSShadowStateProxy.h"
 #import "RNSStackHeaderConfigEventEmitter.h"
-#import "RNSStackHeaderContentFactory.h"
-#import "RNSStackHeaderData.h"
 #import "RNSStackHeaderItemComponent.h"
-#import "RNSStackHeaderItemInvalidationDelegate.h"
 #import "RNSStackHeaderItemSpacerComponent.h"
-#import "RNSStackHeaderEventsDelegate.h"
 #import "RNSStackHeaderConfigView.h"
 #import "RNSStackNavigationController.h"
 #import "RNSStackScreenComponent.h"
@@ -27,18 +23,8 @@ static void RNSAssertIsValidHeaderChild(id child)
               RNSStackHeaderItemSpacerComponent.class);
 }
 
-@interface RNSStackHeaderConfigComponent () <RNSStackHeaderItemInvalidationDelegate, RNSStackHeaderEventsDelegate>
-@end
-
 @LynxElement("ls-stack-header-config")
 @implementation RNSStackHeaderConfigComponent {
-    NSString *_Nullable _title;
-    NSString *_Nullable _subtitle;
-    BOOL _hidden;
-    NSString *_Nullable _largeTitle;
-    NSString *_Nullable _largeSubtitle;
-    BOOL _largeTitleEnabled;
-
     RNSShadowStateProxy *_Nonnull _shadowStateProxy;
     RNSStackHeaderConfigEventEmitter *_Nullable _eventEmitter;
 }
@@ -88,7 +74,16 @@ static void RNSAssertIsValidHeaderChild(id child)
 {
     if (self.view.window != nil) {
         [[self requireNavigationController] setNavigationBarFrameChangeDelegate:self];
-        [self submitCurrentData];
+        RNSStackScreenHeaderCoordinator *coordinator = [self headerCoordinator];
+        coordinator.configDataProvider = self;
+        coordinator.frameChangeDelegate = self;
+        coordinator.eventsDelegate = self;
+        [coordinator rebuild];
+    } else {
+        RNSStackScreenHeaderCoordinator *coordinator = [self headerCoordinator];
+        coordinator.configDataProvider = nil;
+        coordinator.frameChangeDelegate = nil;
+        coordinator.eventsDelegate = nil;
     }
 }
 
@@ -99,7 +94,8 @@ static void RNSAssertIsValidHeaderChild(id child)
     RNSAssertIsValidHeaderChild(child);
 
     // The view-level insertion is dropped by RNSStackHeaderConfigView - the
-    // child is only registered in the Lynx component tree here.
+    // child is only registered in the Lynx component tree here and read by
+    // the coordinator during rebuild.
     [super insertChild:child atIndex:index];
 
     if ([child isKindOfClass:RNSStackHeaderItemComponent.class]) {
@@ -108,7 +104,7 @@ static void RNSAssertIsValidHeaderChild(id child)
         ((RNSStackHeaderItemSpacerComponent *)child).invalidationDelegate = self;
     }
 
-    [self submitCurrentDataIfMounted];
+    [[self headerCoordinator] rebuild];
 }
 
 - (void)removeChild:(id)child atIndex:(NSInteger)index
@@ -122,14 +118,36 @@ static void RNSAssertIsValidHeaderChild(id child)
     }
 
     [super removeChild:child atIndex:index];
-    [self submitCurrentDataIfMounted];
+    [[self headerCoordinator] rebuild];
 }
 
 #pragma mark - RNSStackHeaderItemInvalidationDelegate
 
-- (void)headerItemDidInvalidate
+- (void)headerItemDidInvalidateWithId:(NSString *)itemId
 {
-    [self submitCurrentDataIfMounted];
+    if (itemId == nil) {
+        LLogInfo(@"[RNScreens] headerItemDidInvalidateWithId called with nil id, will run full header rebuild");
+        [[self headerCoordinator] rebuild];
+        return;
+    }
+    [[self headerCoordinator] rebuildItemWithId:itemId];
+}
+
+- (void)headerItemMenuDidChangeWithId:(NSString *)itemId
+{
+    if (itemId == nil) {
+        LLogInfo(@"[RNScreens] headerItemMenuDidChangeWithId called with nil id, will run full header rebuild");
+        [[self headerCoordinator] rebuild];
+        return;
+    }
+    RNSStackScreenHeaderCoordinator *coordinator = [self headerCoordinator];
+    [coordinator resetTrackerForItemWithId:itemId];
+    [coordinator reapplyMenuForItemWithId:itemId];
+}
+
+- (void)headerItemSpacerDidInvalidate
+{
+    [[self headerCoordinator] rebuild];
 }
 
 #pragma mark - RNSStackHeaderEventsDelegate
@@ -151,8 +169,6 @@ static void RNSAssertIsValidHeaderChild(id child)
 - (void)didChangeSelectionForMenu:(NSString *)menuId selectedMenuItemIds:(NSArray<NSString *> *)selectedIds
 {
     [[self getEventEmitter] emitOnMenuSelectionChange:menuId selectedMenuItemIds:selectedIds];
-    // UIKit doesn't update UIAction.state after tap — rebuild menu so tracker state is reflected
-    [self submitCurrentDataIfMounted];
 }
 
 - (void)didPressHeaderItem:(NSString *)itemId
@@ -241,7 +257,7 @@ LYNX_PROP_SETTER("backButtonHidden", setBackButtonHidden, BOOL) {}
 - (void)propsDidUpdate
 {
     [super propsDidUpdate];
-    [self submitCurrentDataIfMounted];
+    [[self headerCoordinator] applyConfigProperties];
 }
 
 #pragma mark - Hit testing
@@ -307,98 +323,15 @@ LYNX_PROP_SETTER("backButtonHidden", setBackButtonHidden, BOOL) {}
 
 #pragma mark - Private
 
-- (void)submitCurrentDataIfMounted
+- (nullable RNSStackScreenHeaderCoordinator *)headerCoordinator
 {
-    if ([self stackScreen] != nil) {
-        [self submitCurrentData];
+    if (self.parent == nil) {
+        return nil;
     }
-}
-
-- (void)submitCurrentData
-{
-    RNSStackScreenComponent *screen = [self stackScreen];
-    if (screen == nil) {
-        LLogWarn(@"[RNScreens] Attempted to submit header data with no parent screen");
-        return;
-    }
-
-    NSMutableArray<UIBarButtonItem *> *leadingItems = [NSMutableArray new];
-    NSMutableArray<UIBarButtonItem *> *trailingItems = [NSMutableArray new];
-    UIView *titleView = nil;
-    UIView *subtitleView = nil;
-    UIView *largeSubtitleView = nil;
-    [self buildBarButtonItemsWithLeadingItems:leadingItems
-                                trailingItems:trailingItems
-                                    titleView:&titleView
-                                 subtitleView:&subtitleView
-                            largeSubtitleView:&largeSubtitleView];
-
-    RNSStackHeaderData *data = [[RNSStackHeaderData alloc] initWithTitle:_title
-                                                                subtitle:_subtitle
-                                                               screenKey:screen.screenKey
-                                                                  hidden:_hidden
-                                                              largeTitle:_largeTitle
-                                                           largeSubtitle:_largeSubtitle
-                                                       largeTitleEnabled:_largeTitleEnabled
-                                                   leadingBarButtonItems:leadingItems
-                                                  trailingBarButtonItems:trailingItems
-                                                               titleView:titleView
-                                                            subtitleView:subtitleView
-                                                       largeSubtitleView:largeSubtitleView];
-    [screen.controller.headerCoordinator submitHeaderData:data];
-}
-
-- (void)buildBarButtonItemsWithLeadingItems:(NSMutableArray<UIBarButtonItem *> *)leadingItems
-                              trailingItems:(NSMutableArray<UIBarButtonItem *> *)trailingItems
-                                  titleView:(UIView *_Nullable *_Nonnull)outTitleView
-                               subtitleView:(UIView *_Nullable *_Nonnull)outSubtitleView
-                          largeSubtitleView:(UIView *_Nullable *_Nonnull)outLargeSubtitleView
-{
-    for (LynxUI *child in self.children) {
-        if ([child isKindOfClass:RNSStackHeaderItemComponent.class]) {
-            RNSStackHeaderItemComponent *item = (RNSStackHeaderItemComponent *)child;
-            switch (item.placement) {
-                case RNSHeaderItemPlacementLeading:
-                    [leadingItems addObject:[RNSStackHeaderContentFactory barButtonItemForHeaderItem:item
-                                                                             withFrameChangeDelegate:self
-                                                                            withHeaderEventsDelegate:self]];
-                    break;
-                case RNSHeaderItemPlacementTrailing:
-                    [trailingItems addObject:[RNSStackHeaderContentFactory barButtonItemForHeaderItem:item
-                                                                              withFrameChangeDelegate:self
-                                                                             withHeaderEventsDelegate:self]];
-                    break;
-                case RNSHeaderItemPlacementTitle:
-                    if (item.customView != nil) {
-                        *outTitleView = [RNSStackHeaderContentFactory wrappedViewForHeaderItem:item
-                                                                           frameChangeDelegate:self];
-                    }
-                    break;
-                case RNSHeaderItemPlacementSubtitle:
-                    if (item.customView != nil) {
-                        *outSubtitleView = [RNSStackHeaderContentFactory wrappedViewForHeaderItem:item
-                                                                              frameChangeDelegate:self];
-                    }
-                    break;
-                case RNSHeaderItemPlacementLargeSubtitle:
-                    if (item.customView != nil) {
-                        *outLargeSubtitleView = [RNSStackHeaderContentFactory wrappedViewForHeaderItem:item
-                                                                                   frameChangeDelegate:self];
-                    }
-                    break;
-            }
-        } else if ([child isKindOfClass:RNSStackHeaderItemSpacerComponent.class]) {
-            RNSStackHeaderItemSpacerComponent *spacer = (RNSStackHeaderItemSpacerComponent *)child;
-            switch (spacer.placement) {
-                case RNSHeaderItemSpacerPlacementLeading:
-                    [leadingItems addObject:[RNSStackHeaderContentFactory spacerForHeaderSpacerItem:spacer]];
-                    break;
-                case RNSHeaderItemSpacerPlacementTrailing:
-                    [trailingItems addObject:[RNSStackHeaderContentFactory spacerForHeaderSpacerItem:spacer]];
-                    break;
-            }
-        }
-    }
+    NSAssert([self.parent isKindOfClass:RNSStackScreenComponent.class],
+             @"[RNScreens] Header Config should be a direct child of RNSStackScreenComponent");
+    RNSStackScreenComponent *screen = (RNSStackScreenComponent *)self.parent;
+    return screen.controller.headerCoordinator;
 }
 
 - (nullable RNSStackScreenComponent *)stackScreen

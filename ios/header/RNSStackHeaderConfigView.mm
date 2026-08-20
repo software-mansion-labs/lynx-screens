@@ -7,9 +7,9 @@
 {
     [super didMoveToWindow];
 
-    if (self.window) {
-        [self.component viewDidMoveToWindow];
-    }
+    // Forwarded for both directions - the component detaches itself from the
+    // header coordinator when the view leaves the window.
+    [self.component viewDidMoveToWindow];
 }
 
 /**
