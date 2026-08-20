@@ -1,9 +1,10 @@
 #import "RNSStackHeaderMenuMapper.h"
+#import "RNSStackHeaderIconMapper.h"
 
 static NSSet<NSString *> *const kRNSAllowedMenuKeys =
-    [NSSet setWithObjects:@"id", @"type", @"title", @"children", @"singleSelection", nil];
-static NSSet<NSString *> *const kRNSAllowedMenuItemKeys =
-    [NSSet setWithObjects:@"id", @"type", @"title", @"itemType", @"initialToggleState", @"keepsMenuPresented", nil];
+    [NSSet setWithObjects:@"id", @"type", @"title", @"children", @"singleSelection", @"icon", nil];
+static NSSet<NSString *> *const kRNSAllowedMenuItemKeys = [NSSet
+    setWithObjects:@"id", @"type", @"title", @"itemType", @"initialToggleState", @"keepsMenuPresented", @"icon", nil];
 
 @implementation RNSStackHeaderMenuMapper
 
@@ -33,10 +34,13 @@ static NSSet<NSString *> *const kRNSAllowedMenuItemKeys =
 
     BOOL singleSelection = [self boolForKey:@"singleSelection" in:dict];
 
+    RNSStackHeaderIconData *icon = [RNSStackHeaderIconMapper iconFromDictionary:dict[@"icon"]];
+
     return [[RNSStackHeaderMenuData alloc] initWithId:[self stringForKey:@"id" in:dict]
                                                 title:[self stringForKey:@"title" in:dict]
                                       singleSelection:singleSelection
-                                             children:children];
+                                             children:children
+                                                 icon:icon];
 }
 
 + (nullable id<RNSStackHeaderMenuElement>)elementFromDictionary:(nullable id)dictionary
@@ -52,12 +56,15 @@ static NSSet<NSString *> *const kRNSAllowedMenuItemKeys =
     } else if ([type isEqual:@"menuItem"]) {
         [RNSStackHeaderMenuMapper validateMenuItemKeys:dict];
 
+        RNSStackHeaderIconData *icon = [RNSStackHeaderIconMapper iconFromDictionary:dict[@"icon"]];
+
         return [[RNSStackHeaderMenuItemData alloc] initWithId:[self stringForKey:@"id" in:dict]
                                                         title:[self stringForKey:@"title" in:dict]
                                                      itemType:[self itemTypeFromString:[self stringForKey:@"itemType"
                                                                                                        in:dict]]
                                            initialToggleState:[self boolForKey:@"initialToggleState" in:dict]
-                                           keepsMenuPresented:[self boolForKey:@"keepsMenuPresented" in:dict]];
+                                           keepsMenuPresented:[self boolForKey:@"keepsMenuPresented" in:dict]
+                                                         icon:icon];
     }
 
     return nil;

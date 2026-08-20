@@ -30,6 +30,27 @@ export type PlatformIconAndroid =
     }
   | PlatformIconShared;
 
+export type PlatformIconIOSSfSymbol = {
+  type: 'sfSymbol';
+  name: string;
+};
+
+export type PlatformIconIOSXcasset = {
+  type: 'xcasset';
+  name: string;
+};
+
+// Adaptation from RNS: image and template sources are plain uri strings
+// (Lynx has no require()-based assets / resolveAssetSource).
+export type PlatformIconIOS =
+  | PlatformIconIOSSfSymbol
+  | PlatformIconIOSXcasset
+  | {
+      type: 'templateSource';
+      uri: string;
+    }
+  | PlatformIconShared;
+
 export interface StackHeaderToolbarSubviewAndroid {
   /**
    * @summary Render callback for the React element placed in this toolbar slot.
@@ -711,6 +732,16 @@ export interface StackHeaderMenuItemIOS {
    */
   initialToggleState?: boolean | undefined;
   /**
+   * @summary Icon displayed for the menu item.
+   *
+   * @description
+   * Supports SF Symbols, xcassets, and image sources. For async image sources,
+   * the menu item renders without an icon first and updates when loaded.
+   *
+   * @platform ios
+   */
+  icon?: PlatformIconIOS | undefined;
+  /**
    * @summary Callback invoked when the menu item is pressed.
    *
    * @description
@@ -797,6 +828,16 @@ export interface StackHeaderMenuIOS {
    */
   singleSelection?: boolean | undefined;
   /**
+   * @summary Icon displayed for the submenu.
+   *
+   * @description
+   * Supports SF Symbols, xcassets, and image sources. For async image sources,
+   * the menu renders without an icon first and updates when loaded.
+   *
+   * @platform ios
+   */
+  icon?: PlatformIconIOS | undefined;
+  /**
    * @summary Child elements of this menu.
    *
    * @description
@@ -836,6 +877,17 @@ export type StackHeaderMenuElementIOS =
 export interface StackHeaderBaseItemIOS {
   id: string;
   title?: string | undefined;
+  /**
+   * @summary Icon displayed for the header item.
+   *
+   * @description
+   * Supports SF Symbols, xcassets, and image sources. For async image sources,
+   * the item renders without an icon first and updates when loaded.
+   * Ignored when custom view ({@link StackHeaderInlineCustomItemIOS.render | render}) is set.
+   *
+   * @platform ios
+   */
+  icon?: PlatformIconIOS | undefined;
 }
 
 export interface SupportsMenuIOS {

@@ -1,5 +1,6 @@
 #import "RNSStackHeaderMenuCoordinator.h"
 #import "RNSDefines.h"
+#import "RNSStackHeaderIconResolver.h"
 
 @implementation RNSStackHeaderMenuCoordinator
 
@@ -7,7 +8,8 @@
            toBarButtonItem:(UIBarButtonItem *)item
     withHeaderEventsDelegate:(id<RNSStackHeaderEventsDelegate>)delegate
               stateTracker:(RNSStackHeaderMenuToggleStateTracker *)tracker
-        menuToggleCallback:(nullable void (^)(void))onMenuToggle
+           withImageLoader:(id<RNSImageLoading>)imageLoader
+    menuInvalidatedCallback:(nullable void (^)(void))onMenuInvalidated
 {
 #if !TARGET_OS_TV || __TV_OS_VERSION_MAX_ALLOWED >= 170000
     if (@available(tvOS 17.0, *)) {
@@ -16,7 +18,8 @@
                                   stateTracker:tracker
                            singleSelectionRoot:nil
             initialSingleSelectionStateClaimed:NULL
-                            menuToggleCallback:onMenuToggle];
+                               withImageLoader:imageLoader
+                       menuInvalidatedCallback:onMenuInvalidated];
     }
 #endif // !TARGET_OS_TV || __TV_OS_VERSION_MAX_ALLOWED >= 170000
 }
@@ -26,7 +29,8 @@
                           stateTracker:(RNSStackHeaderMenuToggleStateTracker *)tracker
                    singleSelectionRoot:(nullable RNSStackHeaderMenuData *)singleSelectionRoot
     initialSingleSelectionStateClaimed:(BOOL *)initialSingleSelectionStateClaimed
-                    menuToggleCallback:(nullable void (^)(void))onMenuToggle
+                       withImageLoader:(id<RNSImageLoading>)imageLoader
+               menuInvalidatedCallback:(nullable void (^)(void))onMenuInvalidated
 {
     // Resolve singleSelection root: first menu in hierarchy with singleSelection becomes the root.
     // Only the root is set the singleSelection option - less things to check if sth goes wrong
@@ -50,13 +54,26 @@
                                                  parentMenu:data
                                         singleSelectionRoot:resolvedRoot
                          initialSingleSelectionStateClaimed:initialSingleSelectionStateClaimed
-                                         menuToggleCallback:onMenuToggle];
+                                            withImageLoader:imageLoader
+                                    menuInvalidatedCallback:onMenuInvalidated];
         if (element != nil) {
             [elements addObject:element];
         }
     }
 
-    return [UIMenu menuWithTitle:data.title image:nil identifier:nil options:options children:elements];
+    UIImage *menuImage = nil;
+    if (data.icon != nil) {
+        UIImage *syncImage = [RNSStackHeaderIconResolver resolveIcon:data.icon
+                                                     withImageLoader:imageLoader
+                                                asyncCompletionBlock:^(UIImage *_Nullable image) {
+                                                    if (onMenuInvalidated) {
+                                                        onMenuInvalidated();
+                                                    }
+                                                }];
+        menuImage = syncImage ? syncImage : [RNSStackHeaderIconResolver placeholderImageForIcon:data.icon];
+    }
+
+    return [UIMenu menuWithTitle:data.title image:menuImage identifier:nil options:options children:elements];
 }
 
 + (nullable UIMenuElement *)buildElementFromData:(id<RNSStackHeaderMenuElement>)element
@@ -65,7 +82,8 @@
                                       parentMenu:(RNSStackHeaderMenuData *)parentMenu
                              singleSelectionRoot:(nullable RNSStackHeaderMenuData *)singleSelectionRoot
               initialSingleSelectionStateClaimed:(BOOL *)initialSingleSelectionStateClaimed
-                              menuToggleCallback:(nullable void (^)(void))onMenuToggle
+                                 withImageLoader:(id<RNSImageLoading>)imageLoader
+                         menuInvalidatedCallback:(nullable void (^)(void))onMenuInvalidated
 {
     if ([element isKindOfClass:[RNSStackHeaderMenuData class]]) {
         return [self buildMenuFromData:(RNSStackHeaderMenuData *)element
@@ -73,7 +91,8 @@
                                   stateTracker:tracker
                            singleSelectionRoot:singleSelectionRoot
             initialSingleSelectionStateClaimed:initialSingleSelectionStateClaimed
-                            menuToggleCallback:onMenuToggle];
+                               withImageLoader:imageLoader
+                       menuInvalidatedCallback:onMenuInvalidated];
     }
 
     if ([element isKindOfClass:[RNSStackHeaderMenuItemData class]]) {
@@ -99,11 +118,15 @@
                          singleSelectionRoot:singleSelectionRoot
                           toggleStateTracker:tracker
                           headerEventsDelegate:delegate
-                            menuToggleCallback:onMenuToggle];
+                               withImageLoader:imageLoader
+                       menuInvalidatedCallback:onMenuInvalidated];
         }
 
         // it effective type is not 'toggle', then it is a regular action button that triggers onPress instead
-        return [self buildActionFromData:itemData withHeaderEventsDelegate:delegate];
+        return [self buildActionFromData:itemData
+                withHeaderEventsDelegate:delegate
+                         withImageLoader:imageLoader
+                 menuInvalidatedCallback:onMenuInvalidated];
     }
 
     return nil;
@@ -124,7 +147,8 @@
                             singleSelectionRoot:(nullable RNSStackHeaderMenuData *)singleSelectionRoot
                              toggleStateTracker:(RNSStackHeaderMenuToggleStateTracker *)tracker
                              headerEventsDelegate:(id<RNSStackHeaderEventsDelegate>)delegate
-                             menuToggleCallback:(nullable void (^)(void))onMenuToggle
+                                withImageLoader:(id<RNSImageLoading>)imageLoader
+                        menuInvalidatedCallback:(nullable void (^)(void))onMenuInvalidated
 {
     BOOL isItemToggledOn = [tracker getToggleStateForItemWithId:data.menuElementId
                                                    initialState:data.initialToggleState];
@@ -134,9 +158,21 @@
 
     __weak id<RNSStackHeaderEventsDelegate> weakDelegate = delegate;
 
+    UIImage *iconImage = nil;
+    if (data.icon != nil) {
+        UIImage *syncImage = [RNSStackHeaderIconResolver resolveIcon:data.icon
+                                                     withImageLoader:imageLoader
+                                                asyncCompletionBlock:^(UIImage *_Nullable image) {
+                                                    if (onMenuInvalidated) {
+                                                        onMenuInvalidated();
+                                                    }
+                                                }];
+        iconImage = syncImage ? syncImage : [RNSStackHeaderIconResolver placeholderImageForIcon:data.icon];
+    }
+
     UIAction *toggleAction = [UIAction
         actionWithTitle:data.title
-                  image:nil
+                  image:iconImage
              identifier:nil
                 handler:^(__kindof UIAction *_Nonnull action) {
                     NSArray<NSString *> *toggleItemsIds = insideSingleSelection
@@ -164,8 +200,8 @@
                         [tracker setToggleStateChanged:NO];
                     }
 
-                    if (onMenuToggle) {
-                        onMenuToggle();
+                    if (onMenuInvalidated) {
+                        onMenuInvalidated();
                     }
                 }];
     toggleAction.state = isItemToggledOn ? UIMenuElementStateOn : UIMenuElementStateOff;
@@ -177,11 +213,25 @@
 
 + (nullable UIMenuElement *)buildActionFromData:(RNSStackHeaderMenuItemData *)data
                          withHeaderEventsDelegate:(id<RNSStackHeaderEventsDelegate>)delegate
+                                withImageLoader:(id<RNSImageLoading>)imageLoader
+                        menuInvalidatedCallback:(nullable void (^)(void))onMenuInvalidated
 {
     __weak id<RNSStackHeaderEventsDelegate> weakDelegate = delegate;
 
+    UIImage *iconImage = nil;
+    if (data.icon != nil) {
+        UIImage *syncImage = [RNSStackHeaderIconResolver resolveIcon:data.icon
+                                                     withImageLoader:imageLoader
+                                                asyncCompletionBlock:^(UIImage *_Nullable image) {
+                                                    if (onMenuInvalidated) {
+                                                        onMenuInvalidated();
+                                                    }
+                                                }];
+        iconImage = syncImage ? syncImage : [RNSStackHeaderIconResolver placeholderImageForIcon:data.icon];
+    }
+
     UIAction *action = [UIAction actionWithTitle:data.title
-                                           image:nil
+                                           image:iconImage
                                       identifier:nil
                                          handler:^(__kindof UIAction *_Nonnull action) {
                                              [weakDelegate didPressMenuItem:data.menuElementId];

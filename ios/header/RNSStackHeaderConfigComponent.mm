@@ -1,4 +1,5 @@
 #import "RNSStackHeaderConfigComponent.h"
+#import "RNSImageLoadingHelper.h"
 #import "RNSShadowStateProxy.h"
 #import "RNSStackHeaderConfigEventEmitter.h"
 #import "RNSStackHeaderItemComponent.h"
@@ -68,6 +69,26 @@ static void RNSAssertIsValidHeaderChild(id child)
     return YES;
 }
 
+#pragma mark - RNSImageLoading
+
+// Adaptation: RNS resolves an RCTImageSource from the RN asset object and
+// loads it through RCTImageLoader obtained from the shadow-node state; on
+// Lynx the source is a plain { uri } dictionary loaded through the shared
+// LynxImageLoader, so no loader instance is plumbed through state.
+- (void)loadImageFromJsonSource:(NSDictionary *)jsonSource
+                     asTemplate:(BOOL)isTemplate
+         withCompletionCallback:(void (^)(UIImage *_Nullable image))completionBlock
+{
+    NSString *uri = jsonSource[@"uri"];
+    if (![uri isKindOfClass:[NSString class]] || uri.length == 0) {
+        LLogError(@"[RNScreens] Expected nonnil image source");
+        completionBlock(nil);
+        return;
+    }
+
+    [RNSImageLoadingHelper loadImageFromURI:uri asTemplate:isTemplate completionBlock:completionBlock];
+}
+
 #pragma mark - UIView lifecycle
 
 - (void)viewDidMoveToWindow
@@ -78,12 +99,14 @@ static void RNSAssertIsValidHeaderChild(id child)
         coordinator.configDataProvider = self;
         coordinator.frameChangeDelegate = self;
         coordinator.eventsDelegate = self;
+        coordinator.imageLoader = self;
         [coordinator rebuild];
     } else {
         RNSStackScreenHeaderCoordinator *coordinator = [self headerCoordinator];
         coordinator.configDataProvider = nil;
         coordinator.frameChangeDelegate = nil;
         coordinator.eventsDelegate = nil;
+        coordinator.imageLoader = nil;
     }
 }
 
@@ -126,7 +149,7 @@ static void RNSAssertIsValidHeaderChild(id child)
 - (void)headerItemDidInvalidateWithId:(NSString *)itemId
 {
     if (itemId == nil) {
-        LLogInfo(@"[RNScreens] headerItemDidInvalidateWithId called with nil id, will run full header rebuild");
+        LLogWarn(@"[RNScreens] headerItemDidInvalidateWithId called with nil id, will run full header rebuild");
         [[self headerCoordinator] rebuild];
         return;
     }
@@ -136,7 +159,7 @@ static void RNSAssertIsValidHeaderChild(id child)
 - (void)headerItemMenuDidChangeWithId:(NSString *)itemId
 {
     if (itemId == nil) {
-        LLogInfo(@"[RNScreens] headerItemMenuDidChangeWithId called with nil id, will run full header rebuild");
+        LLogWarn(@"[RNScreens] headerItemMenuDidChangeWithId called with nil id, will run full header rebuild");
         [[self headerCoordinator] rebuild];
         return;
     }

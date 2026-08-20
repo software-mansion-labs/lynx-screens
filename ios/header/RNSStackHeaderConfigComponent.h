@@ -3,6 +3,7 @@
 #import <Lynx/LynxUI.h>
 #import <UIKit/UIKit.h>
 
+#import "RNSImageLoading.h"
 #import "RNSStackHeaderConfigDataProviding.h"
 #import "RNSStackHeaderConfigView.h"
 #import "RNSStackHeaderEventsDelegate.h"
@@ -25,7 +26,8 @@ NS_ASSUME_NONNULL_BEGIN
 @interface RNSStackHeaderConfigComponent : LynxUI <RNSStackHeaderConfigView *> <RNSViewFrameChangeDelegate,
                                                                                 RNSStackHeaderConfigDataProviding,
                                                                                 RNSStackHeaderItemInvalidationDelegate,
-                                                                                RNSStackHeaderEventsDelegate>
+                                                                                RNSStackHeaderEventsDelegate,
+                                                                                RNSImageLoading>
 
 @property (nonatomic, readonly, nullable) NSString *title;
 @property (nonatomic, readonly, nullable) NSString *subtitle;

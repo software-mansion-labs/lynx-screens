@@ -33,6 +33,9 @@ export type {
   StackHeaderToolbarMenuItemTypeAndroid,
   PlatformIconShared,
   PlatformIconAndroid,
+  PlatformIconIOS,
+  PlatformIconIOSSfSymbol,
+  PlatformIconIOSXcasset,
   // iOS
   StackHeaderConfigPropsIOS,
   StackHeaderInlineItemIOS,
