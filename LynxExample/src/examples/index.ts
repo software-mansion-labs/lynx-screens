@@ -16,6 +16,7 @@ export { default as TestStackSubviewsAndroid } from './TestStackSubviewsAndroid'
 export { default as TestStackSubviewsIOS } from './TestStackSubviewsIOS';
 export { default as TestStackHeaderMenuIOS } from './TestStackHeaderMenuIOS';
 export { default as TestStackHeaderIconIOS } from './TestStackHeaderIconIOS';
+export { default as TestStackHeaderMenuOptionsIOS } from './TestStackHeaderMenuOptionsIOS';
 export { default as TestStackHeaderSubviewOnpressIOS } from './TestStackHeaderSubviewOnpressIOS';
 export { default as TestStackHeaderSelectiveUpdatesIOS } from './TestStackHeaderSelectiveUpdatesIOS';
 export { default as TestPreventNativeDismissSingleStack } from './TestPreventNativeDismissSingleStack';
