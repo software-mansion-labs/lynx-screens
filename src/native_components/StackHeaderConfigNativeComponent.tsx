@@ -22,6 +22,7 @@ import type {
   StackHeaderToolbarMenuItemAndroid,
   StackHeaderToolbarMenuItemBaseAndroid,
   StackHeaderToolbarMenuElementOptionsAndroid,
+  StackHeaderToolbarMenuElementUpdateAndroid,
   StackHeaderTypeAndroid,
   SupportsMenuIOS,
 } from '../types/StackHeaderConfig.js';
@@ -290,7 +291,7 @@ function useHeaderConfigRef(forwardedRef: Ref<StackHeaderConfigRef>) {
 
   useImperativeHandle(forwardedRef, () => ({
     android: {
-      setToolbarMenuElementOptions: (id, options) => {
+      updateToolbarMenuElements: (updates) => {
         if (!ref.current) {
           console.warn(
             '[RNScreens] Reference to native header config component has not been updated yet.',
@@ -298,14 +299,23 @@ function useHeaderConfigRef(forwardedRef: Ref<StackHeaderConfigRef>) {
           return;
         }
 
+        const updatesArray: StackHeaderToolbarMenuElementUpdateAndroid[] =
+          Array.isArray(updates) ? updates : [updates];
+
+        const nativeUpdates = updatesArray.map(({ id, options }) => ({
+          id,
+          ...parseToolbarMenuElementOptionsToParams(options),
+        }));
+
         // RNS dispatches a Fabric view command here; the Lynx counterpart is
-        // a UI method invocation through the NodesRef.
+        // a UI method invocation through the NodesRef. NodesRef.invoke takes a
+        // single params map, so the batch array travels under the "updates"
+        // key.
         ref.current
           .invoke({
-            method: 'setToolbarMenuElementOptions',
+            method: 'updateToolbarMenuElements',
             params: {
-              id,
-              options: parseToolbarMenuElementOptionsToParams(options),
+              updates: nativeUpdates,
             },
           })
           .exec();
