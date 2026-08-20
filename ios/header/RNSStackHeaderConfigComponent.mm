@@ -317,6 +317,17 @@ LYNX_PROP_SETTER("backButtonHidden", setBackButtonHidden, BOOL) {}
         if ([item.view pointInside:itemPoint withEvent:event]) {
             return item;
         }
+        // Counterpart of RNS's custom header hitTest that probes the item's
+        // child views directly (in RNS the react subviews' hitTest honors
+        // hitSlop): a point outside the item bounds may still fall within a
+        // child's hit-slop, so probe the Lynx children with their
+        // hit-slop-aware containsPoint.
+        for (LynxUI *itemChild in [item.children reverseObjectEnumerator]) {
+            CGPoint childPoint = [referenceView convertPoint:point toView:itemChild.view];
+            if ([itemChild containsPoint:childPoint]) {
+                return item;
+            }
+        }
     }
     return nil;
 }

@@ -11,9 +11,11 @@ import { StackContainer } from '../components/StackContainer';
 import { useStackNavigationContext } from '../hooks/useStackNavigationContext';
 
 // Port of RNS single-feature-tests/stack-v5/test-stack-subviews-ios.
-// Adaptations: hitSlop / pressRetentionOffset controls are dropped (RN
-// Pressable-specific; no Lynx counterpart), PressableWithFeedback is replaced
-// with a touch-feedback view built on Lynx touch events.
+// Adaptations: hitSlop maps to Lynx's `hit-slop` attribute;
+// pressRetentionOffset is dropped (RN Pressable-specific; no Lynx
+// counterpart), PressableWithFeedback is replaced with a touch-feedback view
+// built on Lynx touch events. RNS's key-based remount hack is not needed -
+// the `hit-slop` prop updates at runtime on Lynx.
 
 const SHORT_TITLE = 'Title';
 const LONG_TITLE = 'A quick brown fox jumped over the lazy dog';
@@ -21,19 +23,23 @@ const LONG_TITLE = 'A quick brown fox jumped over the lazy dog';
 const TITLE_OPTIONS = ['short', 'long', 'view'] as const;
 const LARGE_TITLE_OPTIONS = ['none', 'short', 'long'] as const;
 const LARGE_SUBTITLE_OPTIONS = ['none', 'short', 'long', 'view'] as const;
+const HIT_SLOP_VALUES = ['0', '10', '30'] as const;
 
 type TitleOption = (typeof TITLE_OPTIONS)[number];
 type LargeTitleOption = (typeof LARGE_TITLE_OPTIONS)[number];
 type LargeSubtitleOption = (typeof LARGE_SUBTITLE_OPTIONS)[number];
+type HitSlopValue = (typeof HIT_SLOP_VALUES)[number];
 
 function PressableWithFeedback({
   onTap,
   width,
   height,
+  hitSlop,
 }: {
   onTap?: (() => void) | undefined;
   width: number;
   height: number;
+  hitSlop?: HitSlopValue | undefined;
 }) {
   const [pressed, setPressed] = useState(false);
 
@@ -45,6 +51,7 @@ function PressableWithFeedback({
         backgroundColor: pressed ? '#7986cb' : '#3f51b5',
         borderRadius: '4px',
       }}
+      hit-slop={`${hitSlop ?? '0'}px`}
       bindtouchstart={() => setPressed(true)}
       bindtouchend={() => setPressed(false)}
       bindtouchcancel={() => setPressed(false)}
@@ -53,12 +60,13 @@ function PressableWithFeedback({
   );
 }
 
-function ResizingItem() {
+function ResizingItem({ hitSlop }: { hitSlop: HitSlopValue }) {
   const [large, setLarge] = useState(false);
 
   return (
     <PressableWithFeedback
       onTap={() => setLarge((lg) => !lg)}
+      hitSlop={hitSlop}
       width={large ? 60 : 20}
       height={large ? 30 : 20}
     />
@@ -83,6 +91,7 @@ interface Config {
   trailingItemsCount: number;
   title: TitleOption;
   subtitle: TitleOption;
+  hitSlop: HitSlopValue;
 }
 
 function resolveTitle(
@@ -115,6 +124,7 @@ const DEFAULT_CONFIG: Config = {
   trailingItemsCount: 2,
   title: 'short',
   subtitle: 'short',
+  hitSlop: '0',
 };
 
 function buildHeaderConfig(config: Config): StackHeaderConfigProps | undefined {
@@ -129,7 +139,7 @@ function buildHeaderConfig(config: Config): StackHeaderConfigProps | undefined {
   }).map((_, i) => ({
     type: 'item',
     id: `leading-${i}`,
-    render: () => <ResizingItem />,
+    render: () => <ResizingItem hitSlop={config.hitSlop} />,
   }));
   if (leadingItems.length > 1) {
     leadingItems.splice(1, 0, {
@@ -145,7 +155,7 @@ function buildHeaderConfig(config: Config): StackHeaderConfigProps | undefined {
   > = Array.from({ length: config.trailingItemsCount }).map((_, i) => ({
     type: 'item',
     id: `trailing-${i}`,
-    render: () => <ResizingItem />,
+    render: () => <ResizingItem hitSlop={config.hitSlop} />,
   }));
   if (trailingItems.length > 1) {
     trailingItems.splice(1, 0, {
@@ -279,6 +289,12 @@ function ConfigScreen() {
           value={config.largeSubtitle}
           items={[...LARGE_SUBTITLE_OPTIONS]}
           onValueChange={(v) => updateConfig('largeSubtitle', v)}
+        />
+        <SettingsPicker<HitSlopValue>
+          label="hit slop"
+          value={config.hitSlop}
+          items={[...HIT_SLOP_VALUES]}
+          onValueChange={(v) => updateConfig('hitSlop', v)}
         />
         <SettingsButton
           label={`Toggle leading items count (${config.leadingItemsCount}/3)`}
