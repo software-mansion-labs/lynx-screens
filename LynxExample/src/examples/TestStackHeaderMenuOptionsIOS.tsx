@@ -16,6 +16,8 @@ const CONTENT_PADDING_TOP = SystemInfo.platform === 'iOS' ? '120px' : '16px';
 function buildHeaderConfig(
   displayInline: boolean,
   nestedDisplayInline: boolean,
+  displayAsPalette: boolean,
+  paletteDisplayInline: boolean,
 ): StackHeaderConfigProps {
   return {
     title: 'Menu Options',
@@ -117,6 +119,68 @@ function buildHeaderConfig(
             ],
           },
         },
+        {
+          type: 'spacer',
+          id: 'palette-spacer',
+          sizing: 'flexible',
+        },
+        {
+          type: 'item',
+          id: 'palette-button',
+          title: 'Palette',
+          icon: { type: 'sfSymbol', name: 'paintpalette' },
+          menu: {
+            type: 'menu',
+            id: 'palette-root',
+            children: [
+              {
+                id: 'palette-submenu',
+                type: 'menu',
+                title: 'Text Style',
+                displayAsPalette,
+                displayInline: paletteDisplayInline,
+                icon: { type: 'sfSymbol', name: 'textformat' },
+                children: [
+                  {
+                    id: 'style-bold',
+                    type: 'menuItem',
+                    itemType: 'action',
+                    title: 'Bold',
+                    icon: { type: 'sfSymbol', name: 'bold' },
+                  },
+                  {
+                    id: 'style-italic',
+                    type: 'menuItem',
+                    itemType: 'action',
+                    title: 'Italic',
+                    icon: { type: 'sfSymbol', name: 'italic' },
+                  },
+                  {
+                    id: 'style-underline',
+                    type: 'menuItem',
+                    itemType: 'action',
+                    title: 'Underline',
+                    icon: { type: 'sfSymbol', name: 'underline' },
+                  },
+                  {
+                    id: 'style-strikethrough',
+                    type: 'menuItem',
+                    itemType: 'action',
+                    title: 'Strikethrough',
+                    icon: { type: 'sfSymbol', name: 'strikethrough' },
+                  },
+                ],
+              },
+              {
+                id: 'palette-action-reset',
+                type: 'menuItem',
+                itemType: 'action',
+                title: 'Reset Formatting',
+                icon: { type: 'sfSymbol', name: 'clear' },
+              },
+            ],
+          },
+        },
       ],
     },
   };
@@ -126,11 +190,24 @@ function ConfigScreen() {
   const navigation = useStackNavigationContext();
   const [displayInline, setDisplayInline] = useState(false);
   const [nestedDisplayInline, setNestedDisplayInline] = useState(false);
+  const [displayAsPalette, setDisplayAsPalette] = useState(false);
+  const [paletteDisplayInline, setPaletteDisplayInline] = useState(false);
 
   const { setRouteOptions, routeKey } = navigation;
   const headerConfig = useMemo(
-    () => buildHeaderConfig(displayInline, nestedDisplayInline),
-    [displayInline, nestedDisplayInline],
+    () =>
+      buildHeaderConfig(
+        displayInline,
+        nestedDisplayInline,
+        displayAsPalette,
+        paletteDisplayInline,
+      ),
+    [
+      displayInline,
+      nestedDisplayInline,
+      displayAsPalette,
+      paletteDisplayInline,
+    ],
   );
 
   useLayoutEffect(() => {
@@ -152,6 +229,10 @@ function ConfigScreen() {
           gap: '6px',
         }}
       >
+        <text style={{ color: 'black', fontSize: '15px' }}>
+          To test displayInline (iOS 17.0+) try different combinations with
+          nested menus:
+        </text>
         <SettingsButton
           label={`displayInline (Sort By): ${displayInline}`}
           onTap={() => setDisplayInline((prev) => !prev)}
@@ -159,6 +240,17 @@ function ConfigScreen() {
         <SettingsButton
           label={`displayInline (Rating): ${nestedDisplayInline}`}
           onTap={() => setNestedDisplayInline((prev) => !prev)}
+        />
+        <text style={{ color: 'black', fontSize: '15px' }}>
+          displayAsPalette works best combined with displayInline:
+        </text>
+        <SettingsButton
+          label={`displayAsPalette (Text Style): ${displayAsPalette}`}
+          onTap={() => setDisplayAsPalette((prev) => !prev)}
+        />
+        <SettingsButton
+          label={`displayInline (Text Style): ${paletteDisplayInline}`}
+          onTap={() => setPaletteDisplayInline((prev) => !prev)}
         />
         <LongText paragraphs={4} />
       </view>

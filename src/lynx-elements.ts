@@ -31,6 +31,7 @@ declare module "@lynx-js/types" {
     singleSelection?: boolean | undefined;
     icon?: StackHeaderIconIOSAttr | undefined;
     displayInline?: boolean | undefined;
+    displayAsPalette?: boolean | undefined;
     children: (StackHeaderMenuAttr | StackHeaderMenuItemAttr)[];
   };
 
