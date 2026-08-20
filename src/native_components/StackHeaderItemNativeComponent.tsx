@@ -40,6 +40,7 @@ type StackHeaderMenuAttr = {
   title?: string | undefined;
   singleSelection?: boolean | undefined;
   icon?: PlatformIconIOS | undefined;
+  displayInline?: boolean | undefined;
   children: (StackHeaderMenuAttr | StackHeaderMenuItemAttr)[];
 };
 
@@ -60,6 +61,7 @@ function parseMenuElementToAttr(
       title: element.title,
       singleSelection: element.singleSelection,
       icon: element.icon,
+      displayInline: element.displayInline,
       children: element.children.map(parseMenuElementToAttr),
     };
   }

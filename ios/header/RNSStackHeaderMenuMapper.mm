@@ -2,7 +2,7 @@
 #import "RNSStackHeaderIconMapper.h"
 
 static NSSet<NSString *> *const kRNSAllowedMenuKeys =
-    [NSSet setWithObjects:@"id", @"type", @"title", @"children", @"singleSelection", @"icon", nil];
+    [NSSet setWithObjects:@"id", @"type", @"title", @"children", @"singleSelection", @"displayInline", @"icon", nil];
 static NSSet<NSString *> *const kRNSAllowedMenuItemKeys = [NSSet
     setWithObjects:@"id", @"type", @"title", @"itemType", @"initialToggleState", @"keepsMenuPresented", @"icon", nil];
 
@@ -33,12 +33,14 @@ static NSSet<NSString *> *const kRNSAllowedMenuItemKeys = [NSSet
     }
 
     BOOL singleSelection = [self boolForKey:@"singleSelection" in:dict];
+    BOOL displayInline = [self boolForKey:@"displayInline" in:dict];
 
     RNSStackHeaderIconData *icon = [RNSStackHeaderIconMapper iconFromDictionary:dict[@"icon"]];
 
     return [[RNSStackHeaderMenuData alloc] initWithId:[self stringForKey:@"id" in:dict]
                                                 title:[self stringForKey:@"title" in:dict]
                                       singleSelection:singleSelection
+                                        displayInline:displayInline
                                              children:children
                                                  icon:icon];
 }
