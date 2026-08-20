@@ -1,12 +1,9 @@
 package com.lynxscreens.screens.header.config
 
-import com.lynxscreens.screens.header.toolbar.StackHeaderToolbarMenuElementOptions
+import com.lynxscreens.screens.header.toolbar.StackHeaderToolbarMenuElementUpdate
 
 internal interface StackHeaderConfigurationObserver {
     fun onConfigChanged(config: StackHeaderConfigurationProviding)
 
-    fun onMenuElementUpdated(
-        id: String,
-        options: StackHeaderToolbarMenuElementOptions,
-    )
+    fun onMenuElementsUpdated(updates: List<StackHeaderToolbarMenuElementUpdate>)
 }

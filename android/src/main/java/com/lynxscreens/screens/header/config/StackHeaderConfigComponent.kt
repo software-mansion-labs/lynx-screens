@@ -19,12 +19,15 @@ import com.lynxscreens.screens.header.subview.OnStackHeaderSubviewChangeListener
 import com.lynxscreens.screens.header.subview.StackHeaderSubviewComponent
 import com.lynxscreens.screens.header.subview.StackHeaderSubviewType
 import com.lynxscreens.screens.header.toolbar.StackHeaderToolbarMenuConfig
+import com.lynxscreens.screens.header.toolbar.StackHeaderToolbarMenuElementRawUpdate
+import com.lynxscreens.screens.header.toolbar.StackHeaderToolbarMenuIconResolver
 import com.lynxscreens.screens.header.toolbar.StackHeaderToolbarMenuItemIconSource
-import com.lynxscreens.screens.header.toolbar.StackHeaderToolbarMenuElementOptions
 import com.lynxscreens.screens.header.toolbar.StackHeaderToolbarMenuMapper
-import com.lynxscreens.screens.header.toolbar.StackHeaderToolbarUpdate
+import com.lynxscreens.screens.header.toolbar.StackHeaderToolbarMenuUpdateQueue
+import com.lynxscreens.screens.header.toolbar.StackHeaderToolbarFieldUpdate
 import com.lynxscreens.screens.helpers.IconResolution
-import com.lynxscreens.screens.helpers.IconResolver
+import com.lynxscreens.screens.helpers.PropIconResolver
+import com.lynxscreens.screens.helpers.resolveImage
 import java.lang.IllegalArgumentException
 import java.lang.ref.WeakReference
 import kotlin.properties.Delegates
@@ -178,7 +181,7 @@ internal class StackHeaderConfigComponent(
     // Resolution happens in resolveBackButtonIconIfNeeded(), called from onPropsUpdated.
     internal var backButtonDrawableIconResourceName: String? = null
     internal var backButtonImageIconUri: String? = null
-    private val backButtonIconResolver = IconResolver()
+    private val backButtonIconResolver = PropIconResolver()
 
     internal fun resolveBackButtonIconIfNeeded() {
         backButtonIconResolver.resolve(
@@ -204,20 +207,18 @@ internal class StackHeaderConfigComponent(
 
     internal var toolbarMenuItemIconSourceMap = mapOf<String, StackHeaderToolbarMenuItemIconSource>()
 
-    private var toolbarMenuItemIconResolvers = mapOf<String, IconResolver>()
+    private var toolbarMenuItemIconResolvers = mapOf<String, PropIconResolver>()
 
-    // Last resolved icon per menu item id. Unlike every other field on this config — which
-    // mirrors a single prop — this cache deliberately merges resolved icons from BOTH sources
-    // that can set a menu item icon: the `toolbarMenu` prop
-    // (resolveToolbarMenuItemIconsIfNeeded) and the imperative `setToolbarMenuElementOptions`
-    // UI method (dispatchMenuElementUpdate). It is necessary to ensure consistency.
+    // Last resolved icon per menu item id, from the `toolbarMenu` prop path only
+    // (resolveToolbarMenuItemIconsIfNeeded). Command (`updateToolbarMenuElements`) icons are applied
+    // directly to the live toolbar and are intentionally NOT stored here.
     private var toolbarMenuItemIcons = mapOf<String, Drawable?>()
 
     internal fun resolveToolbarMenuItemIconsIfNeeded() {
-        val nextResolvers = mutableMapOf<String, IconResolver>()
+        val nextResolvers = mutableMapOf<String, PropIconResolver>()
 
         toolbarMenuItemIconSourceMap.forEach { (id, source) ->
-            val resolver = toolbarMenuItemIconResolvers[id] ?: IconResolver()
+            val resolver = toolbarMenuItemIconResolvers[id] ?: PropIconResolver()
             nextResolvers[id] = resolver
 
             resolver.resolve(
@@ -386,41 +387,45 @@ internal class StackHeaderConfigComponent(
     // region Imperative menu item commands
 
     /**
-     * Applies a toolbar menu item UI-method update. When the update does not touch the icon
-     * ([iconSource] is `null`) the options are delivered immediately. Otherwise, the icon is
-     * resolved first and all options — including the icon — are delivered together in a single
-     * update, so the change is applied atomically once the (possibly async) image has loaded.
+     * Resolves a single command's icon. Unlike the `toolbarMenu` prop path,
+     * this does NOT go through the stateful per-id [PropIconResolver] (whose
+     * drop-stale async guard could leave the queue waiting forever - the queue
+     * requires that [StackHeaderToolbarMenuIconResolver.resolve] always calls
+     * [onResolved] even if the image loading results in failure; see
+     * [StackHeaderToolbarMenuIconResolver] and
+     * [StackHeaderToolbarMenuUpdateQueue] for more details) and does NOT touch
+     * the prop icon cache: it resolves the source with an always-completing
+     * [resolveImage] and forwards the result to the queue, which applies it to
+     * the live toolbar. Ordering across commands is guaranteed by the queue, so
+     * no drop-stale is needed here; a failed or empty source resolves to `null`
+     * -> Reset (the icon is cleared) rather than stalling the queue.
      */
-    internal fun dispatchMenuElementUpdate(
-        id: String,
-        options: StackHeaderToolbarMenuElementOptions,
-        iconSource: StackHeaderToolbarMenuItemIconSource?,
-    ) {
-        if (iconSource == null) {
-            configObserver?.onMenuElementUpdated(id, options)
-            return
+    private val commandIconResolver =
+        StackHeaderToolbarMenuIconResolver { iconSource, onResolved ->
+            resolveImage(
+                lynxContext,
+                iconSource.drawableIconResourceName,
+                iconSource.imageIconUri,
+            ) { drawable ->
+                onResolved(StackHeaderToolbarFieldUpdate.from(drawable))
+            }
         }
 
-        val resolver = toolbarMenuItemIconResolvers[id]
-        if (resolver == null) {
-            Log.w(TAG, "[RNScreens] Unable to find icon resolver for menu element $id.")
-            configObserver?.onMenuElementUpdated(id, options)
-            return
-        }
+    // Serializes `updateToolbarMenuElements` batches and waits for every icon in a batch to
+    // resolve before applying it, so each batch is applied atomically and in order.
+    private val menuUpdateQueue =
+        StackHeaderToolbarMenuUpdateQueue(
+            iconResolver = commandIconResolver,
+            delegate = { updates -> configObserver?.onMenuElementsUpdated(updates) },
+        )
 
-        resolver.resolve(lynxContext, iconSource.drawableIconResourceName, iconSource.imageIconUri) { result ->
-            val icon =
-                when (result) {
-                    IconResolution.Unchanged -> null // keep the current icon
-                    is IconResolution.Resolved -> {
-                        // Keep the cache in sync with the prop-array path: both share this
-                        // id's resolver.
-                        toolbarMenuItemIcons = toolbarMenuItemIcons + (id to result.drawable)
-                        StackHeaderToolbarUpdate.from(result.drawable)
-                    }
-                }
-            configObserver?.onMenuElementUpdated(id, options.copy(icon = icon))
-        }
+    /**
+     * Enqueues a batch of toolbar menu element UI method calls. The batch is processed only
+     * after any earlier batch has been fully applied, and is applied atomically once all of
+     * its icons (if any) have resolved — see [StackHeaderToolbarMenuUpdateQueue].
+     */
+    internal fun dispatchMenuElementUpdates(updates: List<StackHeaderToolbarMenuElementRawUpdate>) {
+        menuUpdateQueue.enqueue(updates)
     }
 
     // endregion
@@ -481,6 +486,7 @@ internal class StackHeaderConfigComponent(
     }
 
     internal fun tearDown() {
+        menuUpdateQueue.tearDown()
         invalidationFlags = StackHeaderInvalidationFlags.NONE
         configObserver = null
         isFlushScheduled = false
@@ -587,28 +593,41 @@ internal class StackHeaderConfigComponent(
         toolbarMenuItemIconSourceMap = iconSources
     }
 
-    // The Lynx counterpart of RNS's setToolbarMenuElementOptions view command,
-    // invoked via NodesRef.invoke from JS.
+    // The Lynx counterpart of RNS's updateToolbarMenuElements view command,
+    // invoked via NodesRef.invoke from JS. Adaptation: NodesRef.invoke passes a
+    // single params map, so the batch array arrives under the "updates" key
+    // (RNS's codegen command takes the array directly).
     @LynxUIMethod
-    fun setToolbarMenuElementOptions(
+    fun updateToolbarMenuElements(
         params: ReadableMap,
         callback: Callback,
     ) {
-        val id = params.getString("id")
-        if (id == null) {
+        val updates = params.getArray("updates")
+        if (updates == null) {
             callback.invoke(LynxUIMethodConstants.PARAM_INVALID)
             return
         }
-        val options = params.getMap("options")
-        if (options == null) {
-            callback.invoke(LynxUIMethodConstants.PARAM_INVALID)
-            return
+        val parsed = ArrayList<StackHeaderToolbarMenuElementRawUpdate>(updates.size())
+        for (i in 0 until updates.size()) {
+            val map = updates.getMap(i)
+            if (map == null) {
+                Log.w(TAG, "[RNScreens] Skipping toolbar menu update at index $i: not an object.")
+                continue
+            }
+            val id = map.getString("id")
+            if (id == null) {
+                Log.w(TAG, "[RNScreens] Skipping toolbar menu update at index $i: missing 'id'.")
+                continue
+            }
+            parsed.add(
+                StackHeaderToolbarMenuElementRawUpdate(
+                    id,
+                    StackHeaderToolbarMenuMapper.parseMenuElementOptions(map),
+                    StackHeaderToolbarMenuMapper.parseMenuElementIconSource(map),
+                ),
+            )
         }
-        dispatchMenuElementUpdate(
-            id,
-            StackHeaderToolbarMenuMapper.parseMenuElementOptions(options),
-            StackHeaderToolbarMenuMapper.parseMenuElementIconSource(options),
-        )
+        dispatchMenuElementUpdates(parsed)
         callback.invoke(LynxUIMethodConstants.SUCCESS)
     }
 
