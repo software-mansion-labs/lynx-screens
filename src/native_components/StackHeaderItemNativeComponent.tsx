@@ -28,6 +28,7 @@ type StackHeaderMenuItemAttr = {
   title?: string | undefined;
   itemType?: 'action' | 'toggle' | 'automatic' | undefined;
   initialToggleState?: boolean | undefined;
+  keepsMenuPresented?: boolean | undefined;
 };
 
 type StackHeaderMenuAttr = {
@@ -62,6 +63,7 @@ function parseMenuElementToAttr(
     title: element.title,
     itemType: element.itemType,
     initialToggleState: element.initialToggleState,
+    keepsMenuPresented: element.keepsMenuPresented,
   };
 }
 

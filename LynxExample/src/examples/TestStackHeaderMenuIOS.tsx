@@ -59,6 +59,7 @@ function PressableWithFeedback({
 function buildHeaderConfig(
   trailingItemsCount: number,
   showClicked: (text: string) => void,
+  keepsMenuPresented: boolean,
 ): StackHeaderConfigProps {
   const trailingItems: NonNullable<
     NonNullable<StackHeaderConfigProps['ios']>['trailingItems']
@@ -81,6 +82,7 @@ function buildHeaderConfig(
           type: 'menuItem',
           itemType: 'action',
           title: `Action ${i}-1`,
+          keepsMenuPresented,
           onPress: () => showClicked(`Clicked Action ${i}-1`),
         },
         {
@@ -88,18 +90,21 @@ function buildHeaderConfig(
           type: 'menuItem',
           itemType: 'toggle',
           title: `Toggle ${i}-1`,
+          keepsMenuPresented,
         },
         {
           id: `toggle-${i}-2`,
           type: 'menuItem',
           itemType: 'toggle',
           title: `Toggle ${i}-2`,
+          keepsMenuPresented,
         },
         {
           id: `toggle-${i}-3`,
           type: 'menuItem',
           itemType: 'toggle',
           title: `Toggle ${i}-3`,
+          keepsMenuPresented,
         },
         {
           id: `submenu-${i}`,
@@ -151,6 +156,7 @@ function ConfigScreen() {
   const [trailingItemsCount, setTrailingItemsCount] = useState<number>(
     DEFAULT_TRAILING_ITEMS_COUNT,
   );
+  const [keepsMenuPresented, setKeepsMenuPresented] = useState(false);
   const [lastClicked, setLastClicked] = useState<string | null>(null);
 
   const showClicked = useCallback(
@@ -160,8 +166,8 @@ function ConfigScreen() {
 
   const { setRouteOptions, routeKey } = navigation;
   const headerConfig = useMemo(
-    () => buildHeaderConfig(trailingItemsCount, showClicked),
-    [trailingItemsCount, showClicked],
+    () => buildHeaderConfig(trailingItemsCount, showClicked, keepsMenuPresented),
+    [trailingItemsCount, showClicked, keepsMenuPresented],
   );
 
   useLayoutEffect(() => {
@@ -186,6 +192,10 @@ function ConfigScreen() {
         <SettingsButton
           label={`Toggle trailing items count (${trailingItemsCount}/4)`}
           onTap={() => setTrailingItemsCount((count) => (count + 1) % 5)}
+        />
+        <SettingsButton
+          label={`keepsMenuPresented: ${keepsMenuPresented}`}
+          onTap={() => setKeepsMenuPresented((prev) => !prev)}
         />
         <text style={{ color: 'black', fontSize: '15px' }}>
           Last clicked: {lastClicked ?? '—'}
