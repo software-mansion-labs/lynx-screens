@@ -50,6 +50,7 @@ declare module "@lynx-js/types" {
     title?: string | undefined;
     titleCondensed?: string | undefined;
     tooltipText?: string | undefined;
+    accessibilityLabel?: string | undefined;
     hidden?: boolean | undefined;
     disabled?: boolean | undefined;
     showAsAction?:
