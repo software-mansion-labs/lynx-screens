@@ -10,6 +10,7 @@ import type {
   StackHeaderToolbarMenuElementAndroid,
   StackHeaderToolbarMenuElementOptionsAndroid,
 } from 'lynx-screens';
+import { ScrollViewMarker } from 'lynx-screens';
 import {
   Heading,
   SettingsButton,
@@ -172,43 +173,45 @@ function MainScreen() {
   }, [cmdTargetId, cmdTitle, cmdHidden]);
 
   return (
-    <scroll-view
-      style={{ width: '100%', height: '100%', backgroundColor: 'white' }}
-    >
-      <view style={{ padding: '10px', paddingBottom: '50px', gap: '6px' }}>
-        <Heading label="Send Command" />
-        <SettingsPicker<IdOption>
-          label="target id"
-          value={cmdTargetId}
-          items={ID_OPTIONS}
-          onValueChange={setCmdTargetId}
-        />
-        <SettingsPicker<CmdTitleOption>
-          label="title"
-          value={cmdTitle}
-          items={CMD_TITLE_OPTIONS}
-          onValueChange={setCmdTitle}
-        />
-        <SettingsPicker<CmdHiddenOption>
-          label="hidden"
-          value={cmdHidden}
-          items={CMD_HIDDEN_OPTIONS}
-          onValueChange={setCmdHidden}
-        />
-        <SettingsButton label="Send Command" onTap={sendCommand} />
+    <ScrollViewMarker style={{ width: '100%', height: '100%' }}>
+      <scroll-view
+        style={{ width: '100%', height: '100%', backgroundColor: 'white' }}
+      >
+        <view style={{ padding: '10px', paddingBottom: '50px', gap: '6px' }}>
+          <Heading label="Send Command" />
+          <SettingsPicker<IdOption>
+            label="target id"
+            value={cmdTargetId}
+            items={ID_OPTIONS}
+            onValueChange={setCmdTargetId}
+          />
+          <SettingsPicker<CmdTitleOption>
+            label="title"
+            value={cmdTitle}
+            items={CMD_TITLE_OPTIONS}
+            onValueChange={setCmdTitle}
+          />
+          <SettingsPicker<CmdHiddenOption>
+            label="hidden"
+            value={cmdHidden}
+            items={CMD_HIDDEN_OPTIONS}
+            onValueChange={setCmdHidden}
+          />
+          <SettingsButton label="Send Command" onTap={sendCommand} />
 
-        <Heading label="Result" />
-        <text style={{ color: 'black', fontSize: '15px' }}>
-          Last clicked: {lastClicked ?? '—'}
-        </text>
+          <Heading label="Result" />
+          <text style={{ color: 'black', fontSize: '15px' }}>
+            Last clicked: {lastClicked ?? '—'}
+          </text>
 
-        <Heading label="Menu Items — Props" />
-        <SlotControls
-          slots={slots}
-          updateSlot={(i, patch) => applySlots(updateSlotAt(slots, i, patch))}
-        />
-      </view>
-    </scroll-view>
+          <Heading label="Menu Items — Props" />
+          <SlotControls
+            slots={slots}
+            updateSlot={(i, patch) => applySlots(updateSlotAt(slots, i, patch))}
+          />
+        </view>
+      </scroll-view>
+    </ScrollViewMarker>
   );
 }
 

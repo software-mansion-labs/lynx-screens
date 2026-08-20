@@ -12,6 +12,7 @@ import type {
   StackHeaderToolbarMenuElementAndroid,
   StackHeaderToolbarMenuElementOptionsAndroid,
 } from 'lynx-screens';
+import { ScrollViewMarker } from 'lynx-screens';
 import searchIcon from '../assets/search_black.png';
 import {
   Heading,
@@ -271,68 +272,70 @@ function MainScreen() {
   ]);
 
   return (
-    <scroll-view
-      scroll-y
-      style={{ width: '100%', height: '100%', backgroundColor: 'white' }}
-    >
-      <view style={{ padding: '10px', paddingBottom: '50px', gap: '6px' }}>
-        <Heading label="Send Command" />
-        <SettingsPicker<IdOption>
-          label="target id"
-          value={cmdTargetId}
-          items={ID_OPTIONS}
-          onValueChange={setCmdTargetId}
-        />
-        <SettingsPicker<CmdIconOption>
-          label="icon"
-          value={cmdIcon}
-          items={CMD_ICON_OPTIONS}
-          onValueChange={setCmdIcon}
-        />
-        <SettingsPicker<CmdTintColorOption>
-          label="tintColorNormal"
-          value={cmdTintColorNormal}
-          items={CMD_TINT_COLOR_OPTIONS}
-          onValueChange={setCmdTintColorNormal}
-        />
-        <SettingsPicker<CmdTintColorOption>
-          label="tintColorPressed"
-          value={cmdTintColorPressed}
-          items={CMD_TINT_COLOR_OPTIONS}
-          onValueChange={setCmdTintColorPressed}
-        />
-        <SettingsPicker<CmdTintColorOption>
-          label="tintColorFocused"
-          value={cmdTintColorFocused}
-          items={CMD_TINT_COLOR_OPTIONS}
-          onValueChange={setCmdTintColorFocused}
-        />
-        <SettingsPicker<CmdTintColorOption>
-          label="tintColorDisabled"
-          value={cmdTintColorDisabled}
-          items={CMD_TINT_COLOR_OPTIONS}
-          onValueChange={setCmdTintColorDisabled}
-        />
-        <SettingsPicker<CmdDisabledOption>
-          label="disabled"
-          value={cmdDisabled}
-          items={CMD_DISABLED_OPTIONS}
-          onValueChange={setCmdDisabled}
-        />
-        <SettingsButton label="Send Command" onTap={sendCommand} />
+    <ScrollViewMarker style={{ width: '100%', height: '100%' }}>
+      <scroll-view
+        scroll-y
+        style={{ width: '100%', height: '100%', backgroundColor: 'white' }}
+      >
+        <view style={{ padding: '10px', paddingBottom: '50px', gap: '6px' }}>
+          <Heading label="Send Command" />
+          <SettingsPicker<IdOption>
+            label="target id"
+            value={cmdTargetId}
+            items={ID_OPTIONS}
+            onValueChange={setCmdTargetId}
+          />
+          <SettingsPicker<CmdIconOption>
+            label="icon"
+            value={cmdIcon}
+            items={CMD_ICON_OPTIONS}
+            onValueChange={setCmdIcon}
+          />
+          <SettingsPicker<CmdTintColorOption>
+            label="tintColorNormal"
+            value={cmdTintColorNormal}
+            items={CMD_TINT_COLOR_OPTIONS}
+            onValueChange={setCmdTintColorNormal}
+          />
+          <SettingsPicker<CmdTintColorOption>
+            label="tintColorPressed"
+            value={cmdTintColorPressed}
+            items={CMD_TINT_COLOR_OPTIONS}
+            onValueChange={setCmdTintColorPressed}
+          />
+          <SettingsPicker<CmdTintColorOption>
+            label="tintColorFocused"
+            value={cmdTintColorFocused}
+            items={CMD_TINT_COLOR_OPTIONS}
+            onValueChange={setCmdTintColorFocused}
+          />
+          <SettingsPicker<CmdTintColorOption>
+            label="tintColorDisabled"
+            value={cmdTintColorDisabled}
+            items={CMD_TINT_COLOR_OPTIONS}
+            onValueChange={setCmdTintColorDisabled}
+          />
+          <SettingsPicker<CmdDisabledOption>
+            label="disabled"
+            value={cmdDisabled}
+            items={CMD_DISABLED_OPTIONS}
+            onValueChange={setCmdDisabled}
+          />
+          <SettingsButton label="Send Command" onTap={sendCommand} />
 
-        <Heading label="Result" />
-        <text style={{ color: 'black', fontSize: '15px' }}>
-          Last clicked: {lastClicked ?? '—'}
-        </text>
+          <Heading label="Result" />
+          <text style={{ color: 'black', fontSize: '15px' }}>
+            Last clicked: {lastClicked ?? '—'}
+          </text>
 
-        <Heading label="Menu Items — Props" />
-        <SlotControls
-          slots={slots}
-          updateSlot={(i, patch) => applySlots(updateSlotAt(slots, i, patch))}
-        />
-      </view>
-    </scroll-view>
+          <Heading label="Menu Items — Props" />
+          <SlotControls
+            slots={slots}
+            updateSlot={(i, patch) => applySlots(updateSlotAt(slots, i, patch))}
+          />
+        </view>
+      </scroll-view>
+    </ScrollViewMarker>
   );
 }
 

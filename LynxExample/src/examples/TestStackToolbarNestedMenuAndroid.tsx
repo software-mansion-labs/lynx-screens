@@ -4,6 +4,7 @@ import type {
   StackHeaderToolbarMenuElementAndroid,
   StackHeaderToolbarMenuElementOptionsAndroid,
 } from 'lynx-screens';
+import { ScrollViewMarker } from 'lynx-screens';
 import {
   Heading,
   SettingsButton,
@@ -258,71 +259,73 @@ function MainScreen() {
   }, [cmdTargetId, cmdTitle, cmdHidden, cmdMenuTitle]);
 
   return (
-    <scroll-view
-      style={{ width: '100%', height: '100%', backgroundColor: 'white' }}
-    >
-      <view style={{ padding: '10px', paddingBottom: '50px', gap: '6px' }}>
-        <Heading label="Result" />
-        <text style={{ color: 'black', fontSize: '15px' }}>
-          Last clicked: {lastClicked ?? '—'}
-        </text>
+    <ScrollViewMarker style={{ width: '100%', height: '100%' }}>
+      <scroll-view
+        style={{ width: '100%', height: '100%', backgroundColor: 'white' }}
+      >
+        <view style={{ padding: '10px', paddingBottom: '50px', gap: '6px' }}>
+          <Heading label="Result" />
+          <text style={{ color: 'black', fontSize: '15px' }}>
+            Last clicked: {lastClicked ?? '—'}
+          </text>
 
-        <Heading label="Send Command" />
-        <SettingsPicker<AllIds>
-          label="target id"
-          value={cmdTargetId}
-          items={[...ALL_IDS]}
-          onValueChange={setCmdTargetId}
-        />
-        <SettingsPicker<CmdTitleOption>
-          label="title"
-          value={cmdTitle}
-          items={CMD_TITLE_OPTIONS}
-          onValueChange={setCmdTitle}
-        />
-        <SettingsPicker<CmdHiddenOption>
-          label="hidden"
-          value={cmdHidden}
-          items={CMD_HIDDEN_OPTIONS}
-          onValueChange={setCmdHidden}
-        />
-        <SettingsPicker<CmdMenuTitleOption>
-          label="menuTitle"
-          value={cmdMenuTitle}
-          items={CMD_MENU_TITLE_OPTIONS}
-          onValueChange={setCmdMenuTitle}
-        />
-        <SettingsButton label="Send Command" onTap={sendCommand} />
+          <Heading label="Send Command" />
+          <SettingsPicker<AllIds>
+            label="target id"
+            value={cmdTargetId}
+            items={[...ALL_IDS]}
+            onValueChange={setCmdTargetId}
+          />
+          <SettingsPicker<CmdTitleOption>
+            label="title"
+            value={cmdTitle}
+            items={CMD_TITLE_OPTIONS}
+            onValueChange={setCmdTitle}
+          />
+          <SettingsPicker<CmdHiddenOption>
+            label="hidden"
+            value={cmdHidden}
+            items={CMD_HIDDEN_OPTIONS}
+            onValueChange={setCmdHidden}
+          />
+          <SettingsPicker<CmdMenuTitleOption>
+            label="menuTitle"
+            value={cmdMenuTitle}
+            items={CMD_MENU_TITLE_OPTIONS}
+            onValueChange={setCmdMenuTitle}
+          />
+          <SettingsButton label="Send Command" onTap={sendCommand} />
 
-        <Heading label="Menu Structure — Props" />
-        <SettingsSwitch
-          label="include submenu-1"
-          value={config.includeSubmenu1}
-          onValueChange={(v) => applyConfig({ ...config, includeSubmenu1: v })}
-        />
-        <SettingsPicker<Submenu1TitleOption>
-          label="submenu-1 title"
-          value={config.submenu1Title}
-          items={[...SUBMENU1_TITLE_OPTIONS]}
-          onValueChange={(v) => applyConfig({ ...config, submenu1Title: v })}
-        />
-        <SettingsPicker<Submenu1MenuTitleOption>
-          label="submenu-1 menuTitle"
-          value={config.submenu1MenuTitle}
-          items={[...SUBMENU1_MENU_TITLE_OPTIONS]}
-          onValueChange={(v) => applyConfig({ ...config, submenu1MenuTitle: v })}
-        />
-        <SettingsSwitch
-          label="add extra item to submenu-1"
-          value={config.addExtraItem}
-          onValueChange={(v) => applyConfig({ ...config, addExtraItem: v })}
-        />
-        <SettingsSwitch
-          label="include submenu-2"
-          value={config.includeSubmenu2}
-          onValueChange={(v) => applyConfig({ ...config, includeSubmenu2: v })}
-        />
-      </view>
-    </scroll-view>
+          <Heading label="Menu Structure — Props" />
+          <SettingsSwitch
+            label="include submenu-1"
+            value={config.includeSubmenu1}
+            onValueChange={(v) => applyConfig({ ...config, includeSubmenu1: v })}
+          />
+          <SettingsPicker<Submenu1TitleOption>
+            label="submenu-1 title"
+            value={config.submenu1Title}
+            items={[...SUBMENU1_TITLE_OPTIONS]}
+            onValueChange={(v) => applyConfig({ ...config, submenu1Title: v })}
+          />
+          <SettingsPicker<Submenu1MenuTitleOption>
+            label="submenu-1 menuTitle"
+            value={config.submenu1MenuTitle}
+            items={[...SUBMENU1_MENU_TITLE_OPTIONS]}
+            onValueChange={(v) => applyConfig({ ...config, submenu1MenuTitle: v })}
+          />
+          <SettingsSwitch
+            label="add extra item to submenu-1"
+            value={config.addExtraItem}
+            onValueChange={(v) => applyConfig({ ...config, addExtraItem: v })}
+          />
+          <SettingsSwitch
+            label="include submenu-2"
+            value={config.includeSubmenu2}
+            onValueChange={(v) => applyConfig({ ...config, includeSubmenu2: v })}
+          />
+        </view>
+      </scroll-view>
+    </ScrollViewMarker>
   );
 }

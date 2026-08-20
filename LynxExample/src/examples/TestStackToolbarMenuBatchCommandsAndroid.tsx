@@ -4,6 +4,7 @@ import type {
   StackHeaderConfigRef,
   StackHeaderToolbarMenuBaseAndroid,
 } from 'lynx-screens';
+import { ScrollViewMarker } from 'lynx-screens';
 import { Heading, SettingsButton } from '../components/SettingsControls';
 import { StackContainer } from '../components/StackContainer';
 import { useStackNavigationContext } from '../hooks/useStackNavigationContext';
@@ -246,69 +247,71 @@ function MainScreen() {
   }, [failingIcon, nextPhotoIcon]);
 
   return (
-    <scroll-view
-      scroll-y
-      style={{ width: '100%', height: '100%', backgroundColor: 'white' }}
-    >
-      <view style={{ padding: '10px', paddingBottom: '50px', gap: '6px' }}>
-        <Heading label="Batch Commands" />
-        <SettingsButton label="Select All (1 event)" onTap={selectAll} />
-        <SettingsButton label="Deselect All (1 event)" onTap={deselectAll} />
-        <SettingsButton
-          label="Batch across groups (2 events)"
-          onTap={batchAcrossGroups}
-        />
-        <SettingsButton
-          label="Single object update (1 event)"
-          onTap={singleObjectUpdate}
-        />
-        <SettingsButton
-          label={
-            appleInToolbar ? 'Move Apple to overflow' : 'Move Apple to toolbar'
-          }
-          onTap={toggleAppleShowAsAction}
-        />
-        <SettingsButton
-          label="Batch: image + check (atomic)"
-          onTap={batchWithImageLoad}
-        />
-        <SettingsButton
-          label="Ordering race (last: Apple absent)"
-          onTap={runOrderingRace}
-        />
-        <SettingsButton
-          label="Failing image + follow-up"
-          onTap={runFailingImageRepro}
-        />
-        <SettingsButton
-          label="Duplicate id: merge + last icon"
-          onTap={runDuplicateIdRepro}
-        />
-        <SettingsButton label="Reset log (menu state kept)" onTap={resetLog} />
+    <ScrollViewMarker style={{ width: '100%', height: '100%' }}>
+      <scroll-view
+        scroll-y
+        style={{ width: '100%', height: '100%', backgroundColor: 'white' }}
+      >
+        <view style={{ padding: '10px', paddingBottom: '50px', gap: '6px' }}>
+          <Heading label="Batch Commands" />
+          <SettingsButton label="Select All (1 event)" onTap={selectAll} />
+          <SettingsButton label="Deselect All (1 event)" onTap={deselectAll} />
+          <SettingsButton
+            label="Batch across groups (2 events)"
+            onTap={batchAcrossGroups}
+          />
+          <SettingsButton
+            label="Single object update (1 event)"
+            onTap={singleObjectUpdate}
+          />
+          <SettingsButton
+            label={
+              appleInToolbar ? 'Move Apple to overflow' : 'Move Apple to toolbar'
+            }
+            onTap={toggleAppleShowAsAction}
+          />
+          <SettingsButton
+            label="Batch: image + check (atomic)"
+            onTap={batchWithImageLoad}
+          />
+          <SettingsButton
+            label="Ordering race (last: Apple absent)"
+            onTap={runOrderingRace}
+          />
+          <SettingsButton
+            label="Failing image + follow-up"
+            onTap={runFailingImageRepro}
+          />
+          <SettingsButton
+            label="Duplicate id: merge + last icon"
+            onTap={runDuplicateIdRepro}
+          />
+          <SettingsButton label="Reset log (menu state kept)" onTap={resetLog} />
 
-        <text style={{ color: '#3f51b5', fontSize: '13px', marginTop: '8px' }}>
-          Move Apple to the toolbar to see its loaded icon (overflow items don't
-          render icons); its checkbox is only visible in the overflow menu. Icon
-          & showAsAction changes emit no events. Menu checked state persists
-          across taps — Reset log clears only the counter and log.
-        </text>
+          <text style={{ color: '#3f51b5', fontSize: '13px', marginTop: '8px' }}>
+            Move Apple to the toolbar to see its loaded icon (overflow items don't
+            render icons); its checkbox is only visible in the overflow menu. Icon
+            & showAsAction changes emit no events. Menu checked state persists
+            across taps — Reset log clears only the counter and log.
+          </text>
 
-        <Heading label={`Events received: ${eventCount}`} />
-        <text style={{ color: '#3f51b5', fontSize: '13px' }}>Newest first</text>
-        {eventLog.length === 0 ? (
-          <text style={{ color: 'black', fontSize: '15px' }}>—</text>
-        ) : (
-          eventLog.map((entry, i) => (
-            <text
-              key={`${i}-${entry}`}
-              style={{ color: 'black', fontSize: '15px' }}
-            >
-              {i === 0 ? '▶ ' : '  '}
-              {entry}
-            </text>
-          ))
-        )}
-      </view>
-    </scroll-view>
+          <Heading label={`Events received: ${eventCount}`} />
+          <text style={{ color: '#3f51b5', fontSize: '13px' }}>Newest first</text>
+          {eventLog.length === 0 ? (
+            <text style={{ color: 'black', fontSize: '15px' }}>—</text>
+          ) : (
+            eventLog.map((entry, i) => (
+              <text
+                key={`${i}-${entry}`}
+                style={{ color: 'black', fontSize: '15px' }}
+              >
+                {i === 0 ? '▶ ' : '  '}
+                {entry}
+              </text>
+            ))
+          )}
+        </view>
+      </scroll-view>
+    </ScrollViewMarker>
   );
 }

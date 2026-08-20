@@ -11,6 +11,7 @@ import type {
   StackHeaderToolbarMenuElementOptionsAndroid,
   StackHeaderToolbarMenuItemShowAsActionAndroid,
 } from 'lynx-screens';
+import { ScrollViewMarker } from 'lynx-screens';
 import {
   Heading,
   SettingsButton,
@@ -175,37 +176,39 @@ function MainScreen() {
   }, [cmdTargetId, cmdShowAsAction]);
 
   return (
-    <scroll-view
-      style={{ width: '100%', height: '100%', backgroundColor: 'white' }}
-    >
-      <view style={{ padding: '10px', paddingBottom: '50px', gap: '6px' }}>
-        <Heading label="Send Command" />
-        <SettingsPicker<IdOption>
-          label="target id"
-          value={cmdTargetId}
-          items={ID_OPTIONS}
-          onValueChange={setCmdTargetId}
-        />
-        <SettingsPicker<CmdShowAsActionOption>
-          label="showAsAction"
-          value={cmdShowAsAction}
-          items={CMD_SHOW_AS_ACTION_OPTIONS}
-          onValueChange={setCmdShowAsAction}
-        />
-        <SettingsButton label="Send Command" onTap={sendCommand} />
+    <ScrollViewMarker style={{ width: '100%', height: '100%' }}>
+      <scroll-view
+        style={{ width: '100%', height: '100%', backgroundColor: 'white' }}
+      >
+        <view style={{ padding: '10px', paddingBottom: '50px', gap: '6px' }}>
+          <Heading label="Send Command" />
+          <SettingsPicker<IdOption>
+            label="target id"
+            value={cmdTargetId}
+            items={ID_OPTIONS}
+            onValueChange={setCmdTargetId}
+          />
+          <SettingsPicker<CmdShowAsActionOption>
+            label="showAsAction"
+            value={cmdShowAsAction}
+            items={CMD_SHOW_AS_ACTION_OPTIONS}
+            onValueChange={setCmdShowAsAction}
+          />
+          <SettingsButton label="Send Command" onTap={sendCommand} />
 
-        <Heading label="Result" />
-        <text style={{ color: 'black', fontSize: '15px' }}>
-          Last clicked: {lastClicked ?? '—'}
-        </text>
+          <Heading label="Result" />
+          <text style={{ color: 'black', fontSize: '15px' }}>
+            Last clicked: {lastClicked ?? '—'}
+          </text>
 
-        <Heading label="Menu Items — Props" />
-        <SlotControls
-          slots={slots}
-          updateSlot={(i, patch) => applySlots(updateSlotAt(slots, i, patch))}
-        />
-      </view>
-    </scroll-view>
+          <Heading label="Menu Items — Props" />
+          <SlotControls
+            slots={slots}
+            updateSlot={(i, patch) => applySlots(updateSlotAt(slots, i, patch))}
+          />
+        </view>
+      </scroll-view>
+    </ScrollViewMarker>
   );
 }
 

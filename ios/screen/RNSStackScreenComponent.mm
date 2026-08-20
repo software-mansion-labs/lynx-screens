@@ -11,6 +11,7 @@
 
 @LynxElement("ls-stack-screen")
 @implementation RNSStackScreenComponent {
+    UIScrollView *_Nullable _contentScrollView;
     RNSStackScreenController *_Nonnull _controller;
     RNSStackScreenEventEmitter *_eventEmitter;
 
@@ -51,7 +52,23 @@
 
 - (UIView *)createView {
     RNSStackScreenView *stackScreenView = [[RNSStackScreenView alloc] init];
+    stackScreenView.component = self;
     return stackScreenView;
+}
+
+#pragma mark - RNSScrollViewSeeking
+
+- (void)registerDescendantScrollView:(UIScrollView *)scrollView fromMarker:(RNSScrollViewMarkerComponent *)marker
+{
+    // Native scroll-edge behavior (UINavigationBar scroll edge appearance, top-screen-tap scroll-to-top on iPad).
+    [self.controller setContentScrollView:scrollView forEdge:NSDirectionalRectEdgeAll];
+    // Cache used by the container-nesting content-scroll-view resolution.
+    _contentScrollView = scrollView;
+}
+
+- (nullable UIScrollView *)cachedContentScrollView
+{
+    return _contentScrollView;
 }
 
 #pragma mark - Props

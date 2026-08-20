@@ -38,11 +38,7 @@
 
 - (nullable UIScrollView *)findContentScrollView
 {
-    // Divergence from RNS: no cached scroll view is passed - the ScrollViewMarker
-    // epic is not ported, so nothing registers a marked scroll view on the screen
-    // component. Resolution falls through to the nested container and the
-    // descendant-chain heuristic.
-    return [_containerItemSupport findContentScrollViewWithCachedScrollView:nil
+    return [_containerItemSupport findContentScrollViewWithCachedScrollView:_screenComponent.cachedContentScrollView
                                                               heuristicRoot:_screenComponent.view];
 }
 

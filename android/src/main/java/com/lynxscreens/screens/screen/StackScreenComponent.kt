@@ -133,6 +133,7 @@ internal class StackScreenComponent(context: LynxContext) : UIGroup<StackScreenV
     override fun createView(context: Context?): StackScreenView =
         StackScreenView(context as LynxContext).also { view ->
             view.onLaidOut = { width, height -> updateStateIfNeeded(width = width, height = height) }
+            view.onContentScrollViewChanged = { headerConfig?.onContentScrollViewChanged() }
         }
 
     @LynxProp(name = "activityMode")

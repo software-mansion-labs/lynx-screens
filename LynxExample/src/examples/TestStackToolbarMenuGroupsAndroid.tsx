@@ -5,6 +5,7 @@ import type {
   StackHeaderToolbarMenuElementAndroid,
   StackHeaderToolbarMenuElementOptionsAndroid,
 } from 'lynx-screens';
+import { ScrollViewMarker } from 'lynx-screens';
 import {
   Heading,
   SettingsButton,
@@ -264,61 +265,63 @@ function MainScreen() {
   }, [cmdTargetId, cmdChecked, cmdTitle, cmdHidden]);
 
   return (
-    <scroll-view
-      style={{ width: '100%', height: '100%', backgroundColor: 'white' }}
-    >
-      <view style={{ padding: '10px', paddingBottom: '50px', gap: '6px' }}>
-        <Heading label="Last Event" />
-        <text style={{ color: 'black', fontSize: '15px' }}>
-          {lastEvent ?? '—'}
-        </text>
+    <ScrollViewMarker style={{ width: '100%', height: '100%' }}>
+      <scroll-view
+        style={{ width: '100%', height: '100%', backgroundColor: 'white' }}
+      >
+        <view style={{ padding: '10px', paddingBottom: '50px', gap: '6px' }}>
+          <Heading label="Last Event" />
+          <text style={{ color: 'black', fontSize: '15px' }}>
+            {lastEvent ?? '—'}
+          </text>
 
-        <Heading label="Send Command" />
-        <SettingsPicker<AllIds>
-          label="target id"
-          value={cmdTargetId}
-          items={[...ALL_IDS]}
-          onValueChange={setCmdTargetId}
-        />
-        <SettingsPicker<CmdCheckedOption>
-          label="checked"
-          value={cmdChecked}
-          items={CMD_CHECKED_OPTIONS}
-          onValueChange={setCmdChecked}
-        />
-        <SettingsPicker<CmdTitleOption>
-          label="title"
-          value={cmdTitle}
-          items={CMD_TITLE_OPTIONS}
-          onValueChange={setCmdTitle}
-        />
-        <SettingsPicker<CmdHiddenOption>
-          label="hidden"
-          value={cmdHidden}
-          items={CMD_HIDDEN_OPTIONS}
-          onValueChange={setCmdHidden}
-        />
-        <SettingsButton label="Send Command" onTap={sendCommand} />
+          <Heading label="Send Command" />
+          <SettingsPicker<AllIds>
+            label="target id"
+            value={cmdTargetId}
+            items={[...ALL_IDS]}
+            onValueChange={setCmdTargetId}
+          />
+          <SettingsPicker<CmdCheckedOption>
+            label="checked"
+            value={cmdChecked}
+            items={CMD_CHECKED_OPTIONS}
+            onValueChange={setCmdChecked}
+          />
+          <SettingsPicker<CmdTitleOption>
+            label="title"
+            value={cmdTitle}
+            items={CMD_TITLE_OPTIONS}
+            onValueChange={setCmdTitle}
+          />
+          <SettingsPicker<CmdHiddenOption>
+            label="hidden"
+            value={cmdHidden}
+            items={CMD_HIDDEN_OPTIONS}
+            onValueChange={setCmdHidden}
+          />
+          <SettingsButton label="Send Command" onTap={sendCommand} />
 
-        <Heading label="Menu Config — Props" />
-        <SettingsSwitch
-          label="singleSelection on colors"
-          value={config.singleSelectionOnColors}
-          onValueChange={(v) =>
-            applyConfig({ ...config, singleSelectionOnColors: v })
-          }
-        />
-        <SettingsSwitch
-          label="include Blue"
-          value={config.includeBlue}
-          onValueChange={(v) => applyConfig({ ...config, includeBlue: v })}
-        />
-        <SettingsSwitch
-          label="divider enabled"
-          value={config.dividerEnabled}
-          onValueChange={(v) => applyConfig({ ...config, dividerEnabled: v })}
-        />
-      </view>
-    </scroll-view>
+          <Heading label="Menu Config — Props" />
+          <SettingsSwitch
+            label="singleSelection on colors"
+            value={config.singleSelectionOnColors}
+            onValueChange={(v) =>
+              applyConfig({ ...config, singleSelectionOnColors: v })
+            }
+          />
+          <SettingsSwitch
+            label="include Blue"
+            value={config.includeBlue}
+            onValueChange={(v) => applyConfig({ ...config, includeBlue: v })}
+          />
+          <SettingsSwitch
+            label="divider enabled"
+            value={config.dividerEnabled}
+            onValueChange={(v) => applyConfig({ ...config, dividerEnabled: v })}
+          />
+        </view>
+      </scroll-view>
+    </ScrollViewMarker>
   );
 }
