@@ -4,6 +4,16 @@ import type * as Lynx from '@lynx-js/types';
 declare module "@lynx-js/types" {
   type EmptyEventPayload = Record<string, never>;
 
+  type StackHeaderIconIOSAttr =
+    | {
+        type: 'sfSymbol' | 'xcasset';
+        name: string;
+      }
+    | {
+        type: 'imageSource' | 'templateSource';
+        uri: string;
+      };
+
   type StackHeaderMenuItemAttr = {
     id: string;
     type: 'menuItem';
@@ -11,6 +21,7 @@ declare module "@lynx-js/types" {
     itemType?: 'action' | 'toggle' | 'automatic' | undefined;
     initialToggleState?: boolean | undefined;
     keepsMenuPresented?: boolean | undefined;
+    icon?: StackHeaderIconIOSAttr | undefined;
   };
 
   type StackHeaderMenuAttr = {
@@ -18,6 +29,7 @@ declare module "@lynx-js/types" {
     type: 'menu';
     title?: string | undefined;
     singleSelection?: boolean | undefined;
+    icon?: StackHeaderIconIOSAttr | undefined;
     children: (StackHeaderMenuAttr | StackHeaderMenuItemAttr)[];
   };
 
@@ -159,6 +171,7 @@ declare module "@lynx-js/types" {
         | undefined;
       itemId?: string | undefined;
       title?: string | undefined;
+      icon?: StackHeaderIconIOSAttr | undefined;
       menu?: StackHeaderMenuAttr | undefined;
       respondsToOnPress?: boolean | undefined;
       bindOnHeaderItemPress?:

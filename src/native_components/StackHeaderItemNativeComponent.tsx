@@ -2,6 +2,7 @@ import React, { useCallback } from 'react';
 import type { ReactElement } from '@lynx-js/react';
 import type { BaseEventOrig, EventHandler } from '@lynx-js/types';
 import type {
+  PlatformIconIOS,
   StackHeaderMenuElementIOS,
   StackHeaderMenuIOS,
 } from '../types/StackHeaderConfig.js';
@@ -17,6 +18,7 @@ export type StackHeaderItemProps = {
   placement: StackHeaderItemPlacement;
   itemId?: string | undefined;
   title?: string | undefined;
+  icon?: PlatformIconIOS | undefined;
   render?: (() => ReactElement) | undefined;
   menu?: StackHeaderMenuIOS | undefined;
   onPress?: (() => void) | undefined;
@@ -29,6 +31,7 @@ type StackHeaderMenuItemAttr = {
   itemType?: 'action' | 'toggle' | 'automatic' | undefined;
   initialToggleState?: boolean | undefined;
   keepsMenuPresented?: boolean | undefined;
+  icon?: PlatformIconIOS | undefined;
 };
 
 type StackHeaderMenuAttr = {
@@ -36,6 +39,7 @@ type StackHeaderMenuAttr = {
   type: 'menu';
   title?: string | undefined;
   singleSelection?: boolean | undefined;
+  icon?: PlatformIconIOS | undefined;
   children: (StackHeaderMenuAttr | StackHeaderMenuItemAttr)[];
 };
 
@@ -43,7 +47,9 @@ type StackHeaderMenuAttr = {
 // relies on the RN bridge dropping function values; Lynx props must stay
 // serializable, so the onPress/onSelectionChange callbacks are stripped
 // here - they come back through the config's OnMenuItemPress and
-// OnMenuSelectionChange events and are resolved by id.
+// OnMenuSelectionChange events and are resolved by id. Icons need no
+// resolution step (RNS resolves require() assets via resolveAssetSource;
+// Lynx icons are plain uri strings) and pass through as data.
 function parseMenuElementToAttr(
   element: StackHeaderMenuElementIOS,
 ): StackHeaderMenuAttr | StackHeaderMenuItemAttr {
@@ -53,6 +59,7 @@ function parseMenuElementToAttr(
       type: 'menu',
       title: element.title,
       singleSelection: element.singleSelection,
+      icon: element.icon,
       children: element.children.map(parseMenuElementToAttr),
     };
   }
@@ -64,6 +71,7 @@ function parseMenuElementToAttr(
     itemType: element.itemType,
     initialToggleState: element.initialToggleState,
     keepsMenuPresented: element.keepsMenuPresented,
+    icon: element.icon,
   };
 }
 
@@ -71,6 +79,7 @@ export const StackHeaderItemNativeComponent = ({
   placement,
   itemId,
   title,
+  icon,
   render,
   menu,
   onPress,
@@ -90,6 +99,7 @@ export const StackHeaderItemNativeComponent = ({
       placement={placement}
       itemId={itemId}
       title={title}
+      icon={icon}
       menu={menu && (parseMenuElementToAttr(menu) as StackHeaderMenuAttr)}
       // We need to tell iOS that we want the handler to be attached only when we actually require it
       // because doing so makes the menu appear on long press instead of tap

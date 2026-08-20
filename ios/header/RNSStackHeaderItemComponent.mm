@@ -1,4 +1,5 @@
 #import "RNSStackHeaderItemComponent.h"
+#import "RNSStackHeaderIconMapper.h"
 #import "RNSStackHeaderItemEventEmitter.h"
 #import "RNSStackHeaderMenuMapper.h"
 
@@ -14,6 +15,7 @@
     BOOL _didSetHeaderItemPlacement;
     NSString *_Nullable _itemId;
     NSString *_Nullable _title;
+    RNSStackHeaderIconData *_Nullable _icon;
     RNSStackHeaderMenuData *_Nullable _menu;
     BOOL _respondsToOnPress;
     BOOL _needsUpdate;
@@ -33,6 +35,7 @@
 {
     _itemId = nil;
     _title = nil;
+    _icon = nil;
     _menu = nil;
     _placement = RNSHeaderItemPlacementTrailing;
     _didSetHeaderItemPlacement = NO;
@@ -87,6 +90,11 @@
 - (nullable NSString *)title
 {
     return _title;
+}
+
+- (nullable RNSStackHeaderIconData *)icon
+{
+    return _icon;
 }
 
 - (nullable RNSStackHeaderMenuData *)menu
@@ -193,6 +201,14 @@ LYNX_PROP_SETTER("title", setTitle, NSString *) {
         _title = value;
         _needsUpdate = YES;
     }
+}
+
+LYNX_PROP_SETTER("icon", setIcon, NSDictionary *) {
+    if (requestReset) {
+        value = nil;
+    }
+    _icon = [RNSStackHeaderIconMapper iconFromDictionary:value];
+    _needsUpdate = YES;
 }
 
 LYNX_PROP_SETTER("respondsToOnPress", setRespondsToOnPress, BOOL) {
