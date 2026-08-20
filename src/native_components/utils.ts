@@ -1,21 +1,74 @@
 import type {
+  PlatformIconIOS,
   StackHeaderMenuElementIOS,
   StackHeaderMenuIOS,
-  SupportsMenuIOS,
 } from '../types/StackHeaderConfig.js';
 
-export function findMenuElementByIdInItems(
-  items: SupportsMenuIOS[],
+export type StackHeaderMenuItemAttr = {
+  id: string;
+  type: 'menuItem';
+  title?: string | undefined;
+  itemType?: 'action' | 'toggle' | 'automatic' | undefined;
+  initialToggleState?: boolean | undefined;
+  keepsMenuPresented?: boolean | undefined;
+  icon?: PlatformIconIOS | undefined;
+};
+
+export type StackHeaderMenuAttr = {
+  id: string;
+  type: 'menu';
+  title?: string | undefined;
+  singleSelection?: boolean | undefined;
+  icon?: PlatformIconIOS | undefined;
+  displayInline?: boolean | undefined;
+  displayAsPalette?: boolean | undefined;
+  children: (StackHeaderMenuAttr | StackHeaderMenuItemAttr)[];
+};
+
+// Adaptation: RNS passes the menu tree to the native component as-is and
+// relies on the RN bridge dropping function values; Lynx props must stay
+// serializable, so the onPress/onSelectionChange callbacks are stripped
+// here - they come back through the config's OnMenuItemPress and
+// OnMenuSelectionChange events and are resolved by id. Icons need no
+// resolution step (RNS resolves require() assets via resolveAssetSource;
+// Lynx icons are plain uri strings) and pass through as data. Shared by the
+// item's menu prop and the config's titleMenu prop - the Lynx counterpart of
+// RNS moving the shared resolveMenuIcons helper into iconUtils.
+export function parseMenuElementToAttr(
+  element: StackHeaderMenuElementIOS,
+): StackHeaderMenuAttr | StackHeaderMenuItemAttr {
+  if (element.type === 'menu') {
+    return {
+      id: element.id,
+      type: 'menu',
+      title: element.title,
+      singleSelection: element.singleSelection,
+      icon: element.icon,
+      displayInline: element.displayInline,
+      displayAsPalette: element.displayAsPalette,
+      children: element.children.map(parseMenuElementToAttr),
+    };
+  }
+
+  return {
+    id: element.id,
+    type: 'menuItem',
+    title: element.title,
+    itemType: element.itemType,
+    initialToggleState: element.initialToggleState,
+    keepsMenuPresented: element.keepsMenuPresented,
+    icon: element.icon,
+  };
+}
+
+export function findMenuElementByIdInMenus(
+  menus: StackHeaderMenuIOS[],
   id: string,
 ): StackHeaderMenuElementIOS | null {
-  for (const item of items) {
-    if (item.menu === undefined) {
-      continue;
-    }
-
-    const menu = findMenuElementById(item.menu, id);
-    if (menu !== null) {
-      return menu;
+  for (const menu of menus) {
+    const element = findMenuElementById(menu, id);
+    if (element !== null) {
+      return element;
     }
   }
 

@@ -126,6 +126,7 @@ declare module "@lynx-js/types" {
       largeTitle?: string | undefined;
       largeSubtitle?: string | undefined;
       largeTitleEnabled?: boolean | undefined;
+      titleMenu?: StackHeaderMenuAttr | undefined;
       toolbarMenu?:
         | {
             groups?: StackHeaderToolbarMenuGroupAttr[] | undefined;

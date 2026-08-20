@@ -3,6 +3,7 @@ import {
   useCallback,
   useEffect,
   useImperativeHandle,
+  useMemo,
   useRef,
   type Ref,
 } from '@lynx-js/react';
@@ -14,6 +15,7 @@ import type {
   StackHeaderConfigRef,
   StackHeaderInlineCustomItemIOS,
   StackHeaderInlineItemIOS,
+  StackHeaderMenuIOS,
   StackHeaderSpacerItemIOS,
   StackHeaderTitleCustomItemIOS,
   StackHeaderToolbarMenuBaseAndroid,
@@ -26,9 +28,13 @@ import type {
   StackHeaderToolbarMenuElementOptionsAndroid,
   StackHeaderToolbarMenuElementUpdateAndroid,
   StackHeaderTypeAndroid,
-  SupportsMenuIOS,
 } from '../types/StackHeaderConfig.js';
-import { findMenuElementByIdInItems, validateMenuCallbacks } from './utils.js';
+import {
+  findMenuElementByIdInMenus,
+  parseMenuElementToAttr,
+  validateMenuCallbacks,
+  type StackHeaderMenuAttr,
+} from './utils.js';
 import { StackHeaderSubviewNativeComponent } from './StackHeaderSubviewNativeComponent.js';
 import { parseAndroidIconToNativeProps } from '../shared/index.js';
 import {
@@ -114,6 +120,7 @@ const StackHeaderConfigIOS = (props: PlatformInnerProps) => {
     leadingItems,
     trailingItems,
     titleItem,
+    titleMenu,
     subtitleItem,
     largeSubtitleItem,
     largeTitle,
@@ -121,51 +128,63 @@ const StackHeaderConfigIOS = (props: PlatformInnerProps) => {
     largeTitleEnabled,
   } = ios ?? {};
 
+  const allMenus = useMemo(
+    () =>
+      [
+        ...(leadingItems ?? [])
+          .filter((it) => it && it.type === 'item')
+          .map((it) => (it as StackHeaderInlineItemIOS).menu),
+        ...(trailingItems ?? [])
+          .filter((it) => it && it.type === 'item')
+          .map((it) => (it as StackHeaderInlineItemIOS).menu),
+        titleMenu,
+      ].filter((it): it is StackHeaderMenuIOS => !!it),
+    [leadingItems, trailingItems, titleMenu],
+  );
+
   const handleMenuItemPress: EventHandler<
     BaseEventOrig<{ menuItemId: string }>
   > = useCallback(
     (event) => {
-      const items: SupportsMenuIOS[] = Array.of(
-        ...(leadingItems ?? []).filter((it) => it && it.type === 'item'),
-        ...(trailingItems ?? []).filter((it) => it && it.type === 'item'),
-      );
-      const menuElement = findMenuElementByIdInItems(
-        items,
+      const menuElement = findMenuElementByIdInMenus(
+        allMenus,
         event.detail.menuItemId,
       );
       if (menuElement && menuElement.type === 'menuItem') {
         menuElement.onPress?.();
       }
     },
-    [leadingItems, trailingItems],
+    [allMenus],
   );
-
-  const allMenuItems: SupportsMenuIOS[] = [
-    ...(leadingItems ?? []),
-    ...(trailingItems ?? []),
-  ].filter((it) => it && it.type === 'item');
 
   const handleSelectionChange: EventHandler<
     BaseEventOrig<{ menuId: string; selectedMenuItemIds: string[] }>
   > = useCallback(
     (event) => {
       const { menuId, selectedMenuItemIds } = event.detail;
-      const menu = findMenuElementByIdInItems(allMenuItems, menuId);
+      const menu = findMenuElementByIdInMenus(allMenus, menuId);
       if (menu && menu.type === 'menu') {
         menu.onSelectionChange?.(selectedMenuItemIds);
       }
     },
-    [allMenuItems],
+    [allMenus],
   );
 
   useEffect(() => {
-    for (const item of allMenuItems) {
-      if ('menu' in item && item.menu) {
-        validateMenuCallbacks(item.menu);
-      }
+    for (const menu of allMenus) {
+      validateMenuCallbacks(menu);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [leadingItems, trailingItems]);
+  }, [allMenus]);
+
+  // Adaptation: RNS resolves the menu icons here (resolveMenuIcons); on Lynx
+  // the counterpart step is stripping the callbacks for serialization.
+  const parsedTitleMenu = useMemo(
+    () =>
+      titleMenu != null
+        ? (parseMenuElementToAttr(titleMenu) as StackHeaderMenuAttr)
+        : undefined,
+    [titleMenu],
+  );
 
   return (
     <ls-stack-header-config
@@ -179,6 +198,7 @@ const StackHeaderConfigIOS = (props: PlatformInnerProps) => {
       largeTitle={largeTitle}
       largeSubtitle={largeSubtitle}
       largeTitleEnabled={!!largeTitleEnabled}
+      titleMenu={parsedTitleMenu}
       bindOnMenuItemPress={handleMenuItemPress}
       bindOnMenuSelectionChange={handleSelectionChange}
     >
