@@ -12,6 +12,7 @@ export { default as TestStackToolbarNestedMenuAndroid } from './TestStackToolbar
 export { default as TestStackToolbarMenuGroupsAndroid } from './TestStackToolbarMenuGroupsAndroid';
 export { default as TestStackToolbarMenuDisabledAndroid } from './TestStackToolbarMenuDisabledAndroid';
 export { default as TestStackToolbarMenuTitleAndroid } from './TestStackToolbarMenuTitleAndroid';
+export { default as TestStackToolbarMenuA11yAndroid } from './TestStackToolbarMenuA11yAndroid';
 export { default as TestStackSubviewsAndroid } from './TestStackSubviewsAndroid';
 export { default as TestStackSubviewsIOS } from './TestStackSubviewsIOS';
 export { default as TestStackHeaderMenuIOS } from './TestStackHeaderMenuIOS';
