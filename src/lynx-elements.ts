@@ -24,6 +24,11 @@ declare module "@lynx-js/types" {
     isNativeDismiss: boolean;
   }>;
 
+  type StackHeaderToolbarMenuGroupAttr = {
+    groupId: string;
+    singleSelection?: boolean | undefined;
+  };
+
   type StackHeaderToolbarMenuElementAttr = {
     type: 'menuItem' | 'menu';
     id: string;
@@ -42,6 +47,10 @@ declare module "@lynx-js/types" {
     iconTintColorPressed?: string | undefined;
     iconTintColorFocused?: string | undefined;
     iconTintColorDisabled?: string | undefined;
+    groupId?: string | undefined;
+    itemType?: 'action' | 'toggle' | 'automatic' | undefined;
+    initialToggleState?: boolean | undefined;
+    groups?: StackHeaderToolbarMenuGroupAttr[] | undefined;
     children?: StackHeaderToolbarMenuElementAttr[] | undefined;
   };
 
@@ -98,11 +107,18 @@ declare module "@lynx-js/types" {
       largeTitleEnabled?: boolean | undefined;
       toolbarMenu?:
         | {
+            groups?: StackHeaderToolbarMenuGroupAttr[] | undefined;
             children?: StackHeaderToolbarMenuElementAttr[] | undefined;
           }
         | undefined;
+      toolbarMenuGroupDividerEnabled?: boolean | undefined;
       bindOnToolbarMenuItemPress?:
         | Lynx.EventHandler<Lynx.BaseEventOrig<{ id: string }>>
+        | undefined;
+      bindOnToolbarMenuGroupSelectionChange?:
+        | Lynx.EventHandler<
+            Lynx.BaseEventOrig<{ groupId: string; selectedIds: string[] }>
+          >
         | undefined;
       bindOnMenuItemPress?:
         | Lynx.EventHandler<Lynx.BaseEventOrig<{ menuItemId: string }>>
