@@ -325,6 +325,8 @@ type StackHeaderToolbarMenuElementAttr = {
   type: 'menuItem' | 'menu';
   id: string;
   title?: string | undefined;
+  titleCondensed?: string | undefined;
+  tooltipText?: string | undefined;
   hidden?: boolean | undefined;
   disabled?: boolean | undefined;
   showAsAction?:

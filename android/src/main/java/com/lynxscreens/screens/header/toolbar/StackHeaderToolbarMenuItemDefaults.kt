@@ -7,7 +7,9 @@ package com.lynxscreens.screens.header.toolbar
  * of truth for defaults of nested-object fields.
  */
 internal object StackHeaderToolbarMenuItemDefaults {
-    const val TITLE: String = ""
+    val TITLE: String? = null
+    val TITLE_CONDENSED: String? = null
+    val TOOLTIP_TEXT: String? = null
     const val HIDDEN: Boolean = false
     const val DISABLED: Boolean = false
     val SHOW_AS_ACTION: StackHeaderToolbarMenuItemShowAsAction = StackHeaderToolbarMenuItemShowAsAction.NEVER
