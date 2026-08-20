@@ -10,7 +10,7 @@
 
 #include <cmath>
 
-@LynxElement("ls-stack-header-item")
+@LynxElement("ls-stack-header-item-ios")
 @implementation RNSStackHeaderItemComponent {
     RNSHeaderItemPlacement _placement;
     BOOL _didSetHeaderItemPlacement;

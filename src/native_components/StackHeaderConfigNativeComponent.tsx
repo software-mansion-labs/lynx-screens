@@ -35,16 +35,16 @@ import {
   validateMenuCallbacks,
   type StackHeaderMenuAttr,
 } from './utils.js';
-import { StackHeaderSubviewNativeComponent } from './StackHeaderSubviewNativeComponent.js';
+import { StackHeaderSubviewAndroidNativeComponent } from './StackHeaderSubviewAndroidNativeComponent.js';
 import { parseAndroidIconToNativeProps } from '../shared/index.js';
 import {
-  StackHeaderItemNativeComponent,
+  StackHeaderItemIOSNativeComponent,
   type StackHeaderItemPlacement,
-} from './StackHeaderItemNativeComponent.js';
+} from './StackHeaderItemIOSNativeComponent.js';
 import {
-  StackHeaderItemSpacerNativeComponent,
+  StackHeaderItemSpacerIOSNativeComponent,
   type StackHeaderItemSpacerPlacement,
-} from './StackHeaderItemSpacerNativeComponent.js';
+} from './StackHeaderItemSpacerIOSNativeComponent.js';
 
 // RNS splits the header config into platform files resolved at build time; a
 // Lynx bundle serves both platforms, so the split happens at runtime instead.
@@ -231,7 +231,7 @@ function makeItemViewFromItem(
     }
 
     return (
-      <StackHeaderItemSpacerNativeComponent
+      <StackHeaderItemSpacerIOSNativeComponent
         key={id}
         placement={placement as StackHeaderItemSpacerPlacement}
         {...rest}
@@ -242,7 +242,7 @@ function makeItemViewFromItem(
   const { id, ...rest } = item;
 
   return (
-    <StackHeaderItemNativeComponent
+    <StackHeaderItemIOSNativeComponent
       key={id}
       itemId={id}
       placement={placement}
@@ -329,27 +329,27 @@ const StackHeaderConfigAndroid = (props: PlatformInnerProps) => {
         the order in native StackHeaderConfigComponent.getConfigSubviewAt.
         */}
       {backgroundSubview && (
-        <StackHeaderSubviewNativeComponent
+        <StackHeaderSubviewAndroidNativeComponent
           type="background"
           collapseMode={backgroundSubview.collapseMode}
         >
           {backgroundSubview.render()}
-        </StackHeaderSubviewNativeComponent>
+        </StackHeaderSubviewAndroidNativeComponent>
       )}
       {leadingSubview && (
-        <StackHeaderSubviewNativeComponent type="leading">
+        <StackHeaderSubviewAndroidNativeComponent type="leading">
           {leadingSubview.render()}
-        </StackHeaderSubviewNativeComponent>
+        </StackHeaderSubviewAndroidNativeComponent>
       )}
       {centerSubview && (
-        <StackHeaderSubviewNativeComponent type="center">
+        <StackHeaderSubviewAndroidNativeComponent type="center">
           {centerSubview.render()}
-        </StackHeaderSubviewNativeComponent>
+        </StackHeaderSubviewAndroidNativeComponent>
       )}
       {trailingSubview && (
-        <StackHeaderSubviewNativeComponent type="trailing">
+        <StackHeaderSubviewAndroidNativeComponent type="trailing">
           {trailingSubview.render()}
-        </StackHeaderSubviewNativeComponent>
+        </StackHeaderSubviewAndroidNativeComponent>
       )}
     </ls-stack-header-config>
   );

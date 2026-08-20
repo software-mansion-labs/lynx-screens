@@ -5,7 +5,7 @@
 NS_ASSUME_NONNULL_BEGIN
 
 /**
- * Painting view of the `ls-stack-header-item` element. UIKit positions it
+ * Painting view of the `ls-stack-header-item-ios` element. UIKit positions it
  * inside the navigation bar; the Lynx engine only computes its size, exposed
  * through intrinsicContentSize (counterpart of RNS's intrinsicContentSize
  * backed by layoutMetrics).
