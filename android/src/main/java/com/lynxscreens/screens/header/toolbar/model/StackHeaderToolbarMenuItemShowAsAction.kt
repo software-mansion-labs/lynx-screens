@@ -1,4 +1,4 @@
-package com.lynxscreens.screens.header.toolbar
+package com.lynxscreens.screens.header.toolbar.model
 
 import android.view.MenuItem.SHOW_AS_ACTION_ALWAYS
 import android.view.MenuItem.SHOW_AS_ACTION_IF_ROOM

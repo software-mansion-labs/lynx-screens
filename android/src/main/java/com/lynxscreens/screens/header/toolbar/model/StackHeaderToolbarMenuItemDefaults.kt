@@ -1,4 +1,4 @@
-package com.lynxscreens.screens.header.toolbar
+package com.lynxscreens.screens.header.toolbar.model
 
 /**
  * Defaults for toolbar menu item fields.

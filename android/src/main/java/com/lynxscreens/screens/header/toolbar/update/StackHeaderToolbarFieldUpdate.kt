@@ -1,4 +1,4 @@
-package com.lynxscreens.screens.header.toolbar
+package com.lynxscreens.screens.header.toolbar.update
 
 internal sealed interface StackHeaderToolbarFieldUpdate<out T> {
     object Reset : StackHeaderToolbarFieldUpdate<Nothing>

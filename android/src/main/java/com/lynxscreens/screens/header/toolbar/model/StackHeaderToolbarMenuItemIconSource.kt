@@ -1,4 +1,4 @@
-package com.lynxscreens.screens.header.toolbar
+package com.lynxscreens.screens.header.toolbar.model
 
 internal data class StackHeaderToolbarMenuItemIconSource(
     val drawableIconResourceName: String?,

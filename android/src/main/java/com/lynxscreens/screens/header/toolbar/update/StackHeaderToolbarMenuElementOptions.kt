@@ -1,6 +1,7 @@
-package com.lynxscreens.screens.header.toolbar
+package com.lynxscreens.screens.header.toolbar.update
 
 import android.graphics.drawable.Drawable
+import com.lynxscreens.screens.header.toolbar.model.StackHeaderToolbarMenuItemShowAsAction
 
 /**
  * Partial update for a toolbar menu element.

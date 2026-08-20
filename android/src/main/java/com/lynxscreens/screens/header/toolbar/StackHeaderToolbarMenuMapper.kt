@@ -7,7 +7,22 @@ import com.lynxscreens.screens.helpers.readColor
 import com.lynxscreens.screens.helpers.readImageUri
 import com.lynxscreens.screens.helpers.readOptionalString
 import com.lynxscreens.screens.helpers.requireNotNullString
+import com.lynxscreens.screens.header.toolbar.model.StackHeaderToolbarMenuConfig
+import com.lynxscreens.screens.header.toolbar.model.StackHeaderToolbarMenuElementConfig
+import com.lynxscreens.screens.header.toolbar.model.StackHeaderToolbarMenuGroupConfig
+import com.lynxscreens.screens.header.toolbar.model.StackHeaderToolbarMenuItemConfig
+import com.lynxscreens.screens.header.toolbar.model.StackHeaderToolbarMenuItemDefaults
+import com.lynxscreens.screens.header.toolbar.model.StackHeaderToolbarMenuItemIconSource
+import com.lynxscreens.screens.header.toolbar.model.StackHeaderToolbarMenuItemShowAsAction
+import com.lynxscreens.screens.header.toolbar.model.StackHeaderToolbarMenuItemType
+import com.lynxscreens.screens.header.toolbar.update.StackHeaderToolbarFieldUpdate
+import com.lynxscreens.screens.header.toolbar.update.StackHeaderToolbarMenuElementOptions
+import com.lynxscreens.screens.header.toolbar.update.StackHeaderToolbarMenuElementRawUpdate
 
+/**
+ * Parses Lynx toolbar-menu props (ReadableMap) into the native menu
+ * config and element-update models.
+ */
 internal object StackHeaderToolbarMenuMapper {
     // region Menu prop parsing
 
