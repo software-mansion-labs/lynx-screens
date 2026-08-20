@@ -28,7 +28,7 @@ export type StackRouteOptions = Omit<
 export type StackRouteConfig = {
   name: string;
   Component: React.ComponentType;
-  options: StackRouteOptions;
+  options?: StackRouteOptions | undefined;
 };
 
 export type StackRoute = Omit<StackRouteConfig, 'Component'> & {

@@ -37,7 +37,6 @@ function StackSetup() {
         {
           name: 'Home',
           Component: HomeScreen,
-          options: {},
         },
         {
           name: 'A',

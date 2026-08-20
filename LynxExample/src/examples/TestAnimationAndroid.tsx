@@ -12,22 +12,18 @@ function StackSetup() {
         {
           name: 'Home',
           Component: HomeScreen,
-          options: {},
         },
         {
           name: 'Blue',
           Component: BlueScreen,
-          options: {},
         },
         {
           name: 'Red',
           Component: RedScreen,
-          options: {},
         },
         {
           name: 'NestedHost',
           Component: NestedHostScreen,
-          options: {},
         },
       ]}
     />
@@ -104,17 +100,14 @@ function NestedHostScreen() {
         {
           name: 'NestedHome',
           Component: NestedHomeScreen,
-          options: {},
         },
         {
           name: 'NestedBlue',
           Component: NestedBlueScreen,
-          options: {},
         },
         {
           name: 'NestedRed',
           Component: NestedRedScreen,
-          options: {},
         },
       ]}
     />

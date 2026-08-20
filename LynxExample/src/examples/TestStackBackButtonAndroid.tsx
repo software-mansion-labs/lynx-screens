@@ -106,12 +106,10 @@ const ROUTE_CONFIGS: StackRouteConfig[] = [
   {
     name: 'Root',
     Component: RootScreen,
-    options: {},
   },
   {
     name: 'Pushed',
     Component: PushedScreen,
-    options: {},
   },
 ];
 

@@ -6,12 +6,10 @@ const ROUTE_CONFIGS: StackRouteConfig[] = [
   {
     name: 'A',
     Component: TemplateScreen,
-    options: {},
   },
   {
     name: 'B',
     Component: TemplateScreen,
-    options: {},
   },
 ];
 
