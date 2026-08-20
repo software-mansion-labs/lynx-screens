@@ -10,6 +10,7 @@ declare module "@lynx-js/types" {
     title?: string | undefined;
     itemType?: 'action' | 'toggle' | 'automatic' | undefined;
     initialToggleState?: boolean | undefined;
+    keepsMenuPresented?: boolean | undefined;
   };
 
   type StackHeaderMenuAttr = {

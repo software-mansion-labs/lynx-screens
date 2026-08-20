@@ -1,5 +1,10 @@
 #import "RNSStackHeaderMenuMapper.h"
 
+static NSSet<NSString *> *const kRNSAllowedMenuKeys =
+    [NSSet setWithObjects:@"id", @"type", @"title", @"children", @"singleSelection", nil];
+static NSSet<NSString *> *const kRNSAllowedMenuItemKeys =
+    [NSSet setWithObjects:@"id", @"type", @"title", @"itemType", @"initialToggleState", @"keepsMenuPresented", nil];
+
 @implementation RNSStackHeaderMenuMapper
 
 + (nullable RNSStackHeaderMenuData *)menuFromDictionary:(nullable id)dictionary
@@ -51,7 +56,8 @@
                                                         title:[self stringForKey:@"title" in:dict]
                                                      itemType:[self itemTypeFromString:[self stringForKey:@"itemType"
                                                                                                        in:dict]]
-                                           initialToggleState:[self boolForKey:@"initialToggleState" in:dict]];
+                                           initialToggleState:[self boolForKey:@"initialToggleState" in:dict]
+                                           keepsMenuPresented:[self boolForKey:@"keepsMenuPresented" in:dict]];
     }
 
     return nil;
@@ -62,10 +68,7 @@
 + (void)validateMenuKeys:(NSDictionary *)dict
 {
     for (NSString *key in dict) {
-        NSAssert([key isEqualToString:@"id"] || [key isEqualToString:@"type"] || [key isEqualToString:@"title"] ||
-                     [key isEqualToString:@"children"] || [key isEqualToString:@"singleSelection"],
-                 @"[RNScreens] Invalid key \"%@\" found in menu",
-                 key);
+        NSAssert([kRNSAllowedMenuKeys containsObject:key], @"[RNScreens] Invalid key \"%@\" found in menu", key);
     }
     NSAssert(dict[@"children"], @"[RNScreens] missing key \"children\" in menu");
     NSAssert(dict[@"id"], @"[RNScreens] missing id on one of menu elements");
@@ -74,10 +77,7 @@
 + (void)validateMenuItemKeys:(NSDictionary *)dict
 {
     for (NSString *key in dict) {
-        NSAssert([key isEqualToString:@"id"] || [key isEqualToString:@"type"] || [key isEqualToString:@"title"] ||
-                     [key isEqualToString:@"itemType"] || [key isEqualToString:@"initialToggleState"],
-                 @"[RNScreens] Invalid key \"%@\" found in menu item",
-                 key);
+        NSAssert([kRNSAllowedMenuItemKeys containsObject:key], @"[RNScreens] Invalid key \"%@\" found in menu item", key);
     }
     NSAssert(dict[@"id"], @"[RNScreens] missing id on one of menu elements");
 }
