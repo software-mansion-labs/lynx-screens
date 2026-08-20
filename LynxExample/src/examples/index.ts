@@ -12,4 +12,5 @@ export { default as TestStackToolbarNestedMenuAndroid } from './TestStackToolbar
 export { default as TestStackSubviewsAndroid } from './TestStackSubviewsAndroid';
 export { default as TestStackSubviewsIOS } from './TestStackSubviewsIOS';
 export { default as TestStackHeaderMenuIOS } from './TestStackHeaderMenuIOS';
+export { default as TestStackHeaderSubviewOnpressIOS } from './TestStackHeaderSubviewOnpressIOS';
 export { default as TestPreventNativeDismissSingleStack } from './TestPreventNativeDismissSingleStack';

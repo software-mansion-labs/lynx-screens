@@ -6,7 +6,7 @@
 #import "RNSStackHeaderItemComponent.h"
 #import "RNSStackHeaderItemInvalidationDelegate.h"
 #import "RNSStackHeaderItemSpacerComponent.h"
-#import "RNSStackHeaderMenuEventsDelegate.h"
+#import "RNSStackHeaderEventsDelegate.h"
 #import "RNSStackHeaderConfigView.h"
 #import "RNSStackNavigationController.h"
 #import "RNSStackScreenComponent.h"
@@ -27,8 +27,7 @@ static void RNSAssertIsValidHeaderChild(id child)
               RNSStackHeaderItemSpacerComponent.class);
 }
 
-@interface RNSStackHeaderConfigComponent () <RNSStackHeaderItemInvalidationDelegate,
-                                              RNSStackHeaderMenuEventsDelegate>
+@interface RNSStackHeaderConfigComponent () <RNSStackHeaderItemInvalidationDelegate, RNSStackHeaderEventsDelegate>
 @end
 
 @LynxElement("ls-stack-header-config")
@@ -133,7 +132,7 @@ static void RNSAssertIsValidHeaderChild(id child)
     [self submitCurrentDataIfMounted];
 }
 
-#pragma mark - RNSStackHeaderMenuEventsDelegate
+#pragma mark - RNSStackHeaderEventsDelegate
 
 - (RNSStackHeaderConfigEventEmitter *)getEventEmitter
 {
@@ -154,6 +153,19 @@ static void RNSAssertIsValidHeaderChild(id child)
     [[self getEventEmitter] emitOnMenuSelectionChange:menuId selectedMenuItemIds:selectedIds];
     // UIKit doesn't update UIAction.state after tap — rebuild menu so tracker state is reflected
     [self submitCurrentDataIfMounted];
+}
+
+- (void)didPressHeaderItem:(NSString *)itemId
+{
+    for (LynxUI *child in self.children) {
+        if ([child isKindOfClass:RNSStackHeaderItemComponent.class]) {
+            RNSStackHeaderItemComponent *item = (RNSStackHeaderItemComponent *)child;
+            if ([item.itemId isEqualToString:itemId]) {
+                [item emitOnPress];
+                return;
+            }
+        }
+    }
 }
 
 #pragma mark - RNSViewFrameChangeDelegate
@@ -349,12 +361,12 @@ LYNX_PROP_SETTER("backButtonHidden", setBackButtonHidden, BOOL) {}
                 case RNSHeaderItemPlacementLeading:
                     [leadingItems addObject:[RNSStackHeaderContentFactory barButtonItemForHeaderItem:item
                                                                              withFrameChangeDelegate:self
-                                                                              withMenuEventsDelegate:self]];
+                                                                            withHeaderEventsDelegate:self]];
                     break;
                 case RNSHeaderItemPlacementTrailing:
                     [trailingItems addObject:[RNSStackHeaderContentFactory barButtonItemForHeaderItem:item
                                                                               withFrameChangeDelegate:self
-                                                                               withMenuEventsDelegate:self]];
+                                                                             withHeaderEventsDelegate:self]];
                     break;
                 case RNSHeaderItemPlacementTitle:
                     if (item.customView != nil) {
