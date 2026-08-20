@@ -9,7 +9,7 @@ import type {
   PlatformIconAndroid,
   StackHeaderConfigRef,
   StackHeaderToolbarMenuElementAndroid,
-  StackHeaderToolbarMenuItemOptionsAndroid,
+  StackHeaderToolbarMenuElementOptionsAndroid,
   StackHeaderToolbarMenuItemShowAsActionAndroid,
 } from 'lynx-screens';
 import searchIcon from '../assets/search_black.png';
@@ -224,7 +224,7 @@ function MainScreen() {
   );
 
   const sendCommand = useCallback(() => {
-    const options: StackHeaderToolbarMenuItemOptionsAndroid = {
+    const options: StackHeaderToolbarMenuElementOptionsAndroid = {
       ...(cmdTitle !== 'no change' && {
         title: cmdTitle === 'undefined' ? undefined : cmdTitle,
       }),
@@ -235,7 +235,7 @@ function MainScreen() {
         tooltipText: resolveOptionalString(cmdTooltip),
       }),
     };
-    headerConfigRef.current?.android?.setToolbarMenuItemOptions(
+    headerConfigRef.current?.android?.setToolbarMenuElementOptions(
       cmdTargetId,
       options,
     );

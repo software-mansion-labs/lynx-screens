@@ -3,7 +3,7 @@ import type {
   PlatformIconAndroid,
   StackHeaderConfigRef,
   StackHeaderToolbarMenuBaseAndroid,
-  StackHeaderToolbarMenuItemOptionsAndroid,
+  StackHeaderToolbarMenuElementOptionsAndroid,
 } from 'lynx-screens';
 import searchIcon from '../assets/search_black.png';
 import {
@@ -213,13 +213,13 @@ function MainScreen() {
   );
 
   const sendCommand = useCallback(() => {
-    const options: StackHeaderToolbarMenuItemOptionsAndroid = {
+    const options: StackHeaderToolbarMenuElementOptionsAndroid = {
       ...(cmdDisabled !== 'no change' && {
         disabled:
           cmdDisabled === 'undefined' ? undefined : cmdDisabled === 'true',
       }),
     };
-    headerConfigRef.current?.android?.setToolbarMenuItemOptions(
+    headerConfigRef.current?.android?.setToolbarMenuElementOptions(
       cmdTargetId,
       options,
     );

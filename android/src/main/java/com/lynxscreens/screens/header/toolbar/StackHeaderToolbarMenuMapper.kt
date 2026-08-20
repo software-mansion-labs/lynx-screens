@@ -22,10 +22,10 @@ internal object StackHeaderToolbarMenuMapper {
 
     // endregion
 
-    // region Menu item command parsing
+    // region Menu element command parsing
 
-    fun parseMenuItemOptions(map: ReadableMap): StackHeaderToolbarMenuItemOptions =
-        StackHeaderToolbarMenuItemOptions(
+    fun parseMenuElementOptions(map: ReadableMap): StackHeaderToolbarMenuElementOptions =
+        StackHeaderToolbarMenuElementOptions(
             title = map.readNullableStringUpdate("title"),
             titleCondensed = map.readNullableStringUpdate("titleCondensed"),
             tooltipText = map.readNullableStringUpdate("tooltipText"),
@@ -46,9 +46,10 @@ internal object StackHeaderToolbarMenuMapper {
                     "checked",
                     StackHeaderToolbarMenuItemDefaults.INITIAL_TOGGLE_STATE,
                 ),
+            menuTitle = map.readNullableStringUpdate("menuTitle"),
         )
 
-    fun parseMenuItemIconSource(map: ReadableMap): StackHeaderToolbarMenuItemIconSource? {
+    fun parseMenuElementIconSource(map: ReadableMap): StackHeaderToolbarMenuItemIconSource? {
         if (!map.hasKey("drawableIconResourceName") && !map.hasKey("imageIconUri")) {
             return null
         }
@@ -106,6 +107,7 @@ internal object StackHeaderToolbarMenuMapper {
                 StackHeaderToolbarMenuElementConfig.Submenu(
                     item = item,
                     menu = StackHeaderToolbarMenuConfig(parseGroups(map), parseChildren(map, iconSources)),
+                    menuTitle = map.readOptionalString("menuTitle"),
                 )
 
             else ->

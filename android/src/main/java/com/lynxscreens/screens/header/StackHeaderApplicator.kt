@@ -35,7 +35,7 @@ import com.lynxscreens.screens.header.toolbar.StackHeaderToolbarMenuElementConfi
 import com.lynxscreens.screens.header.toolbar.StackHeaderToolbarMenuGroupConfig
 import com.lynxscreens.screens.header.toolbar.StackHeaderToolbarMenuGroupMetadata
 import com.lynxscreens.screens.header.toolbar.StackHeaderToolbarMenuItemConfig
-import com.lynxscreens.screens.header.toolbar.StackHeaderToolbarMenuItemOptions
+import com.lynxscreens.screens.header.toolbar.StackHeaderToolbarMenuElementOptions
 import com.lynxscreens.screens.header.toolbar.StackHeaderToolbarMenuItemType
 import com.lynxscreens.screens.header.toolbar.StackHeaderToolbarUpdate
 import com.lynxscreens.screens.header.toolbar.valueOrNull
@@ -432,12 +432,13 @@ internal class StackHeaderApplicator(
             when (element) {
                 is StackHeaderToolbarMenuElementConfig.MenuItem -> {
                     val menuItem = menu.add(groupIntId, itemId, index, null)
-                    applyMenuItemOptions(toolbar, menuItem, element.item.toOptions())
+                    applyMenuElementOptions(toolbar, menuItem, element.item.toOptions())
                     applyCheckability(menuItem, element.item)
                 }
                 is StackHeaderToolbarMenuElementConfig.Submenu -> {
                     val subMenu = menu.addSubMenu(groupIntId, itemId, index, null)
-                    applyMenuItemOptions(toolbar, subMenu.item, element.item.toOptions())
+                    applyMenuElementOptions(toolbar, subMenu.item, element.item.toOptions())
+                    element.menuTitle?.let { subMenu.setHeaderTitle(it) }
                     addElements(toolbar, subMenu, element.menu, forwardIdMap, forwardGroupIdMap)
                 }
             }
@@ -484,24 +485,24 @@ internal class StackHeaderApplicator(
         }
     }
 
-    fun updateToolbarMenuItem(
+    fun updateToolbarMenuElement(
         toolbar: MaterialToolbar,
         forwardIdMap: Map<String, Int>,
         id: String,
-        options: StackHeaderToolbarMenuItemOptions,
+        options: StackHeaderToolbarMenuElementOptions,
     ) {
         val item =
             forwardIdMap[id]?.let { toolbar.menu.findItem(it) } ?: run {
-                Log.e(TAG, "[RNScreens] Unable to find menu item.")
+                Log.e(TAG, "[RNScreens] Unable to find menu element.")
                 return
             }
-        applyMenuItemOptions(toolbar, item, options)
+        applyMenuElementOptions(toolbar, item, options)
     }
 
-    private fun applyMenuItemOptions(
+    private fun applyMenuElementOptions(
         toolbar: MaterialToolbar,
         menuItem: MenuItem,
-        options: StackHeaderToolbarMenuItemOptions,
+        options: StackHeaderToolbarMenuElementOptions,
     ) {
         options.title?.let { menuItem.title = it.valueOrNull() }
         options.titleCondensed?.let { menuItem.titleCondensed = it.valueOrNull() }
@@ -524,6 +525,19 @@ internal class StackHeaderApplicator(
 
         if (options.requiresIconTintColorUpdate || options.icon != null) {
             MenuItemCompat.setIconTintList(menuItem, getResolvedIconTintList(menuItem, options))
+        }
+
+        options.menuTitle?.let { update ->
+            val subMenu = menuItem.subMenu
+            if (subMenu != null) {
+                // In order to match native behavior, we need to clear the header first and then use
+                // regular title if menuTitle is not provided. If title is also null, there will be
+                // no submenu header at all.
+                subMenu.clearHeader()
+                subMenu.setHeaderTitle(update.valueOrNull() ?: menuItem.title)
+            } else {
+                Log.w(TAG, "[RNScreens] menuTitle ignored: target is not a submenu.")
+            }
         }
     }
 
@@ -598,7 +612,7 @@ internal class StackHeaderApplicator(
     }
 
     private fun StackHeaderToolbarMenuItemConfig.toOptions() =
-        StackHeaderToolbarMenuItemOptions(
+        StackHeaderToolbarMenuElementOptions(
             title = StackHeaderToolbarUpdate.from(title),
             titleCondensed = StackHeaderToolbarUpdate.from(titleCondensed),
             tooltipText = StackHeaderToolbarUpdate.from(tooltipText),
@@ -640,7 +654,7 @@ internal class StackHeaderApplicator(
 
     private fun getResolvedIconTintList(
         menuItem: MenuItem,
-        options: StackHeaderToolbarMenuItemOptions,
+        options: StackHeaderToolbarMenuElementOptions,
     ): ColorStateList? {
         val currentTintList = MenuItemCompat.getIconTintList(menuItem)
         // The currently-applied normal (catch-all) color, if any. Used both as the "leave

@@ -53,6 +53,7 @@ declare module "@lynx-js/types" {
     groupId?: string | undefined;
     itemType?: 'action' | 'toggle' | 'automatic' | undefined;
     initialToggleState?: boolean | undefined;
+    menuTitle?: string | undefined;
     groups?: StackHeaderToolbarMenuGroupAttr[] | undefined;
     children?: StackHeaderToolbarMenuElementAttr[] | undefined;
   };
