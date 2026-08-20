@@ -101,7 +101,7 @@ LYNX_PROP_SETTER("width", setWidth, CGFloat) {
 
     if (_needsUpdate) {
         _needsUpdate = NO;
-        [_invalidationDelegate headerItemDidInvalidate];
+        [_invalidationDelegate headerItemSpacerDidInvalidate];
     }
 }
 

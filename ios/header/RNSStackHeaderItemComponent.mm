@@ -1,7 +1,6 @@
 #import "RNSStackHeaderItemComponent.h"
 #import "RNSStackHeaderItemEventEmitter.h"
 #import "RNSStackHeaderMenuMapper.h"
-#import "RNSStackHeaderMenuToggleStateTracker.h"
 
 #import <Lynx/LynxComponentRegistry.h>
 #import <Lynx/LynxLog.h>
@@ -16,9 +15,9 @@
     NSString *_Nullable _itemId;
     NSString *_Nullable _title;
     RNSStackHeaderMenuData *_Nullable _menu;
-    RNSStackHeaderMenuToggleStateTracker *_Nullable _menuToggleStateTracker;
     BOOL _respondsToOnPress;
     BOOL _needsUpdate;
+    BOOL _menuDidChange;
     RNSStackHeaderItemEventEmitter *_Nullable _eventEmitter;
 }
 
@@ -35,11 +34,11 @@
     _itemId = nil;
     _title = nil;
     _menu = nil;
-    _menuToggleStateTracker = nil;
     _placement = RNSHeaderItemPlacementTrailing;
     _didSetHeaderItemPlacement = NO;
     _respondsToOnPress = NO;
     _needsUpdate = NO;
+    _menuDidChange = NO;
 }
 
 // Adaptation: RNS creates the codegen-backed emitter eagerly and refreshes it
@@ -95,11 +94,6 @@
     return _menu;
 }
 
-- (nullable RNSStackHeaderMenuToggleStateTracker *)menuToggleStateTracker
-{
-    return _menuToggleStateTracker;
-}
-
 - (nullable UIView *)customView
 {
     // Adaptation: on Lynx the item's painting view (not the component itself)
@@ -144,7 +138,7 @@
 
     // An existing item may have transitioned from label-only to custom view,
     // and needs to be rebuilt.
-    [_invalidationDelegate headerItemDidInvalidate];
+    [_invalidationDelegate headerItemDidInvalidateWithId:_itemId];
 }
 
 - (void)removeChild:(id)child atIndex:(NSInteger)index
@@ -153,7 +147,7 @@
 
     // An existing item may have transitioned from custom view to label-only,
     // and needs to be rebuilt.
-    [_invalidationDelegate headerItemDidInvalidate];
+    [_invalidationDelegate headerItemDidInvalidateWithId:_itemId];
 }
 
 #pragma mark - Props
@@ -218,8 +212,7 @@ LYNX_PROP_SETTER("menu", setMenu, NSDictionary *) {
     // Adaptation: Lynx delivers the prop as a plain NSDictionary - no
     // folly::dynamic conversion is needed.
     _menu = [RNSStackHeaderMenuMapper menuFromDictionary:value];
-    _menuToggleStateTracker = _menu != nil ? [RNSStackHeaderMenuToggleStateTracker new] : nil;
-    _needsUpdate = YES;
+    _menuDidChange = YES;
 }
 
 - (void)propsDidUpdate
@@ -228,7 +221,19 @@ LYNX_PROP_SETTER("menu", setMenu, NSDictionary *) {
 
     if (_needsUpdate) {
         _needsUpdate = NO;
-        [_invalidationDelegate headerItemDidInvalidate];
+        // rebuilds the item; needs to rebuilds the menu, but keeps its state
+        [_invalidationDelegate headerItemDidInvalidateWithId:_itemId];
+    }
+
+    if (_menuDidChange) {
+        _menuDidChange = NO;
+        // there are 3 distinct cases for rebuilding the menu
+        // 1. only menu changed -- no item rebuilding, menu state reset
+        // 2. some different prop changed -- item rebuilds, but menu should keep its state
+        // 3. both menu and some other prop changed -- both item and menu rebuilds + menu state should be reset
+        // If we don't have separate if-s, we won't cover all cases,
+        // but unfortunately we're rebuilding the menu twice for 3. case.
+        [_invalidationDelegate headerItemMenuDidChangeWithId:_itemId];
     }
 }
 
