@@ -53,7 +53,7 @@ function buildHeaderConfig(config: Config): StackHeaderConfigProps | undefined {
 export default function App(props: { onRender?: () => void }) {
   return (
     <StackContainer
-      routeConfigs={[{ name: 'Home', Component: ConfigScreen, options: {} }]}
+      routeConfigs={[{ name: 'Home', Component: ConfigScreen }]}
     />
   );
 }

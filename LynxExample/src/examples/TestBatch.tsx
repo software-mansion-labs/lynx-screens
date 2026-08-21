@@ -168,12 +168,10 @@ const routeConfigs: StackRouteConfig[] = [
   {
     name: 'Menu',
     Component: MenuScreen,
-    options: {},
   },
   ...ALPHABET.map((name) => ({
     name,
     Component: TemplateScreen,
-    options: {},
   })),
 ];
 

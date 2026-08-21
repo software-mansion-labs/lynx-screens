@@ -173,7 +173,6 @@ const ROUTE_CONFIGS: StackRouteConfig[] = [
   {
     name: 'Home',
     Component: ConfigScreen,
-    options: {},
   },
 ];
 

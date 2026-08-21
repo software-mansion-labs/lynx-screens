@@ -208,12 +208,10 @@ export default function App(props: { onRender?: () => void }) {
         {
           name: 'Home',
           Component: ConfigScreen,
-          options: {},
         },
         {
           name: 'Second',
           Component: ConfigScreen,
-          options: {},
         },
       ]}
     />

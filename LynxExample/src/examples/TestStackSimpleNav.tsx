@@ -7,17 +7,14 @@ const ROUTE_CONFIGS: StackRouteConfig[] = [
   {
     name: 'Home',
     Component: HomeScreen,
-    options: {},
   },
   {
     name: 'A',
     Component: AScreen,
-    options: {},
   },
   {
     name: 'B',
     Component: BScreen,
-    options: {},
   },
 ];
 
