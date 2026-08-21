@@ -102,17 +102,6 @@ function buildHeaderConfig(config: Config): StackHeaderConfigProps {
   };
 }
 
-const ROUTE_CONFIGS: StackRouteConfig[] = [
-  {
-    name: 'Root',
-    Component: RootScreen,
-  },
-  {
-    name: 'Pushed',
-    Component: PushedScreen,
-  },
-];
-
 export default function App(props: { onRender?: () => void }) {
   const [config, setConfig] = useState<Config>(DEFAULT_CONFIG);
 
@@ -123,9 +112,31 @@ export default function App(props: { onRender?: () => void }) {
     [],
   );
 
+  // The header config is part of the route options so a pushed screen mounts
+  // its header in the same commit as the screen - the setRouteOptions effect
+  // lands in a later native update than the push on Lynx, making the header
+  // appear only after the transition. The config is app-level state here, so
+  // the route configs are rebuilt from the current value; already-mounted
+  // instances keep receiving updates through useApplyHeaderConfig.
+  const routeConfigs = useMemo<StackRouteConfig[]>(() => {
+    const headerConfig = buildHeaderConfig(config);
+    return [
+      {
+        name: 'Root',
+        Component: RootScreen,
+        options: { headerConfig },
+      },
+      {
+        name: 'Pushed',
+        Component: PushedScreen,
+        options: { headerConfig },
+      },
+    ];
+  }, [config]);
+
   return (
     <ConfigContext.Provider value={{ config, updateConfig }}>
-      <StackContainer routeConfigs={ROUTE_CONFIGS} />
+      <StackContainer routeConfigs={routeConfigs} />
     </ConfigContext.Provider>
   );
 }

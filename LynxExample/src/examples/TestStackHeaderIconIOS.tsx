@@ -229,6 +229,20 @@ export default function App(props: { onRender?: () => void }) {
         {
           name: 'Home',
           Component: ConfigScreen,
+          // Initial header config (default variants, no-op callbacks) so a
+          // pushed instance mounts its header in the same commit as the
+          // screen - the setRouteOptions layout effect lands in a later
+          // native update than the push on Lynx, making the items miss the
+          // iOS 26 navigation bar transition. The screen's effect replaces
+          // it with the live config right after mount.
+          options: {
+            headerConfig: buildHeaderConfig(
+              'sfSymbol',
+              'sfSymbol',
+              () => {},
+              () => {},
+            ),
+          },
         },
       ]}
     />
