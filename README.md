@@ -86,7 +86,6 @@ Parts of `react-native-screens` in the synced range that were deliberately left 
 - **FormSheet v5** — standalone RNS component; out of scope for this port.
 - **Native Tabs, SplitView, SafeArea, ScrollToTopGuard** — components lynx-screens doesn't port; see also the open topics below.
 - **ScrollViewMarker scroll edge effects** — only the scroll view registration core of the SVM epic is ported; the iOS scroll edge effect subsystem is not.
-- **Stack v4 / legacy** — lynx-screens is v5-only.
 
 ### 3. Further plans in RNScreens
 
