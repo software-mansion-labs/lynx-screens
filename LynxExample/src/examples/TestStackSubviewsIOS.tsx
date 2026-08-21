@@ -201,6 +201,16 @@ function buildHeaderConfig(config: Config): StackHeaderConfigProps | undefined {
   };
 }
 
+// Initial header config in the route options so a pushed screen mounts its
+// header in the same commit as the screen itself. On Lynx the setRouteOptions
+// layout effect reaches the native side in a later update than the push, so a
+// header applied only through the effect misses the iOS 26 navigation bar
+// transition and its items pop in after the animation. The per-screen effect
+// still takes over for runtime updates.
+const INITIAL_ROUTE_OPTIONS = {
+  headerConfig: buildHeaderConfig(DEFAULT_CONFIG),
+};
+
 export default function App(props: { onRender?: () => void }) {
   return (
     <StackContainer
@@ -208,10 +218,12 @@ export default function App(props: { onRender?: () => void }) {
         {
           name: 'Home',
           Component: ConfigScreen,
+          options: INITIAL_ROUTE_OPTIONS,
         },
         {
           name: 'Second',
           Component: ConfigScreen,
+          options: INITIAL_ROUTE_OPTIONS,
         },
       ]}
     />

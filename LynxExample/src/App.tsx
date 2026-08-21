@@ -95,7 +95,14 @@ function withExitOverlay(Component: React.ComponentType): React.ComponentType {
   return function ExampleWithExitOverlay() {
     const navigation = useStackNavigationContext();
     return (
-      <view style={{ width: '100%', height: '100%' }}>
+      <view
+        style={{
+          display: 'flex',
+          flexDirection: 'column',
+          width: '100%',
+          height: '100%',
+        }}
+      >
         <Component />
         <view
           style={{

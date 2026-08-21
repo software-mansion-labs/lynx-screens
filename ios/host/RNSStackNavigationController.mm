@@ -93,16 +93,33 @@
         return;
     }
 
+    // Divergence from RNS: only the operation that establishes the final top
+    // screen is animated; the preceding ones run with animated:NO so UIKit
+    // applies them synchronously. In RNS the batched calls land inside the
+    // Fabric mounting transaction, where UIKit coalesces them into a single
+    // transition on its own; with our timing (iOS 26 starts the first
+    // animated transition eagerly) every animated call would defer the
+    // following ones, serializing one animation per operation and re-breaking
+    // the synchronous update assumption.
+    BOOL hasPendingPushes = _pendingPushOperations.count > 0;
+
+    NSUInteger popIndex = 0;
     for (RNSPopOperation *op in _pendingPopOperations) {
         UIViewController *controller = static_cast<UIViewController *>(op.stackScreen.controller);
         NSAssert([self.viewControllers count] > 1, @"[RNScreens] Attempt to pop last screen from the stack");
         NSAssert(self.topViewController == controller, @"[RNScreens] Attempt to pop non-top screen");
-        [self popViewControllerAnimated:YES];
+        BOOL isFinalOperation =
+            !hasPendingPushes && popIndex == _pendingPopOperations.count - 1;
+        [self popViewControllerAnimated:isFinalOperation];
+        popIndex += 1;
     }
 
+    NSUInteger pushIndex = 0;
     for (RNSPushOperation *op in _pendingPushOperations) {
         UIViewController *controller = static_cast<UIViewController *>(op.stackScreen.controller);
-        [self pushViewController:controller animated:YES];
+        BOOL isFinalOperation = pushIndex == _pendingPushOperations.count - 1;
+        [self pushViewController:controller animated:isFinalOperation];
+        pushIndex += 1;
     }
 
     NSAssert([self.viewControllers count] > 0, @"[RNScreens] Stack should never be empty after updates");

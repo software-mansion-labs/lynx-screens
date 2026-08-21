@@ -96,6 +96,52 @@ function getSubviewDimensions(size: SubviewSize): {
   }
 }
 
+type PressedState = 'pressed-out' | 'pressed-in' | 'pressed';
+
+// Port of RNS's shared PressableWithFeedback (purple when idle, blue while
+// held down, yellow once a press registered), built on Lynx touch events -
+// RN's Pressable and pressRetentionOffset have no Lynx counterpart.
+function PressableWithFeedback({
+  label,
+  width,
+  height,
+}: {
+  label: string;
+  width: number;
+  height: number;
+}) {
+  const [pressedState, setPressedState] = useState<PressedState>('pressed-out');
+
+  const backgroundColor =
+    pressedState === 'pressed-in'
+      ? '#38acdd'
+      : pressedState === 'pressed'
+        ? '#ffd61e'
+        : '#782aeb';
+
+  return (
+    <view
+      style={{
+        display: 'flex',
+        width: `${width}px`,
+        height: `${height}px`,
+        backgroundColor,
+        justifyContent: 'center',
+        alignItems: 'center',
+      }}
+      bindtouchstart={() => setPressedState('pressed-in')}
+      bindtouchcancel={() => setPressedState('pressed-out')}
+      bindtouchend={() => setPressedState('pressed-out')}
+      bindtap={() => {
+        console.log(`[Example] Tapped subview ${label}`);
+        setPressedState('pressed');
+      }}
+    >
+      <text style={{ color: 'white', fontSize: '10px' }}>{label}</text>
+    </view>
+  );
+}
+
 function buildHeaderConfig(config: Config): StackHeaderConfigProps | undefined {
   if (!config.enabled) {
     return undefined;
@@ -108,19 +154,11 @@ function buildHeaderConfig(config: Config): StackHeaderConfigProps | undefined {
     const dims = getSubviewDimensions(size);
     return {
       render: () => (
-        <view
-          style={{
-            display: 'flex',
-            width: `${dims.width}px`,
-            height: `${dims.height}px`,
-            backgroundColor: '#3f51b5',
-            justifyContent: 'center',
-            alignItems: 'center',
-          }}
-          bindtap={() => console.log(`[Example] Tapped subview ${label}`)}
-        >
-          <text style={{ color: 'white', fontSize: '10px' }}>{label}</text>
-        </view>
+        <PressableWithFeedback
+          label={label}
+          width={dims.width}
+          height={dims.height}
+        />
       ),
     };
   };
@@ -173,6 +211,11 @@ const ROUTE_CONFIGS: StackRouteConfig[] = [
   {
     name: 'Home',
     Component: ConfigScreen,
+    // Initial header config so a pushed instance mounts its header in the
+    // same commit as the screen - the setRouteOptions layout effect lands in
+    // a later native update than the push on Lynx, making the header appear
+    // only after the transition. The effect takes over for runtime updates.
+    options: { headerConfig: buildHeaderConfig(DEFAULT_CONFIG) },
   },
 ];
 
