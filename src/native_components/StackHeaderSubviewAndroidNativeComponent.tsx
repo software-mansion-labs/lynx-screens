@@ -1,13 +1,13 @@
 import React from 'react';
 import type { StackHeaderSubviewProps } from '../types/StackHeaderConfig.js';
 
-export const StackHeaderSubviewNativeComponent = ({
+export const StackHeaderSubviewAndroidNativeComponent = ({
   children,
   type,
   collapseMode,
 }: StackHeaderSubviewProps) => {
   return (
-    <ls-stack-header-subview
+    <ls-stack-header-subview-android
       style={
         type === 'background'
           ? {
@@ -27,6 +27,6 @@ export const StackHeaderSubviewNativeComponent = ({
       collapseMode={collapseMode}
     >
       {children}
-    </ls-stack-header-subview>
+    </ls-stack-header-subview-android>
   );
 };

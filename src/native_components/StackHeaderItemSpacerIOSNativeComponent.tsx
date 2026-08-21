@@ -1,5 +1,5 @@
 import React from 'react';
-import type { StackHeaderItemPlacement } from './StackHeaderItemNativeComponent.js';
+import type { StackHeaderItemPlacement } from './StackHeaderItemIOSNativeComponent.js';
 
 export type StackHeaderItemSpacerPlacement = Extract<
   StackHeaderItemPlacement,
@@ -12,11 +12,11 @@ export type StackHeaderItemSpacerProps = {
   width?: number | undefined;
 };
 
-export const StackHeaderItemSpacerNativeComponent = (
+export const StackHeaderItemSpacerIOSNativeComponent = (
   props: StackHeaderItemSpacerProps,
 ) => {
   return (
-    <ls-stack-header-item-spacer
+    <ls-stack-header-item-spacer-ios
       style={{
         position: 'absolute',
         left: 0,

@@ -4,7 +4,7 @@
 #import <Lynx/LynxLog.h>
 #import <Lynx/LynxPropsProcessor.h>
 
-@LynxElement("ls-stack-header-item-spacer")
+@LynxElement("ls-stack-header-item-spacer-ios")
 @implementation RNSStackHeaderItemSpacerComponent {
     RNSHeaderItemSpacerPlacement _placement;
     BOOL _didSetHeaderItemSpacerPlacement;

@@ -160,7 +160,7 @@ declare module "@lynx-js/types" {
       id?: string | undefined;
       style?: string | Lynx.CSSProperties | undefined;
     };
-    "ls-stack-header-subview": {
+    "ls-stack-header-subview-android": {
       className?: string | undefined;
       children?: ReactNode | undefined;
       id?: string | undefined;
@@ -168,7 +168,7 @@ declare module "@lynx-js/types" {
       type?: 'background' | 'leading' | 'center' | 'trailing' | undefined;
       collapseMode?: 'off' | 'parallax' | undefined;
     };
-    "ls-stack-header-item": {
+    "ls-stack-header-item-ios": {
       className?: string | undefined;
       children?: ReactNode | undefined;
       id?: string | undefined;
@@ -189,7 +189,7 @@ declare module "@lynx-js/types" {
         | Lynx.EventHandler<Lynx.BaseEventOrig<Record<string, never>>>
         | undefined;
     };
-    "ls-stack-header-item-spacer": {
+    "ls-stack-header-item-spacer-ios": {
       className?: string | undefined;
       id?: string | undefined;
       style?: string | Lynx.CSSProperties | undefined;

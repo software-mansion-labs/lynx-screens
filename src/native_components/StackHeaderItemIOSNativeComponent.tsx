@@ -24,7 +24,7 @@ export type StackHeaderItemProps = {
   onPress?: (() => void) | undefined;
 };
 
-export const StackHeaderItemNativeComponent = ({
+export const StackHeaderItemIOSNativeComponent = ({
   placement,
   itemId,
   title,
@@ -39,7 +39,7 @@ export const StackHeaderItemNativeComponent = ({
     }, [onPress]);
 
   return (
-    <ls-stack-header-item
+    <ls-stack-header-item-ios
       style={{
         position: 'absolute',
         left: 0,
@@ -56,6 +56,6 @@ export const StackHeaderItemNativeComponent = ({
       bindOnHeaderItemPress={handlePress}
     >
       {render?.()}
-    </ls-stack-header-item>
+    </ls-stack-header-item-ios>
   );
 };
