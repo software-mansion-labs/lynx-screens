@@ -121,6 +121,7 @@ declare module "@lynx-js/types" {
       scrollFlagEnterAlwaysCollapsed?: boolean | undefined;
       scrollFlagExitUntilCollapsed?: boolean | undefined;
       scrollFlagSnap?: boolean | undefined;
+      liftOnScroll?: boolean | undefined;
       hasBackgroundSubview?: boolean | undefined;
       largeTitle?: string | undefined;
       largeSubtitle?: string | undefined;
@@ -151,6 +152,12 @@ declare module "@lynx-js/types" {
             }>
           >
         | undefined;
+    };
+    "ls-scroll-view-marker": {
+      className?: string | undefined;
+      children: ReactNode;
+      id?: string | undefined;
+      style?: string | Lynx.CSSProperties | undefined;
     };
     "ls-stack-header-subview": {
       className?: string | undefined;

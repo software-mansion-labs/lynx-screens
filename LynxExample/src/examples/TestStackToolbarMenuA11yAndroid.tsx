@@ -4,6 +4,7 @@ import type {
   StackHeaderToolbarMenuElementAndroid,
   StackHeaderToolbarMenuElementOptionsAndroid,
 } from 'lynx-screens';
+import { ScrollViewMarker } from 'lynx-screens';
 import searchIcon from '../assets/search_black.png';
 import {
   Heading,
@@ -134,33 +135,35 @@ function MainScreen() {
   }, [cmdTargetId, cmdLabel]);
 
   return (
-    <scroll-view
-      scroll-y
-      style={{ width: '100%', height: '100%', backgroundColor: 'white' }}
-    >
-      <view
-        style={{ padding: '10px', paddingBottom: '50px', gap: '6px' }}
+    <ScrollViewMarker style={{ width: '100%', height: '100%' }}>
+      <scroll-view
+        scroll-y
+        style={{ width: '100%', height: '100%', backgroundColor: 'white' }}
       >
-        <Heading label="Result" />
-        <text style={{ color: 'black', fontSize: '15px' }}>
-          Last clicked: {lastClicked ?? '—'}
-        </text>
+        <view
+          style={{ padding: '10px', paddingBottom: '50px', gap: '6px' }}
+        >
+          <Heading label="Result" />
+          <text style={{ color: 'black', fontSize: '15px' }}>
+            Last clicked: {lastClicked ?? '—'}
+          </text>
 
-        <Heading label="Send Command" />
-        <SettingsPicker<AllIds>
-          label="target id"
-          value={cmdTargetId}
-          items={[...ALL_IDS]}
-          onValueChange={setCmdTargetId}
-        />
-        <SettingsPicker<LabelOption>
-          label="accessibilityLabel"
-          value={cmdLabel}
-          items={LABEL_OPTIONS}
-          onValueChange={setCmdLabel}
-        />
-        <SettingsButton label="Send Command" onTap={sendCommand} />
-      </view>
-    </scroll-view>
+          <Heading label="Send Command" />
+          <SettingsPicker<AllIds>
+            label="target id"
+            value={cmdTargetId}
+            items={[...ALL_IDS]}
+            onValueChange={setCmdTargetId}
+          />
+          <SettingsPicker<LabelOption>
+            label="accessibilityLabel"
+            value={cmdLabel}
+            items={LABEL_OPTIONS}
+            onValueChange={setCmdLabel}
+          />
+          <SettingsButton label="Send Command" onTap={sendCommand} />
+        </view>
+      </scroll-view>
+    </ScrollViewMarker>
   );
 }

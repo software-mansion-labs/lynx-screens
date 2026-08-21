@@ -158,6 +158,11 @@ internal class StackHeaderConfigComponent(
     }
         internal set
 
+    override var liftOnScroll: Boolean by Delegates.observable(true) { _, old, new ->
+        if (old != new) invalidate(StackHeaderInvalidationFlags.LIFT_ON_SCROLL)
+    }
+        internal set
+
     override var toolbarMenu: StackHeaderToolbarMenuConfig
         by Delegates.observable(StackHeaderToolbarMenuConfig(emptyList(), emptyList())) { _, old, new ->
             if (old != new) invalidate(StackHeaderInvalidationFlags.TOOLBAR_MENU)
@@ -171,6 +176,23 @@ internal class StackHeaderConfigComponent(
 
     override val isRTL: Boolean
         get() = view.layoutDirection == LayoutDirection.RTL
+
+    // endregion
+
+    // region Content scroll view
+
+    /**
+     * Called by the owning [com.lynxscreens.screens.screen.StackScreenComponent]
+     * when its content scroll view changes (e.g. a `ScrollViewMarker` registered
+     * one). Re-triggers lift-on-scroll so the coordinator can resolve and apply
+     * the up-to-date `liftOnScrollTargetView`.
+     */
+    internal fun onContentScrollViewChanged() {
+        invalidate(StackHeaderInvalidationFlags.LIFT_ON_SCROLL)
+        if (!isInsidePropsUpdate) {
+            flushUpdates()
+        }
+    }
 
     // endregion
 
@@ -579,6 +601,12 @@ internal class StackHeaderConfigComponent(
     @LynxProp(name = "scrollFlagSnap")
     fun setScrollFlagSnap(value: Boolean?) {
         scrollFlagSnap = value == true
+    }
+
+    @LynxProp(name = "liftOnScroll")
+    fun setLiftOnScroll(value: Boolean?) {
+        // Unlike Fabric, Lynx delivers null for an absent prop - fall back to the default (true).
+        liftOnScroll = value != false
     }
 
     @LynxProp(name = "toolbarMenuGroupDividerEnabled")

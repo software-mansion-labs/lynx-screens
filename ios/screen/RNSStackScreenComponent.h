@@ -19,11 +19,18 @@ typedef NS_ENUM(NSInteger, RNSScreenLifecycleEvent) {
     RNSScreenLifecycleEventDidDisappear = 3
 };
 
+@class RNSScrollViewMarkerComponent;
+
 @interface RNSStackScreenComponent : LynxUI <RNSStackScreenView *>
 
 @property (nonatomic, weak, readwrite, nullable) RNSStackHostComponent *stackHost;
 @property (nonatomic, strong, readonly, nonnull) RNSStackScreenController *controller;
 @property (nonatomic) BOOL isNativelyDismissed;
+
+- (void)registerDescendantScrollView:(nonnull UIScrollView *)scrollView
+                          fromMarker:(nonnull RNSScrollViewMarkerComponent *)marker;
+
+- (nullable UIScrollView *)cachedContentScrollView;
 
 @end
 

@@ -4,6 +4,7 @@ import type {
   StackHeaderTypeAndroid,
   StackHeaderBackgroundSubviewCollapseModeAndroid,
 } from 'lynx-screens';
+import { ScrollViewMarker } from 'lynx-screens';
 import {
   Heading,
   LongText,
@@ -201,110 +202,112 @@ function ConfigScreen() {
   }, [headerConfig, setRouteOptions, routeKey]);
 
   return (
-    <scroll-view
-      style={{ width: '100%', height: '100%', backgroundColor: 'white' }}
-    >
-      <view style={{ padding: '16px', gap: '6px' }}>
-        <Heading label="General" />
-        <SettingsSwitch
-          label="headerConfig enabled"
-          value={config.enabled}
-          onValueChange={(v) => updateConfig('enabled', v)}
-        />
-        <SettingsPicker<StackHeaderTypeAndroid>
-          label="type"
-          value={config.type}
-          onValueChange={(v) => updateConfig('type', v)}
-          items={HEADER_TYPES}
-        />
-        <SettingsSwitch
-          label="transparent"
-          value={config.transparent}
-          onValueChange={(v) => updateConfig('transparent', v)}
-        />
-        <SettingsSwitch
-          label="hidden"
-          value={config.hidden}
-          onValueChange={(v) => updateConfig('hidden', v)}
-        />
-        <SettingsPicker<TitleOption>
-          label="title"
-          value={config.title}
-          onValueChange={(v) => updateConfig('title', v)}
-          items={TITLE_OPTIONS}
-        />
+    <ScrollViewMarker style={{ width: '100%', height: '100%' }}>
+      <scroll-view
+        style={{ width: '100%', height: '100%', backgroundColor: 'white' }}
+      >
+        <view style={{ padding: '16px', gap: '6px' }}>
+          <Heading label="General" />
+          <SettingsSwitch
+            label="headerConfig enabled"
+            value={config.enabled}
+            onValueChange={(v) => updateConfig('enabled', v)}
+          />
+          <SettingsPicker<StackHeaderTypeAndroid>
+            label="type"
+            value={config.type}
+            onValueChange={(v) => updateConfig('type', v)}
+            items={HEADER_TYPES}
+          />
+          <SettingsSwitch
+            label="transparent"
+            value={config.transparent}
+            onValueChange={(v) => updateConfig('transparent', v)}
+          />
+          <SettingsSwitch
+            label="hidden"
+            value={config.hidden}
+            onValueChange={(v) => updateConfig('hidden', v)}
+          />
+          <SettingsPicker<TitleOption>
+            label="title"
+            value={config.title}
+            onValueChange={(v) => updateConfig('title', v)}
+            items={TITLE_OPTIONS}
+          />
 
-        <Heading label="Toolbar Subviews" />
-        <SettingsPicker<SubviewSize>
-          label="leading"
-          value={config.leadingSize}
-          onValueChange={(v) => updateConfig('leadingSize', v)}
-          items={SUBVIEW_SIZES}
-        />
-        <SettingsPicker<SubviewSize>
-          label="center"
-          value={config.centerSize}
-          onValueChange={(v) => updateConfig('centerSize', v)}
-          items={SUBVIEW_SIZES}
-        />
-        <SettingsPicker<SubviewSize>
-          label="trailing"
-          value={config.trailingSize}
-          onValueChange={(v) => updateConfig('trailingSize', v)}
-          items={SUBVIEW_SIZES}
-        />
+          <Heading label="Toolbar Subviews" />
+          <SettingsPicker<SubviewSize>
+            label="leading"
+            value={config.leadingSize}
+            onValueChange={(v) => updateConfig('leadingSize', v)}
+            items={SUBVIEW_SIZES}
+          />
+          <SettingsPicker<SubviewSize>
+            label="center"
+            value={config.centerSize}
+            onValueChange={(v) => updateConfig('centerSize', v)}
+            items={SUBVIEW_SIZES}
+          />
+          <SettingsPicker<SubviewSize>
+            label="trailing"
+            value={config.trailingSize}
+            onValueChange={(v) => updateConfig('trailingSize', v)}
+            items={SUBVIEW_SIZES}
+          />
 
-        <Heading label="Background Subview" />
-        <SettingsSwitch
-          label="background enabled"
-          value={config.backgroundEnabled}
-          onValueChange={(v) => updateConfig('backgroundEnabled', v)}
-        />
-        <SettingsPicker<StackHeaderBackgroundSubviewCollapseModeAndroid>
-          label="collapseMode"
-          value={config.backgroundCollapseMode}
-          onValueChange={(v) => updateConfig('backgroundCollapseMode', v)}
-          items={COLLAPSE_MODES}
-        />
+          <Heading label="Background Subview" />
+          <SettingsSwitch
+            label="background enabled"
+            value={config.backgroundEnabled}
+            onValueChange={(v) => updateConfig('backgroundEnabled', v)}
+          />
+          <SettingsPicker<StackHeaderBackgroundSubviewCollapseModeAndroid>
+            label="collapseMode"
+            value={config.backgroundCollapseMode}
+            onValueChange={(v) => updateConfig('backgroundCollapseMode', v)}
+            items={COLLAPSE_MODES}
+          />
 
-        <Heading label="Scroll Flags" />
-        <SettingsPicker<ScrollFlagValue>
-          label="scrollFlagScroll"
-          value={config.scrollFlagScroll}
-          onValueChange={(v) => updateConfig('scrollFlagScroll', v)}
-          items={SCROLL_FLAG_VALUES}
-        />
-        <SettingsPicker<ScrollFlagValue>
-          label="scrollFlagEnterAlways"
-          value={config.scrollFlagEnterAlways}
-          onValueChange={(v) => updateConfig('scrollFlagEnterAlways', v)}
-          items={SCROLL_FLAG_VALUES}
-        />
-        <SettingsPicker<ScrollFlagValue>
-          label="scrollFlagEnterAlwaysCollapsed"
-          value={config.scrollFlagEnterAlwaysCollapsed}
-          onValueChange={(v) => updateConfig('scrollFlagEnterAlwaysCollapsed', v)}
-          items={SCROLL_FLAG_VALUES}
-        />
-        <SettingsPicker<ScrollFlagValue>
-          label="scrollFlagExitUntilCollapsed"
-          value={config.scrollFlagExitUntilCollapsed}
-          onValueChange={(v) => updateConfig('scrollFlagExitUntilCollapsed', v)}
-          items={SCROLL_FLAG_VALUES}
-        />
-        <SettingsPicker<ScrollFlagValue>
-          label="scrollFlagSnap"
-          value={config.scrollFlagSnap}
-          onValueChange={(v) => updateConfig('scrollFlagSnap', v)}
-          items={SCROLL_FLAG_VALUES}
-        />
+          <Heading label="Scroll Flags" />
+          <SettingsPicker<ScrollFlagValue>
+            label="scrollFlagScroll"
+            value={config.scrollFlagScroll}
+            onValueChange={(v) => updateConfig('scrollFlagScroll', v)}
+            items={SCROLL_FLAG_VALUES}
+          />
+          <SettingsPicker<ScrollFlagValue>
+            label="scrollFlagEnterAlways"
+            value={config.scrollFlagEnterAlways}
+            onValueChange={(v) => updateConfig('scrollFlagEnterAlways', v)}
+            items={SCROLL_FLAG_VALUES}
+          />
+          <SettingsPicker<ScrollFlagValue>
+            label="scrollFlagEnterAlwaysCollapsed"
+            value={config.scrollFlagEnterAlwaysCollapsed}
+            onValueChange={(v) => updateConfig('scrollFlagEnterAlwaysCollapsed', v)}
+            items={SCROLL_FLAG_VALUES}
+          />
+          <SettingsPicker<ScrollFlagValue>
+            label="scrollFlagExitUntilCollapsed"
+            value={config.scrollFlagExitUntilCollapsed}
+            onValueChange={(v) => updateConfig('scrollFlagExitUntilCollapsed', v)}
+            items={SCROLL_FLAG_VALUES}
+          />
+          <SettingsPicker<ScrollFlagValue>
+            label="scrollFlagSnap"
+            value={config.scrollFlagSnap}
+            onValueChange={(v) => updateConfig('scrollFlagSnap', v)}
+            items={SCROLL_FLAG_VALUES}
+          />
 
-        <Heading label="Push screen" />
-        <SettingsButton label="Push screen" onTap={() => push('Home')} />
+          <Heading label="Push screen" />
+          <SettingsButton label="Push screen" onTap={() => push('Home')} />
 
-        <Heading label="ScrollView content" />
-        <LongText paragraphs={20} />
-      </view>
-    </scroll-view>
+          <Heading label="ScrollView content" />
+          <LongText paragraphs={20} />
+        </view>
+      </scroll-view>
+    </ScrollViewMarker>
   );
 }

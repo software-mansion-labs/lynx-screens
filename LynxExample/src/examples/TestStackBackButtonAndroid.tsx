@@ -3,6 +3,7 @@ import type {
   StackHeaderConfigProps,
   StackHeaderConfigPropsAndroid,
 } from 'lynx-screens';
+import { ScrollViewMarker } from 'lynx-screens';
 import arrowIcon from '../assets/arrow.png';
 import {
   Heading,
@@ -185,16 +186,18 @@ function RootScreen() {
   useApplyHeaderConfig();
 
   return (
-    <scroll-view
-      scroll-y
-      style={{ width: '100%', height: '100%', backgroundColor: 'white' }}
-    >
-      <view style={{ padding: '16px', gap: '6px' }}>
-        <ConfigControls />
-        <Heading label="Navigation" />
-        <SettingsButton label="Push screen" onTap={() => push('Pushed')} />
-      </view>
-    </scroll-view>
+    <ScrollViewMarker style={{ width: '100%', height: '100%' }}>
+      <scroll-view
+        scroll-y
+        style={{ width: '100%', height: '100%', backgroundColor: 'white' }}
+      >
+        <view style={{ padding: '16px', gap: '6px' }}>
+          <ConfigControls />
+          <Heading label="Navigation" />
+          <SettingsButton label="Push screen" onTap={() => push('Pushed')} />
+        </view>
+      </scroll-view>
+    </ScrollViewMarker>
   );
 }
 
@@ -203,15 +206,17 @@ function PushedScreen() {
   useApplyHeaderConfig();
 
   return (
-    <scroll-view
-      scroll-y
-      style={{ width: '100%', height: '100%', backgroundColor: 'white' }}
-    >
-      <view style={{ padding: '16px', gap: '6px' }}>
-        <ConfigControls />
-        <Heading label="Navigation" />
-        <SettingsButton label="Push another" onTap={() => push('Pushed')} />
-      </view>
-    </scroll-view>
+    <ScrollViewMarker style={{ width: '100%', height: '100%' }}>
+      <scroll-view
+        scroll-y
+        style={{ width: '100%', height: '100%', backgroundColor: 'white' }}
+      >
+        <view style={{ padding: '16px', gap: '6px' }}>
+          <ConfigControls />
+          <Heading label="Navigation" />
+          <SettingsButton label="Push another" onTap={() => push('Pushed')} />
+        </view>
+      </scroll-view>
+    </ScrollViewMarker>
   );
 }
