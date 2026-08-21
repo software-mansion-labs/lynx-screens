@@ -1108,6 +1108,19 @@ export interface StackHeaderConfigPropsIOS {
       )[]
     | undefined;
   titleItem?: StackHeaderTitleCustomItemIOS | undefined;
+  /**
+   * @summary Menu definition for the title context menu.
+   *
+   * @description
+   * Configures a dropdown menu attached to the navigation bar title area.
+   * Works independently of {@link titleItem}; the menu appears for both
+   * plain text and custom view title.
+   *
+   * @platform ios
+   *
+   * @supported iOS 16 and higher
+   */
+  titleMenu?: StackHeaderMenuIOS | undefined;
   trailingItems?:
     | (
         | StackHeaderInlineItemIOS

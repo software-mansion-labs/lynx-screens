@@ -4,7 +4,9 @@
 #import "RNSStackHeaderConfigEventEmitter.h"
 #import "RNSStackHeaderItemComponent.h"
 #import "RNSStackHeaderItemSpacerComponent.h"
+#import "RNSStackHeaderMenuCoordinator.h"
 #import "RNSStackHeaderMenuFinder.h"
+#import "RNSStackHeaderMenuMapper.h"
 #import "RNSStackHeaderMenuUpdateOptions.h"
 #import "RNSStackHeaderConfigView.h"
 #import "RNSStackNavigationController.h"
@@ -31,6 +33,7 @@ static void RNSAssertIsValidHeaderChild(id child)
 @implementation RNSStackHeaderConfigComponent {
     RNSShadowStateProxy *_Nonnull _shadowStateProxy;
     RNSStackHeaderConfigEventEmitter *_Nullable _eventEmitter;
+    BOOL _titleMenuDidChange;
 }
 
 - (instancetype)init
@@ -50,6 +53,7 @@ static void RNSAssertIsValidHeaderChild(id child)
     _largeTitle = nil;
     _largeSubtitle = nil;
     _largeTitleEnabled = NO;
+    _titleMenu = nil;
 }
 
 - (UIView *)createView
@@ -288,6 +292,18 @@ LYNX_PROP_SETTER("largeTitleEnabled", setLargeTitleEnabled, BOOL) {
     _largeTitleEnabled = value;
 }
 
+LYNX_PROP_SETTER("titleMenu", setTitleMenu, NSDictionary *) {
+    if (requestReset) {
+        value = nil;
+    }
+    // Adaptation: Lynx delivers the prop as a plain NSDictionary - no
+    // folly::dynamic conversion is needed. RNS detects the change with an
+    // old/new props comparison in updateProps; on Lynx the setter itself only
+    // fires when the attr value changed, so the flag is set unconditionally.
+    _titleMenu = [RNSStackHeaderMenuMapper menuFromDictionary:value];
+    _titleMenuDidChange = YES;
+}
+
 // Base props consumed only by the Android implementation for now (RNS iOS
 // also receives and ignores them in this commit).
 LYNX_PROP_SETTER("transparent", setTransparent, BOOL) {}
@@ -297,6 +313,15 @@ LYNX_PROP_SETTER("backButtonHidden", setBackButtonHidden, BOOL) {}
 {
     [super propsDidUpdate];
     [[self headerCoordinator] applyConfigProperties];
+
+    if (_titleMenuDidChange) {
+        _titleMenuDidChange = NO;
+        // title menu is a prop on the navigation item, not on one of the bar button items
+        // thus it is not configured with matching RNSStackHeaderItemComponentView
+        // but here directly
+        [[self headerCoordinator] resetTitleMenuTracker];
+        [[self headerCoordinator] reapplyTitleMenu];
+    }
 }
 
 #pragma mark - Commands
@@ -316,7 +341,8 @@ LYNX_UI_METHOD(setMenuItemOptions) {
     }
 
     RNSMenuElementLocator *locator = [RNSStackHeaderMenuFinder findMenuElementWithId:menuItemId
-                                                                       inHeaderItems:[self headerItems]];
+                                                                       inHeaderItems:[self headerItems]
+                                                                           titleMenu:_titleMenu];
     if (locator == nil) {
         LLogWarn(@"[RNScreens] setMenuItemOptions: element with id \"%@\" not found", menuItemId);
         callback(kUIMethodSuccess, nil);
@@ -333,15 +359,15 @@ LYNX_UI_METHOD(setMenuItemOptions) {
     RNSStackHeaderMenuItemData *newItemData = [RNSMenuItemUpdateOptions applyOptions:updateOptions
                                                                           toMenuItem:oldItemData];
 
-    if (updateOptions.hasToggleState) {
+    if (updateOptions.hasToggleState && locator.rootMenu != nil && locator.trackerItemId != nil) {
         BOOL isToggle = oldItemData.itemType == RNSMenuItemTypeToggle ||
-            (oldItemData.itemType == RNSMenuItemTypeAutomatic && locator.headerItem.menu != nil &&
-             [RNSStackHeaderMenuFinder singleSelectionRootForElementWithId:menuItemId
-                                                                    inMenu:locator.headerItem.menu] != nil);
+            (oldItemData.itemType == RNSMenuItemTypeAutomatic &&
+             [RNSStackHeaderMenuFinder singleSelectionRootForElementWithId:menuItemId inMenu:locator.rootMenu] != nil);
         if (isToggle) {
             [[self headerCoordinator] setToggleState:updateOptions.toggleState
                                     forMenuElementId:menuItemId
-                                          withItemId:locator.headerItem.itemId
+                                       trackerItemId:locator.trackerItemId
+                                            rootMenu:locator.rootMenu
                                           parentMenu:locator.searchResult.parentMenu];
         }
     }
@@ -356,8 +382,15 @@ LYNX_UI_METHOD(setMenuItemOptions) {
                              parentMenu:locator.searchResult.parentMenu];
             break;
         case RNSMenuElementPositionTitle:
+            if (locator.searchResult.parentMenu != nil) {
+                _titleMenu = [RNSStackHeaderMenuCoordinator menu:_titleMenu
+                                            replacingChildWithId:menuItemId
+                                                     withElement:newItemData];
+            }
+            [[self headerCoordinator] reapplyTitleMenu];
+            break;
         case RNSMenuElementPositionOverflow:
-            // TODO: handle title menu and overflow menu
+            // TODO: handle overflow menu
             break;
     }
     callback(kUIMethodSuccess, nil);
@@ -373,7 +406,8 @@ LYNX_UI_METHOD(setMenuOptions) {
     }
 
     RNSMenuElementLocator *locator = [RNSStackHeaderMenuFinder findMenuElementWithId:menuElementId
-                                                                       inHeaderItems:[self headerItems]];
+                                                                       inHeaderItems:[self headerItems]
+                                                                           titleMenu:_titleMenu];
     if (locator == nil) {
         LLogWarn(@"[RNScreens] setMenuOptions: element with id \"%@\" not found", menuElementId);
         callback(kUIMethodSuccess, nil);
@@ -399,8 +433,17 @@ LYNX_UI_METHOD(setMenuOptions) {
                              parentMenu:locator.searchResult.parentMenu];
             break;
         case RNSMenuElementPositionTitle:
+            if (locator.searchResult.parentMenu == nil) {
+                _titleMenu = (RNSStackHeaderMenuData *)newMenuItem;
+            } else {
+                _titleMenu = [RNSStackHeaderMenuCoordinator menu:_titleMenu
+                                            replacingChildWithId:menuElementId
+                                                     withElement:newMenuItem];
+            }
+            [[self headerCoordinator] reapplyTitleMenu];
+            break;
         case RNSMenuElementPositionOverflow:
-            // TODO: handle title menu and overflow menu
+            // TODO: handle overflow menu
             break;
     }
     callback(kUIMethodSuccess, nil);

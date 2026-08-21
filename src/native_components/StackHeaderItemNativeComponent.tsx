@@ -3,9 +3,9 @@ import type { ReactElement } from '@lynx-js/react';
 import type { BaseEventOrig, EventHandler } from '@lynx-js/types';
 import type {
   PlatformIconIOS,
-  StackHeaderMenuElementIOS,
   StackHeaderMenuIOS,
 } from '../types/StackHeaderConfig.js';
+import { parseMenuElementToAttr, type StackHeaderMenuAttr } from './utils.js';
 
 export type StackHeaderItemPlacement =
   | 'leading'
@@ -23,61 +23,6 @@ export type StackHeaderItemProps = {
   menu?: StackHeaderMenuIOS | undefined;
   onPress?: (() => void) | undefined;
 };
-
-type StackHeaderMenuItemAttr = {
-  id: string;
-  type: 'menuItem';
-  title?: string | undefined;
-  itemType?: 'action' | 'toggle' | 'automatic' | undefined;
-  initialToggleState?: boolean | undefined;
-  keepsMenuPresented?: boolean | undefined;
-  icon?: PlatformIconIOS | undefined;
-};
-
-type StackHeaderMenuAttr = {
-  id: string;
-  type: 'menu';
-  title?: string | undefined;
-  singleSelection?: boolean | undefined;
-  icon?: PlatformIconIOS | undefined;
-  displayInline?: boolean | undefined;
-  displayAsPalette?: boolean | undefined;
-  children: (StackHeaderMenuAttr | StackHeaderMenuItemAttr)[];
-};
-
-// Adaptation: RNS passes the menu tree to the native component as-is and
-// relies on the RN bridge dropping function values; Lynx props must stay
-// serializable, so the onPress/onSelectionChange callbacks are stripped
-// here - they come back through the config's OnMenuItemPress and
-// OnMenuSelectionChange events and are resolved by id. Icons need no
-// resolution step (RNS resolves require() assets via resolveAssetSource;
-// Lynx icons are plain uri strings) and pass through as data.
-function parseMenuElementToAttr(
-  element: StackHeaderMenuElementIOS,
-): StackHeaderMenuAttr | StackHeaderMenuItemAttr {
-  if (element.type === 'menu') {
-    return {
-      id: element.id,
-      type: 'menu',
-      title: element.title,
-      singleSelection: element.singleSelection,
-      icon: element.icon,
-      displayInline: element.displayInline,
-      displayAsPalette: element.displayAsPalette,
-      children: element.children.map(parseMenuElementToAttr),
-    };
-  }
-
-  return {
-    id: element.id,
-    type: 'menuItem',
-    title: element.title,
-    itemType: element.itemType,
-    initialToggleState: element.initialToggleState,
-    keepsMenuPresented: element.keepsMenuPresented,
-    icon: element.icon,
-  };
-}
 
 export const StackHeaderItemNativeComponent = ({
   placement,
