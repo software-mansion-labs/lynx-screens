@@ -9,7 +9,7 @@ android {
     compileSdk = 36
 
     defaultConfig {
-        minSdk = 24
+        minSdk = 21
     }
 
     compileOptions {
@@ -29,7 +29,7 @@ dependencies {
     implementation("androidx.coordinatorlayout:coordinatorlayout:1.2.0")
     // Image engine of Lynx's standard image-service setup; used by helpers/ImageLoader.
     implementation("com.facebook.fresco:fresco:2.3.0")
-    implementation("androidx.fragment:fragment-ktx:1.8.9")
+    implementation("androidx.fragment:fragment-ktx:1.1.0")
     implementation("androidx.appcompat:appcompat:1.7.1")
     implementation("androidx.transition:transition-ktx:1.7.0")
     implementation("com.google.android.material:material:1.14.0")

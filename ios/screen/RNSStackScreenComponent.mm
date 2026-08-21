@@ -18,6 +18,9 @@
     BOOL _hasUpdatedActivityMode;
 }
 
+// Self-register for hosts that do not invoke the generated library registry.
+LYNX_LAZY_REGISTER_UI("stack-screen-native")
+
 - (instancetype)init
 {
     self = [super init];

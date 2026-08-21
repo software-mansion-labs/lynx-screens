@@ -16,6 +16,9 @@
     BOOL _isMountingTransactionPending;
 }
 
+// Self-register for hosts that do not invoke the generated library registry.
+LYNX_LAZY_REGISTER_UI("stack-host-native")
+
 #pragma mark - Init
 
 - (instancetype)init

@@ -5,7 +5,6 @@ import android.content.Context
 import android.util.Log
 import android.view.ViewGroup
 import android.widget.FrameLayout
-import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import com.lynxscreens.screens.common.container.Container
 import com.lynxscreens.screens.common.container.ParentContainerItemRegistry
@@ -244,30 +243,22 @@ internal class StackContainer(
         }
     }
 
-    // This is called after special effects (animations) are dispatched
-    override fun onBackStackChanged() = Unit
+    /**
+     * Fragment 1.3 only exposes this coarse back-stack callback. JS-driven pops update stackModel
+     * before the transaction, while a native pop leaves the removed top Fragment in stackModel.
+     */
+    override fun onBackStackChanged() {
+        val currentFragmentManager = fragmentManager ?: return
+        val addedFragments = currentFragmentManager.fragments
 
-    // This is called before the special effects (animations) are dispatched, however mid transaction!
-    // Therefore make sure to not execute any action that might cause synchronous transaction synchronously
-    // from this callback.
-    override fun onBackStackChangeCommitted(
-        fragment: Fragment,
-        pop: Boolean,
-    ) {
-        if (fragment !is StackScreenFragment) {
-            Log.w(TAG, "[RNScreens] Unexpected type of fragment: ${fragment.javaClass.simpleName}")
-            return
-        }
-        // This callback is called for every fragment involved in the back stack change, even
-        // if its not added or removed, but e.g. set as a primary navigation fragment, hence
-        // we need to check whether the fragment is actually being removed.
-        // I avoid using `pop` parameter here, because transaction might not be classified as `pop`
-        // and still include fragment removal operations.
-        if (fragment.isRemoving) {
-            delegate.get()?.onScreenDismissCommitted(fragment.stackScreen)
-            if (stackModel.contains(fragment)) {
-                onNativeFragmentPop(fragment)
+        while (stackModel.size > 1) {
+            val topFragment = stackModel.last()
+            if (addedFragments.contains(topFragment)) {
+                return
             }
+
+            delegate.get()?.onScreenDismissCommitted(topFragment.stackScreen)
+            onNativeFragmentPop(topFragment)
         }
     }
 
