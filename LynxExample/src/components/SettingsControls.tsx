@@ -1,3 +1,5 @@
+import { useState } from '@lynx-js/react';
+
 export function Heading({ label }: { label: string }) {
   return (
     <text
@@ -39,12 +41,13 @@ export function SettingsSwitch({
       <view
         style={{
           display: 'flex',
+          flexDirection: 'row',
           width: '48px',
           height: '24px',
           borderRadius: '12px',
           backgroundColor: value ? '#3f51b5' : '#bdbdbd',
-          justifyContent: 'center',
-          alignItems: value ? 'flex-end' : 'flex-start',
+          justifyContent: value ? 'flex-end' : 'flex-start',
+          alignItems: 'center',
           paddingLeft: '2px',
           paddingRight: '2px',
         }}
@@ -62,7 +65,7 @@ export function SettingsSwitch({
   );
 }
 
-// Tap cycles through the available values.
+// Tap toggles the item list; tapping an item selects it.
 export function SettingsPicker<T extends string>({
   label,
   value,
@@ -74,35 +77,64 @@ export function SettingsPicker<T extends string>({
   onValueChange: (value: T) => void;
   items: T[];
 }) {
-  const cycle = () => {
-    const index = items.indexOf(value);
-    onValueChange(items[(index + 1) % items.length]);
-  };
+  const [isOpen, setIsOpen] = useState(false);
   return (
     <view
       style={{
         display: 'flex',
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        alignItems: 'center',
+        flexDirection: 'column',
         paddingTop: '6px',
         paddingBottom: '6px',
       }}
-      bindtap={cycle}
+      bindtap={() => setIsOpen(!isOpen)}
     >
-      <text style={{ color: 'black' }}>{label}</text>
       <view
         style={{
-          paddingLeft: '10px',
-          paddingRight: '10px',
-          paddingTop: '4px',
-          paddingBottom: '4px',
-          borderRadius: '6px',
-          backgroundColor: '#e8eaf6',
+          display: 'flex',
+          flexDirection: 'row',
+          justifyContent: 'space-between',
+          alignItems: 'center',
         }}
       >
-        <text style={{ color: '#3f51b5' }}>{value}</text>
+        <text style={{ color: 'black' }}>{label}</text>
+        <view
+          style={{
+            paddingLeft: '10px',
+            paddingRight: '10px',
+            paddingTop: '4px',
+            paddingBottom: '4px',
+            borderRadius: '6px',
+            backgroundColor: '#e8eaf6',
+          }}
+        >
+          <text style={{ color: '#3f51b5' }}>{value}</text>
+        </view>
       </view>
+      {isOpen
+        ? items.map(item => (
+            <view
+              key={item}
+              style={{
+                display: 'flex',
+                paddingTop: '5px',
+                paddingBottom: '5px',
+                paddingLeft: '20px',
+                paddingRight: '20px',
+                alignItems: 'center',
+              }}
+              catchtap={() => onValueChange(item)}
+            >
+              <text
+                style={{
+                  color: item === value ? '#3f51b5' : 'black',
+                  fontWeight: item === value ? 'bold' : 'normal',
+                }}
+              >
+                {item}
+              </text>
+            </view>
+          ))
+        : null}
     </view>
   );
 }
