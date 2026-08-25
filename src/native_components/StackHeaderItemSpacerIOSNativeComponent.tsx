@@ -1,4 +1,3 @@
-import React from 'react';
 import type { StackHeaderItemPlacement } from './StackHeaderItemIOSNativeComponent.js';
 
 export type StackHeaderItemSpacerPlacement = Extract<

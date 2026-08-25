@@ -16,7 +16,8 @@
   "scripts": {
     "codegen": "lynx-autolink-codegen",
     "format": "prettier --write .",
-    "lint": "eslint ."
+    "lint": "eslint .",
+    "typecheck": "tsc"
   },
   "peerDependencies": {
     "@lynx-js/react": "*"

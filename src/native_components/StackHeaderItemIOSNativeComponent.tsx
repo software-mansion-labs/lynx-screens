@@ -1,4 +1,4 @@
-import React, { useCallback } from 'react';
+import { useCallback } from 'react';
 import type { ReactElement } from '@lynx-js/react';
 import type { BaseEventOrig, EventHandler } from '@lynx-js/types';
 import type {

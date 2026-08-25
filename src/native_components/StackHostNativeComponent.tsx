@@ -1,4 +1,3 @@
-import React from 'react';
 import * as Lynx from '@lynx-js/types';
 
 export const StackHostNativeComponent = ({

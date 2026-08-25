@@ -1,4 +1,3 @@
-import React from 'react';
 import type { StackHeaderSubviewProps } from '../types/StackHeaderConfig.js';
 
 export const StackHeaderSubviewAndroidNativeComponent = ({

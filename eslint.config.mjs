@@ -18,6 +18,7 @@ export default tseslint.config([
     languageOptions: {
       ecmaVersion: 2020,
       globals: globals.browser,
+      parserOptions: { jsxPragma: null },
     },
   },
 ]);

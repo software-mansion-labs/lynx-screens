@@ -1,4 +1,3 @@
-import React from 'react';
 import { StackContainer } from '../components/StackContainer';
 import { useStackNavigationContext } from '../hooks/useStackNavigationContext';
 import { StackNavigationButtons } from '../components/StackNavigationButtons';
