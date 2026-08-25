@@ -1,4 +1,3 @@
-import React from 'react';
 
 import { StackContainer } from '../components/StackContainer';
 import type { StackRouteConfig } from '../types/StackContainer';
