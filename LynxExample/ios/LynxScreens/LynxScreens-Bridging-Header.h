@@ -6,3 +6,4 @@
 #import <Lynx/LynxModule.h>
 
 #import "elements/LynxColorBoxComponent.h"
+#import <LynxLibraryRegistry/LynxGeneratedLibraryRegistry.h>

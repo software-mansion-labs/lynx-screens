@@ -10,7 +10,13 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     
     // Register new modules with:
     // config.register(YourModuleName.self)
-    
+
+    // cocoapods-lynx-library generates the registry from every linked Lynx
+    // library, but nothing calls it - so ls-stack-host and friends were never
+    // registered and the stack failed with LynxCreateUIException. Android gets
+    // this for free through autolink.
+    LynxGeneratedLibraryRegistry().setup(config)
+
     lynxEnv.prepareConfig(config)
     
     return true
