@@ -17,6 +17,12 @@ import com.lynx.tasm.TemplateData
  * opened with, and how later ones arrive. On Lynx the card is not the process
  * receiving the link - the host is - so the host has to pass it along:
  *
+ *   adb shell am start -a android.intent.action.VIEW -d "lynxscreens:///depth/3"
+ *
+ * That is the real path: a VIEW intent, the same shape a host gets when
+ * another app links into it. The `-e route` extra below does the same thing
+ * without a link, for pointing the debug activity at an arbitrary bundle:
+ *
  *   adb shell am start -n <pkg>/com.lynxscreens.DebugActivity \
  *     -e url <bundle url> -e route /depth/3
  *
@@ -35,11 +41,20 @@ class DebugActivity : AppCompatActivity() {
         val view = buildLynxView()
         lynxView = view
         setContentView(view)
-        val url = intent.getStringExtra("url")
-        if (url != null) {
-            view.renderTemplateUrl(url, navigationData(intent))
-        }
+        // A link carries a route, not a bundle, so fall back to the same one
+        // MainActivity loads. `-e url` still wins, for pointing the debug
+        // activity at an arbitrary bundle.
+        val url = intent.getStringExtra("url") ?: defaultBundleUrl()
+
+        view.renderTemplateUrl(url, navigationData(intent))
     }
+
+    private fun defaultBundleUrl(): String =
+        if (BuildConfig.DEBUG) {
+            "http://10.0.2.2:3000/main.lynx.bundle?fullscreen=true"
+        } else {
+            "main.lynx.bundle"
+        }
 
     /**
      * Reached when the host is asked to open a route while the card is already
@@ -50,7 +65,7 @@ class DebugActivity : AppCompatActivity() {
         super.onNewIntent(intent)
         setIntent(intent)
 
-        val route = intent.getStringExtra(ROUTE_EXTRA) ?: return
+        val route = route(intent) ?: return
 
         // The bridge only converts its own JavaOnly* types; a plain Kotlin map
         // nested inside the array arrives in JS as null.
@@ -59,8 +74,31 @@ class DebugActivity : AppCompatActivity() {
         lynxView?.sendGlobalEvent(URL_EVENT, JavaOnlyArray.of(payload))
     }
 
+    /**
+     * The path the host was asked to open, e.g. `/depth/3`.
+     *
+     * A real host gets this as the data of a VIEW intent, which is what the
+     * intent-filter above declares. The extra is only a convenience for driving
+     * the example from a script, mirroring `-route` on iOS.
+     */
+    private fun route(intent: Intent): String? {
+        val uri = intent.data ?: return intent.getStringExtra(ROUTE_EXTRA)
+
+        // `lynxscreens://depth/3` parses `depth` as the authority and `/3` as
+        // the path, while `lynxscreens:///depth/3` puts all of it in the path.
+        // Both should mean the same route.
+        val path = buildString {
+            uri.host?.takeIf(String::isNotEmpty)?.let { append('/').append(it) }
+            append(uri.path.orEmpty())
+        }.ifEmpty { "/" }
+
+        // Routes that start with `/` reach `getStateFromPath` without any
+        // prefix stripping.
+        return uri.query?.takeIf(String::isNotEmpty)?.let { "$path?$it" } ?: path
+    }
+
     private fun navigationData(intent: Intent): TemplateData {
-        val route = intent.getStringExtra(ROUTE_EXTRA) ?: return TemplateData.empty()
+        val route = route(intent) ?: return TemplateData.empty()
 
         return TemplateData.fromMap(
             mapOf(
