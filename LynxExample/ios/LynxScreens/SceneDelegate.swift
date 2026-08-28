@@ -1,31 +1,12 @@
 import UIKit
 
-/// Also the reference for how a host hands a route to a card, mirroring
-/// `DebugActivity` on Android.
-///
-/// React Navigation asks the platform two things: which route the card was
-/// opened with, and how later ones arrive. A card is not the process receiving
-/// the link - the host is - so the host has to pass it along:
-///
-///     xcrun simctl openurl booted "lynxscreens:///depth/3"
-///     xcrun simctl launch booted com.example.LynxScreens -route /depth/3
-///
-/// The launch argument is there because opening a custom scheme from the
-/// simulator raises a system confirmation prompt, which makes the URL route
-/// awkward to drive from a script. It mirrors `-e route` on Android.
-///
-/// Cold start rides in on `initData`, which the card can read before any
-/// listener exists, so there is no race to lose the launch route to. Later
-/// routes go out as a global event carrying `{ url }`.
+/// xcrun simctl openurl booted "lynxscreens:///depth/3"
 class SceneDelegate: UIResponder, UIWindowSceneDelegate {
   var window: UIWindow?
   private var lynxView: LynxView?
 
-  /// Matches `INIT_DATA_KEY` in `@react-navigation/lynx`.
+  // Both match `@react-navigation/lynx`.
   private static let navigationKey = "__navigation"
-
-  /// Matches `URL_EVENT`. Namespaced because `GlobalEventEmitter` is one
-  /// namespace shared with the host.
   private static let urlEvent = "reactnavigation.url"
 
   func scene(
@@ -58,8 +39,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     window?.rootViewController = rootViewController
     rootViewController.view = lynxView
 
-    let route = Self.route(in: connectionOptions.urlContexts) ?? Self.routeFromLaunchArguments()
-    let initData = Self.navigationData(for: route)
+    let initData = Self.navigationData(for: Self.route(in: connectionOptions.urlContexts))
 
 #if DEBUG
     lynxView.loadTemplate(
@@ -73,45 +53,30 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     window?.makeKeyAndVisible()
   }
 
-  /// Reached when a link arrives while the card is already up.
   func scene(_ scene: UIScene, openURLContexts URLContexts: Set<UIOpenURLContext>) {
     guard let route = Self.route(in: URLContexts) else { return }
 
     lynxView?.sendGlobalEvent(Self.urlEvent, withParams: [["url": route]])
   }
 
-  /// The path the host was asked to open, e.g. `/depth/3` out of
-  /// `lynxscreens:///depth/3`. Routes that start with `/` reach
-  /// `getStateFromPath` without any prefix stripping.
   private static func route(in contexts: Set<UIOpenURLContext>) -> String? {
     guard let url = contexts.first?.url else { return nil }
 
-    let path = url.path.isEmpty ? "/" : url.path
+    // `lynxscreens://depth/3` parses `depth` as the host, while
+    // `lynxscreens:///depth/3` puts all of it in the path.
+    var path = url.path
+    if let host = url.host, !host.isEmpty { path = "/\(host)\(path)" }
+    if path.isEmpty { path = "/" }
 
     guard let query = url.query, !query.isEmpty else { return path }
 
     return "\(path)?\(query)"
   }
 
-  /// `-route /depth/3` on the command line, for driving a cold start from a
-  /// script.
-  private static func routeFromLaunchArguments() -> String? {
-    let arguments = ProcessInfo.processInfo.arguments
-
-    guard let flag = arguments.firstIndex(of: "-route"),
-          arguments.indices.contains(flag + 1)
-    else {
-      return nil
-    }
-
-    return arguments[flag + 1]
-  }
-
   private static func navigationData(for route: String?) -> LynxTemplateData? {
     guard let route else { return nil }
 
-    // `initData` is state, not an event: without something that changes per
-    // navigation, going to the same route twice would leave the value
+    // initData is state, not an event: the same route twice would leave it
     // untouched and be dropped.
     return LynxTemplateData(dictionary: [
       navigationKey: [

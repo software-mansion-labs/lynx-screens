@@ -21,8 +21,6 @@
             android:launchMode="singleTop"
             android:theme="@style/Theme.AppCompat.DayNight.NoActionBar">
 
-            <!-- How a route actually reaches a host: a VIEW intent carrying the
-                 link. Matches the `lynxscreens` scheme registered on iOS. -->
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
 
