@@ -185,8 +185,8 @@ DEPENDENCIES:
   - Lynx/Framework (= 4.0.1)
   - LynxDevtool/Framework (= 4.0.1)
   - LynxDevtool/LynxRecorder (= 4.0.1)
-  - LynxLibraryRegistry (from `/Users/bytedance/projects/lynx-screens-mono/react-navigation-lynx/lynx-screens/LynxExample/ios/generated/lynx-library`)
-  - LynxScreens (from `/Users/bytedance/projects/lynx-screens-mono/react-navigation-lynx/lynx-screens/ios`)
+  - LynxLibraryRegistry (from `/Users/tomaszboron/lynx-screens/LynxExample/ios/generated/lynx-library`)
+  - LynxScreens (from `/Users/tomaszboron/lynx-screens/ios`)
   - LynxService/Devtool (= 4.0.1)
   - LynxService/Http (= 4.0.1)
   - LynxService/Image (= 4.0.1)
@@ -219,9 +219,9 @@ SPEC REPOS:
 
 EXTERNAL SOURCES:
   LynxLibraryRegistry:
-    :path: "/Users/bytedance/projects/lynx-screens-mono/react-navigation-lynx/lynx-screens/LynxExample/ios/generated/lynx-library"
+    :path: "/Users/tomaszboron/lynx-screens/LynxExample/ios/generated/lynx-library"
   LynxScreens:
-    :path: "/Users/bytedance/projects/lynx-screens-mono/react-navigation-lynx/lynx-screens/ios"
+    :path: "/Users/tomaszboron/lynx-screens/ios"
 
 SPEC CHECKSUMS:
   BaseDevtool: 873867f035e6d08545c79466eaea748706ccd8f0
@@ -230,8 +230,8 @@ SPEC CHECKSUMS:
   Lynx: 1a461f83f48104309f7e2031dabf3af84b181807
   LynxBase: 5ca5092517e6460e0df6ad9b49fca76396c058d8
   LynxDevtool: 953bfc73918a0eec65f6a5bf60a3e6f52a4134c4
-  LynxLibraryRegistry: 90f37ff2c33748f66b98663c8a05c1d7e67e08bd
-  LynxScreens: 6cbd45730d403a064ad701f0237dd831015a366e
+  LynxLibraryRegistry: b2017f1b3dd04bcac00caacc69d28fddcd6c9043
+  LynxScreens: 1f269a2346904b8b402d6b03e1b3bddeb5f1cc10
   LynxService: f447c67687d3ea66eec94e10b7564996e67c06dc
   LynxServiceAPI: 67ae06f77e45c80f0ecaa6705d126ac3b4b8dff4
   LynxTextra: e1a22775e880e000605091aad8dec614ca2ca79a
@@ -246,4 +246,4 @@ SPEC CHECKSUMS:
 
 PODFILE CHECKSUM: e77c480e607f804734497993e7379c120e5c6e05
 
-COCOAPODS: 1.12.1
+COCOAPODS: 1.17.0
