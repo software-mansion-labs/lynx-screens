@@ -98,3 +98,7 @@ The implementation for the following features hasn't been initiated in `react-na
 
 - How screens should integrate with `SafeAreaView` is still unresolved in RNS. Additionally the research on the Lynx approach on this topics hasn't been investigated (who owns the insets etc.) yet. Related known gap: on iOS, v5 screen content is not inset below the navigation bar (RNS relies on UIKit's automatic scroll view insets, which Lynx's scroll view opts out of) - the examples approximate the inset with a static padding.
 - Stack v5 is only a part of what `react-native-screens` ships. Whether Lynx is interested in other navigators: **Native Tabs**, **SplitView** - this hasn't been confirmed yet. Those components are good candidates for a Lynx port too.
+
+## License
+
+`lynx-screens` library is licensed under [The MIT License](LICENSE).
