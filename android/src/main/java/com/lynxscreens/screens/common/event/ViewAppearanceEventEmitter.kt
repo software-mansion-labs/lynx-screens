@@ -1,6 +1,6 @@
 package com.lynxscreens.screens.common.event
 
-internal interface ViewAppearanceEventEmitter {
+public interface ViewAppearanceEventEmitter {
     fun emitOnWillAppear()
 
     fun emitOnDidAppear()

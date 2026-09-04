@@ -11,8 +11,8 @@ import com.lynx.tasm.behavior.LynxProp
 import com.lynx.tasm.behavior.ui.LynxBaseUI
 import com.lynx.tasm.behavior.ui.LynxUI
 import com.lynx.tasm.behavior.ui.UIGroup
+import com.lynxscreens.screens.LynxScreens
 import com.lynxscreens.screens.common.ShadowStateProxy
-import com.lynxscreens.screens.formsheet.core.FormSheetDialogManager
 import com.lynxscreens.screens.formsheet.interfaces.FormSheetContentSizeChangeDelegate
 import com.lynxscreens.screens.formsheet.interfaces.FormSheetController
 import com.lynxscreens.screens.formsheet.model.FormSheetConfig
@@ -79,7 +79,12 @@ internal class FormSheetHostComponent(context: LynxContext) : UIGroup<FormSheetH
     override fun onPropsUpdated() {
         super.onPropsUpdated()
         if (!::controller.isInitialized) {
-            controller = FormSheetDialogManager(lynxContext, sheetContentView, eventEmitter)
+            controller =
+                LynxScreens.requireFormSheetControllerFactory().create(
+                    context = lynxContext,
+                    contentView = sheetContentView,
+                    eventEmitter = eventEmitter,
+                )
             sheetContentView.contentSizeChangeDelegate =
                 FormSheetContentSizeChangeDelegate(controller::onContentHeightChanged)
         }

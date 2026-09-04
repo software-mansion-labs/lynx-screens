@@ -5,7 +5,7 @@ import android.view.View
 import com.lynxscreens.screens.formsheet.model.FormSheetConfig
 
 /** Runtime-independent interface of the native FormSheet module. */
-internal interface FormSheetController {
+public interface FormSheetController {
     fun apply(config: FormSheetConfig)
 
     fun onContentHeightChanged(height: Int)
@@ -13,10 +13,12 @@ internal interface FormSheetController {
     fun dispose()
 }
 
-internal fun interface FormSheetControllerFactory {
+public fun interface FormSheetControllerFactory {
     fun create(
         context: Context,
         contentView: View,
         eventEmitter: FormSheetDialogEventEmitter,
     ): FormSheetController
+
+    public companion object
 }
