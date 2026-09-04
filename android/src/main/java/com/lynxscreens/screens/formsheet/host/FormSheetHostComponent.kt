@@ -13,6 +13,8 @@ import com.lynx.tasm.behavior.ui.LynxUI
 import com.lynx.tasm.behavior.ui.UIGroup
 import com.lynxscreens.screens.common.ShadowStateProxy
 import com.lynxscreens.screens.formsheet.core.FormSheetDialogManager
+import com.lynxscreens.screens.formsheet.interfaces.FormSheetContentSizeChangeDelegate
+import com.lynxscreens.screens.formsheet.interfaces.FormSheetController
 import com.lynxscreens.screens.formsheet.model.FormSheetConfig
 
 @LynxElement(name = "ls-form-sheet")
@@ -20,7 +22,7 @@ internal class FormSheetHostComponent(context: LynxContext) : UIGroup<FormSheetH
     private val eventEmitter by lazy { FormSheetHostEventEmitter(lynxContext, sign) }
     private val shadowStateProxy by lazy { ShadowStateProxy(lynxContext, sign) }
     private lateinit var sheetContentView: FormSheetContentView
-    private lateinit var dialogManager: FormSheetDialogManager
+    private lateinit var controller: FormSheetController
 
     private var isOpen = false
     private var detents: List<Double> = emptyList()
@@ -45,9 +47,6 @@ internal class FormSheetHostComponent(context: LynxContext) : UIGroup<FormSheetH
                 },
                 dispatchLynxTouchEvent = ::dispatchDialogTouchEvent,
             )
-        dialogManager = FormSheetDialogManager(lynxContext, sheetContentView)
-        dialogManager.eventEmitter = eventEmitter
-        sheetContentView.contentSizeChangeDelegate = dialogManager.contentSizeChangeDelegate
         return FormSheetHostView(lynxContext)
     }
 
@@ -79,7 +78,12 @@ internal class FormSheetHostComponent(context: LynxContext) : UIGroup<FormSheetH
 
     override fun onPropsUpdated() {
         super.onPropsUpdated()
-        dialogManager.applyConfig(
+        if (!::controller.isInitialized) {
+            controller = FormSheetDialogManager(lynxContext, sheetContentView, eventEmitter)
+            sheetContentView.contentSizeChangeDelegate =
+                FormSheetContentSizeChangeDelegate(controller::onContentHeightChanged)
+        }
+        controller.apply(
             FormSheetConfig(
                 isOpen = isOpen,
                 detents = detents,
@@ -93,7 +97,7 @@ internal class FormSheetHostComponent(context: LynxContext) : UIGroup<FormSheetH
     }
 
     override fun destroy() {
-        if (::dialogManager.isInitialized) dialogManager.destroy()
+        if (::controller.isInitialized) controller.dispose()
         super.destroy()
     }
 
