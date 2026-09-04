@@ -210,7 +210,10 @@ internal class StackContainer(
     private fun updateTopFragment() {
         // We try to handle situation where other fragments might be present.
         val fragmentManager = requireFragmentManager()
-        val fragments = fragmentManager.fragments.filterIsInstance<StackScreenFragment>()
+        val fragments =
+            fragmentManager.fragments
+                .filterIsInstance<StackScreenFragment>()
+                .filterNot { it.isRestoredPlaceholder }
         check(fragments.isNotEmpty()) { "[RNScreens] Empty fragment manager while attempting to update top fragment" }
         fragments.forEach { it.onResignTopFragment() }
         fragments.last().onBecomeTopFragment()
@@ -232,6 +235,7 @@ internal class StackContainer(
         requireFragmentManager()
             .fragments
             .filterIsInstance<StackScreenFragment>()
+            .filterNot { it.isRestoredPlaceholder }
             .lastOrNull()
 
     /**
@@ -256,6 +260,9 @@ internal class StackContainer(
     ) {
         if (fragment !is StackScreenFragment) {
             Log.w(TAG, "[RNScreens] Unexpected type of fragment: ${fragment.javaClass.simpleName}")
+            return
+        }
+        if (fragment.isRestoredPlaceholder) {
             return
         }
         // This callback is called for every fragment involved in the back stack change, even

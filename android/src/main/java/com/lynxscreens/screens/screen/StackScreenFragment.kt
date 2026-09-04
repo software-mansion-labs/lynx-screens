@@ -5,14 +5,35 @@ import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.fragment.app.Fragment
+import androidx.annotation.Keep
 import androidx.transition.Slide
 import com.lynxscreens.screens.header.StackHeaderCoordinatorLayout
 
-internal class StackScreenFragment(
-    internal val stackScreen: StackScreenComponent,
-    private val canNavigateBack: Boolean,
-) : Fragment() {
+internal data class StackScreenRuntimeState(
+    val stackScreen: StackScreenComponent,
+    val canNavigateBack: Boolean,
+)
+
+internal class StackScreenFragment @Keep constructor() :
+    NonRestorableLynxFragment<StackScreenRuntimeState>() {
+    internal constructor(
+        stackScreen: StackScreenComponent,
+        canNavigateBack: Boolean,
+    ) : this() {
+        initializeRuntimeState(
+            StackScreenRuntimeState(
+                stackScreen = stackScreen,
+                canNavigateBack = canNavigateBack,
+            ),
+        )
+    }
+
+    internal val stackScreen: StackScreenComponent
+        get() = runtimeState.stackScreen
+
+    private val canNavigateBack: Boolean
+        get() = runtimeState.canNavigateBack
+
     private var screenLifecycleEventEmitter: StackScreenAppearanceEventsEmitter? = null
 
     /**
@@ -27,9 +48,7 @@ internal class StackScreenFragment(
 
     private var isTopFragment: Boolean = false
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-
+    override fun onRuntimeCreate(savedInstanceState: Bundle?) {
         setupPreventNativeDismissCallback()
 
         allowEnterTransitionOverlap = true
@@ -41,32 +60,29 @@ internal class StackScreenFragment(
         reenterTransition = Slide(Gravity.LEFT)
     }
 
-    override fun onCreateView(
+    override fun onCreateRuntimeView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?,
     ): View = StackHeaderCoordinatorLayout(requireContext(), stackScreen, canNavigateBack)
 
-    override fun onViewCreated(
+    override fun onRuntimeViewCreated(
         view: View,
-        savedInstanceState: Bundle?
+        savedInstanceState: Bundle?,
     ) {
-        super.onViewCreated(view, savedInstanceState)
         screenLifecycleEventEmitter = stackScreen.createAppearanceEventsEmitter(viewLifecycleOwner)
     }
 
-    override fun onDestroyView() {
+    override fun onRuntimeDestroyView() {
         val coordinatorLayout = view
         check(coordinatorLayout is StackHeaderCoordinatorLayout) {
             "[RNScreens] Unexpected fragment view type: $view"
         }
         coordinatorLayout.tearDown()
-        super.onDestroyView()
         screenLifecycleEventEmitter = null
     }
 
-    override fun onDestroy() {
-        super.onDestroy()
+    override fun onRuntimeDestroy() {
         stackScreen.onDismiss()
         teardownPreventNativeDismissCallback()
     }
