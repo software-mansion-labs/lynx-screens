@@ -52,6 +52,10 @@ function TemplateScreen() {
         label="Push NestedStack"
         onTap={() => navigation.push('NestedStack')}
       />
+      <Button
+        label="Push DeepNestedStack"
+        onTap={() => navigation.push('DeepNestedStack')}
+      />
       <Button label="Pop" onTap={() => navigation.pop(navigation.routeKey)} />
       <Button label="Preload A" onTap={() => navigation.preload('A')} />
       <Button label="Preload B" onTap={() => navigation.preload('B')} />
@@ -109,6 +113,19 @@ function NestedStackScreen() {
   return <StackContainer routeConfigs={ROUTE_CONFIGS_NESTED_STACK} />;
 }
 
+function DeepNestedStackScreen() {
+  return <StackContainer routeConfigs={ROUTE_CONFIGS_MIDDLE_STACK} />;
+}
+
+// The middle root is destroyed with its parent without being independently removed.
+// Back from the deepest root must dismiss only the outer DeepNestedStack route.
+const ROUTE_CONFIGS_MIDDLE_STACK: StackRouteConfig[] = [
+  {
+    name: 'MiddleRoot',
+    Component: NestedStackScreen,
+  },
+];
+
 const ROUTE_CONFIGS: StackRouteConfig[] = [
   {
     name: 'A',
@@ -129,6 +146,10 @@ const ROUTE_CONFIGS: StackRouteConfig[] = [
       onDidAppear: () => console.log('B onDidAppear'),
       onDidDisappear: () => console.log('B onDidDisappear'),
     },
+  },
+  {
+    name: 'DeepNestedStack',
+    Component: DeepNestedStackScreen,
   },
   {
     name: 'NestedStack',
