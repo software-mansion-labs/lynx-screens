@@ -1,6 +1,6 @@
 # Lynx Screens
 
-This project aims to expose native navigation container components (currently the Stack v5 navigation model) to Lynx. It is not designed to be used as a standalone library but rather as a dependency of a full-featured navigation library. The implementation is based on [`react-native-screens`](https://github.com/software-mansion/react-native-screens).
+This project aims to expose native navigation container components to Lynx. It is not designed to be used as a standalone library but rather as a dependency of a full-featured navigation library. The implementation is based on [`react-native-screens`](https://github.com/software-mansion/react-native-screens).
 
 The repository is structured similarly as `react-native-screens`: a library at the root with an example app, integrated via [Lynx autolinking](https://lynxjs.org/4.0/guide/autolink.html):
 
@@ -60,6 +60,7 @@ Already ported to Lynx and working:
 | Predictive back gesture support (internal) | ✅ | N/A |
 | Transition API / screen transitions (internal) | ✅ | ❌ |
 | `ScrollViewMarker` (registers a wrapped scroll view with the enclosing screen for header integrations) | ✅ | ✅ |
+| FormSheet v5 | ✅ | ✅ |
 
 **Header — Android**
 
@@ -83,7 +84,6 @@ Already ported to Lynx and working:
 
 Parts of `react-native-screens` in the synced range that were deliberately left out:
 
-- **FormSheet v5** — standalone RNS component; out of scope for this port.
 - **Native Tabs, SplitView, SafeArea, ScrollToTopGuard** — components lynx-screens doesn't port; see also the open topics below.
 - **ScrollViewMarker scroll edge effects** — only the scroll view registration core of the SVM epic is ported; the iOS scroll edge effect subsystem is not.
 
