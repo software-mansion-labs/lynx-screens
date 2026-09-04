@@ -5,6 +5,12 @@ export { StackScreenNativeComponent } from './native_components/StackScreenNativ
 export { StackHeaderConfigNativeComponent } from './native_components/StackHeaderConfigNativeComponent';
 export { ScrollViewMarker } from './native_components/ScrollViewMarkerNativeComponent';
 export type { ScrollViewMarkerProps } from './native_components/ScrollViewMarkerNativeComponent';
+export { FormSheetNativeComponent } from './native_components/FormSheetNativeComponent';
+export type {
+  FormSheetDetents,
+  FormSheetNativeContainerStyle,
+  FormSheetProps,
+} from './types/FormSheet';
 
 export type {
   OnDismissEventPayload,
