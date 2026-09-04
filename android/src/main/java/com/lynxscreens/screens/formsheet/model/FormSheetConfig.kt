@@ -1,6 +1,6 @@
 package com.lynxscreens.screens.formsheet.model
 
-internal data class FormSheetConfig(
+public data class FormSheetConfig(
     val isOpen: Boolean = false,
     val detents: List<Double> = emptyList(),
     val prefersGrabberVisible: Boolean = false,
