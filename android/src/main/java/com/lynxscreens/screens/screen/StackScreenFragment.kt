@@ -67,7 +67,12 @@ internal class StackScreenFragment(
 
     override fun onDestroy() {
         super.onDestroy()
-        stackScreen.onDismiss()
+
+        // Destroying an outer StackScreen also destroys all Fragments in its child manager. Those
+        // nested screens were not independently popped and must not emit another native dismissal.
+        if (parentFragment?.isRemoving != true) {
+            stackScreen.onDismiss()
+        }
         teardownPreventNativeDismissCallback()
     }
 
