@@ -26,6 +26,19 @@ cd LynxExample/android
 ./gradlew :app:assembleDebug   # or open LynxExample/android in Android Studio
 ```
 
+The bundled Material FormSheet backend is used by default. A host that supplies its own backend can
+exclude the bundled implementation at compile time:
+
+```properties
+lynxScreens.formSheetBackend=external
+```
+
+The host must then register its factory before creating a FormSheet:
+
+```kotlin
+LynxScreens.setFormSheetControllerFactory(HostFormSheetControllerFactory)
+```
+
 ### iOS
 
 ```bash

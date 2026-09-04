@@ -4,6 +4,13 @@ plugins {
     id("org.jetbrains.kotlin.kapt")
 }
 
+val formSheetBackendSourceDir =
+    when (val backend = providers.gradleProperty("lynxScreens.formSheetBackend").orElse("material").get()) {
+        "material" -> "src/formSheetMaterial/java"
+        "external" -> "src/formSheetExternal/java"
+        else -> error("Unsupported FormSheet backend: $backend")
+    }
+
 android {
     namespace = "com.lynxscreens.screens"
     compileSdk = 36
@@ -18,6 +25,10 @@ android {
     }
     kotlinOptions {
         jvmTarget = "1.8"
+    }
+
+    sourceSets.named("main") {
+        java.srcDir(formSheetBackendSourceDir)
     }
 }
 
