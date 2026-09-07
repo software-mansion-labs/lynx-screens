@@ -9,6 +9,7 @@ import com.facebook.imagepipeline.core.ImagePipelineConfig
 import com.facebook.imagepipeline.memory.PoolConfig
 import com.facebook.imagepipeline.memory.PoolFactory
 import com.lynx.devtoolwrapper.LynxDevtoolGlobalHelper
+import com.lynx.service.devtool.LynxDevToolService
 import com.lynx.service.image.LynxImageService
 import com.lynx.service.log.LynxLogService
 import com.lynx.tasm.LynxEnv
@@ -31,6 +32,15 @@ class MainApplication : Application() {
         LynxServiceCenter.inst().registerService(LynxImageService.getInstance())
         LynxServiceCenter.inst().registerService(LynxLogService)
         LynxServiceCenter.inst().registerService(LynxHttpService)
+
+        // Required for the DevTool desktop app to see this app at all.
+        LynxDevToolService.INSTANCE.enableAllSessions()
+        LynxServiceCenter.inst().registerService(LynxDevToolService.INSTANCE)
+        LynxDevToolService.INSTANCE.setLynxDebugPresetValue(true)
+        LynxDevToolService.INSTANCE.setLogBoxPresetValue(true)
+        // JavaScript debugging: PrimJS and V8 respectively.
+        LynxDevToolService.INSTANCE.setLoadQJSBridge(true)
+        LynxDevToolService.INSTANCE.setLoadV8Bridge(true)
     }
 
     private fun initLynxEnv() {
