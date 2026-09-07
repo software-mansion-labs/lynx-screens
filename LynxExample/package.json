@@ -9,15 +9,15 @@
     "preview": "rspeedy preview"
   },
   "dependencies": {
-    "@lynx-js/react": "^0.125.0",
+    "@lynx-js/react": "^0.126.0",
     "lynx-screens": "file:../"
   },
   "devDependencies": {
-    "@lynx-js/preact-devtools": "^5.0.1-20260821134614-21e65a4",
-    "@lynx-js/qrcode-rsbuild-plugin": "^0.6.0",
-    "@lynx-js/react-rsbuild-plugin": "^0.19.1",
-    "@lynx-js/rspeedy": "^0.16.5",
-    "@lynx-js/types": "^4.1.0",
+    "@lynx-js/preact-devtools": "^5.0.1-20260827072047-5f77e12",
+    "@lynx-js/qrcode-rsbuild-plugin": "^0.7.1",
+    "@lynx-js/react-rsbuild-plugin": "^0.20.1",
+    "@lynx-js/rspeedy": "^0.17.1",
+    "@lynx-js/types": "^4.2.1",
     "@rsbuild/plugin-type-check": "^1.6.0",
     "@types/react": "~19.2.17",
     "typescript": "~5.9.2"
