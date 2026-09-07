@@ -104,5 +104,5 @@ class HomeViewController: UIViewController, UITableViewDataSource, UITableViewDe
 
 }
 
-private let historyKey = "home.history"
+let historyKey = "home.history"
 private let historyLimit = 10

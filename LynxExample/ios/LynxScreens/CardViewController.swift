@@ -3,10 +3,12 @@ import UIKit
 /// Renders one bundle. The URL comes from the home screen, never from here.
 class CardViewController: UIViewController {
   private let url: String
+  private let route: String?
   private var lynxView: LynxView?
 
-  init(url: String) {
+  init(url: String, route: String? = nil) {
     self.url = url
+    self.route = route
     super.init(nibName: nil, bundle: nil)
   }
 
@@ -63,7 +65,7 @@ class CardViewController: UIViewController {
     resize(lynxView)
     view.addSubview(lynxView)
 
-    lynxView.loadTemplate(fromURL: url, initData: nil)
+    lynxView.loadTemplate(fromURL: url, initData: Self.navigationData(for: route))
   }
 
   /// The card lives inside the safe area, so its own header does not end up
@@ -76,4 +78,26 @@ class CardViewController: UIViewController {
     lynxView.preferredLayoutWidth = frame.width
     lynxView.preferredLayoutHeight = frame.height
   }
+
+  /// A link that arrived while this card is already up.
+  func deliver(route: String) {
+    lynxView?.sendGlobalEvent(Self.urlEvent, withParams: [["url": route]])
+  }
+
+  private static func navigationData(for route: String?) -> LynxTemplateData? {
+    guard let route else { return nil }
+
+    // initData is state, not an event: the same route twice would leave it
+    // untouched and be dropped.
+    return LynxTemplateData(dictionary: [
+      navigationKey: [
+        "route": route,
+        "nonce": Date().timeIntervalSince1970,
+      ],
+    ])
+  }
+
+  // Both match `@react-navigation/lynx`.
+  private static let navigationKey = "__navigation"
+  private static let urlEvent = "reactnavigation.url"
 }
