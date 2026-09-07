@@ -37,7 +37,7 @@ class ScanViewController: UIViewController, AVCaptureMetadataOutputObjectsDelega
     // The simulator has no camera: the session builds but fails to start, which
     // otherwise just leaves a black screen.
     NotificationCenter.default.addObserver(
-      forName: .AVCaptureSessionRuntimeError,
+      forName: AVCaptureSession.runtimeErrorNotification,
       object: session,
       queue: .main
     ) { [weak self] _ in
