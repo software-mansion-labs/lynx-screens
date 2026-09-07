@@ -8,6 +8,7 @@ import android.widget.Button
 import android.widget.EditText
 import android.widget.ListView
 import android.widget.Toast
+import androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult
 import androidx.appcompat.app.AppCompatActivity
 
 /**
@@ -16,6 +17,12 @@ import androidx.appcompat.app.AppCompatActivity
  */
 class HomeActivity : AppCompatActivity() {
     private lateinit var input: EditText
+
+    private val scan = registerForActivityResult(StartActivityForResult()) { result ->
+        if (result.resultCode == Activity.RESULT_OK) {
+            open(result.data?.getStringExtra(QRScanActivity.EXTRA_RESULT).orEmpty())
+        }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -26,18 +33,10 @@ class HomeActivity : AppCompatActivity() {
 
         findViewById<Button>(R.id.open).setOnClickListener { open(input.text.toString()) }
         findViewById<Button>(R.id.scan).setOnClickListener {
-            startActivityForResult(Intent(this, QRScanActivity::class.java), SCAN_REQUEST)
+            scan.launch(Intent(this, QRScanActivity::class.java))
         }
 
         showHistory()
-    }
-
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-
-        if (requestCode == SCAN_REQUEST && resultCode == Activity.RESULT_OK) {
-            open(data?.getStringExtra(QRScanActivity.EXTRA_RESULT).orEmpty())
-        }
     }
 
     private fun showHistory() {
@@ -78,7 +77,6 @@ class HomeActivity : AppCompatActivity() {
     }
 
     private companion object {
-        const val SCAN_REQUEST = 1
         const val KEY_HISTORY = "history"
         const val HISTORY_LIMIT = 10
     }
