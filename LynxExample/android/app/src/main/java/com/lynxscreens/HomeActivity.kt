@@ -10,6 +10,9 @@ import android.widget.ListView
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.updatePadding
 
 /**
  * Where a bundle URL comes from, so none of them are baked into the sources.
@@ -27,6 +30,7 @@ class HomeActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_home)
+        applyInsets()
 
         input = findViewById(R.id.url)
         input.setText(history().firstOrNull().orEmpty())
@@ -37,6 +41,22 @@ class HomeActivity : AppCompatActivity() {
         }
 
         showHistory()
+    }
+
+    /** targetSdk 35+ draws edge to edge, so the bars would sit over the form. */
+    private fun applyInsets() {
+        val root = findViewById<android.view.View>(R.id.root)
+        val padding = root.paddingTop
+
+        ViewCompat.setOnApplyWindowInsetsListener(root) { view, windowInsets ->
+            val insets = windowInsets.getInsets(
+                WindowInsetsCompat.Type.systemBars() or WindowInsetsCompat.Type.ime(),
+            )
+
+            view.updatePadding(top = padding + insets.top, bottom = padding + insets.bottom)
+
+            windowInsets
+        }
     }
 
     private fun showHistory() {
