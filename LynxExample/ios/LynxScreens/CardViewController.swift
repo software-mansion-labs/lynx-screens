@@ -21,6 +21,19 @@ class CardViewController: UIViewController {
     view = container
   }
 
+  override func viewWillAppear(_ animated: Bool) {
+    super.viewWillAppear(animated)
+
+    // The card draws its own back button, so the outer bar would be a second
+    // one and would push the stack down.
+    navigationController?.setNavigationBarHidden(true, animated: animated)
+  }
+
+  override func viewWillDisappear(_ animated: Bool) {
+    super.viewWillDisappear(animated)
+    navigationController?.setNavigationBarHidden(false, animated: animated)
+  }
+
   override func viewDidLayoutSubviews() {
     super.viewDidLayoutSubviews()
 
@@ -53,11 +66,14 @@ class CardViewController: UIViewController {
     lynxView.loadTemplate(fromURL: url, initData: nil)
   }
 
-  /// The card fills this view, which the navigation bar makes shorter than
-  /// the screen, so its layout size is not the screen size.
+  /// The card lives inside the safe area, so its own header does not end up
+  /// under the status bar, and its layout size is that area rather than the
+  /// screen.
   private func resize(_ lynxView: LynxView) {
-    lynxView.frame = view.bounds
-    lynxView.preferredLayoutWidth = view.bounds.width
-    lynxView.preferredLayoutHeight = view.bounds.height
+    let frame = view.safeAreaLayoutGuide.layoutFrame
+
+    lynxView.frame = frame
+    lynxView.preferredLayoutWidth = frame.width
+    lynxView.preferredLayoutHeight = frame.height
   }
 }
