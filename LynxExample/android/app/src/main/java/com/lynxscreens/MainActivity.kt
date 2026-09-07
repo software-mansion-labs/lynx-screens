@@ -31,7 +31,6 @@ class MainActivity : AppCompatActivity() {
         lynxView.renderTemplateUrl(uri, "")
     }
 
-    
     private fun buildLynxView(): LynxView {
         val viewBuilder: LynxViewBuilder = LynxViewBuilder()
         viewBuilder.addBehaviors(XElementBehaviors().create())
