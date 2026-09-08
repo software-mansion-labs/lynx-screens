@@ -97,7 +97,8 @@ declare module "@lynx-js/types" {
       bindOnDidAppear?: Lynx.EventHandler<Lynx.BaseEventOrig<EmptyEventPayload>> | undefined;
       bindOnWillDisappear?: Lynx.EventHandler<Lynx.BaseEventOrig<EmptyEventPayload>> | undefined;
       bindOnDidDisappear?: Lynx.EventHandler<Lynx.BaseEventOrig<EmptyEventPayload>> | undefined;
-      bindOnDismiss?: Lynx.EventHandler<Lynx.BaseEventOrig<OnDismissEventPayload>> | undefined;
+      bindOnDismiss?: Lynx.EventHandler<Lynx.BaseEventOrig<EmptyEventPayload>> | undefined;
+      bindOnNativeDismiss?: Lynx.EventHandler<Lynx.BaseEventOrig<EmptyEventPayload>> | undefined;
       bindOnNativeDismissPrevented?: Lynx.EventHandler<Lynx.BaseEventOrig<EmptyEventPayload>> | undefined;
       bindOnDetentChanged?:
         | Lynx.EventHandler<

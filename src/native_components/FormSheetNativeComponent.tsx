@@ -8,10 +8,6 @@ import {
   resolveNativeDetents,
 } from './FormSheetUtils.js';
 
-type DismissEventPayload = Readonly<{
-  isNativeDismiss: boolean;
-}>;
-
 type DetentChangedEventPayload = Readonly<{
   index: number;
 }>;
@@ -35,17 +31,6 @@ export const FormSheetNativeComponent = ({
 }: FormSheetProps) => {
   const nativeDetents = resolveNativeDetents(detents);
   const detentsCount = nativeDetents?.length ?? 0;
-
-  const onDismissEvent = React.useCallback(
-    (event: Lynx.BaseEventOrig<DismissEventPayload>) => {
-      if (event.detail.isNativeDismiss) {
-        onNativeDismiss?.();
-      } else {
-        onDismiss?.();
-      }
-    },
-    [onDismiss, onNativeDismiss],
-  );
 
   const onDetentChangedEvent = React.useCallback(
     (event: Lynx.BaseEventOrig<DetentChangedEventPayload>) => {
@@ -72,7 +57,8 @@ export const FormSheetNativeComponent = ({
       bindOnDidAppear={onDidAppear}
       bindOnWillDisappear={onWillDisappear}
       bindOnDidDisappear={onDidDisappear}
-      bindOnDismiss={onDismissEvent}
+      bindOnDismiss={onDismiss}
+      bindOnNativeDismiss={onNativeDismiss}
       bindOnNativeDismissPrevented={onNativeDismissPrevented}
       bindOnDetentChanged={onDetentChangedEvent}
       {...rest}

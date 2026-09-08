@@ -28,6 +28,7 @@ internal class FormSheetDialogManager(
         FormSheetPresentationManager(
             presentationFactory = ::createPresentation,
             dimmingManager = dimmingManager,
+            onNativeDismiss = eventEmitter::emitOnNativeDismissEvent,
             onDismiss = eventEmitter::emitOnDismissEvent,
         )
     private val presentationCallbacks =

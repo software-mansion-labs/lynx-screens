@@ -2,13 +2,13 @@ package com.lynxscreens.screens.formsheet.coordinator
 
 import android.content.res.ColorStateList
 import android.os.Build
-import android.util.TypedValue
 import android.widget.FrameLayout
 import androidx.core.view.doOnNextLayout
 import com.google.android.material.shape.CornerFamily
 import com.google.android.material.shape.MaterialShapeDrawable
 import com.google.android.material.shape.ShapeAppearanceModel
 import com.lynxscreens.screens.formsheet.model.FormSheetConfig
+import com.lynxscreens.screens.utils.dpToPx
 
 internal class FormSheetAppearanceCoordinator(private val bottomSheetView: FrameLayout?) {
     private var currentCornerRadius = FormSheetConfig.SYSTEM_DEFAULT_CORNER_RADIUS
@@ -46,12 +46,7 @@ internal class FormSheetAppearanceCoordinator(private val bottomSheetView: Frame
             defaultShapeAppearanceModel?.let { background.shapeAppearanceModel = it }
             return
         }
-        val radiusInPx =
-            TypedValue.applyDimension(
-                TypedValue.COMPLEX_UNIT_DIP,
-                currentCornerRadius,
-                view.resources.displayMetrics,
-            )
+        val radiusInPx = view.dpToPx(currentCornerRadius)
         background.shapeAppearanceModel =
             (defaultShapeAppearanceModel ?: background.shapeAppearanceModel)
                 .toBuilder()
