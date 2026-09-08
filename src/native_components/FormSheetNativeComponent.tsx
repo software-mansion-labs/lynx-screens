@@ -6,11 +6,7 @@ import {
   resolveLargestUndimmedDetentIndex,
   resolveNativeCornerRadius,
   resolveNativeDetents,
-} from './FormSheetUtils.js';
-
-type DismissEventPayload = Readonly<{
-  isNativeDismiss: boolean;
-}>;
+} from '../utils/FormSheetUtils.js';
 
 type DetentChangedEventPayload = Readonly<{
   index: number;
@@ -35,17 +31,6 @@ export const FormSheetNativeComponent = ({
 }: FormSheetProps) => {
   const nativeDetents = resolveNativeDetents(detents);
   const detentsCount = nativeDetents?.length ?? 0;
-
-  const onDismissEvent = React.useCallback(
-    (event: Lynx.BaseEventOrig<DismissEventPayload>) => {
-      if (event.detail.isNativeDismiss) {
-        onNativeDismiss?.();
-      } else {
-        onDismiss?.();
-      }
-    },
-    [onDismiss, onNativeDismiss],
-  );
 
   const onDetentChangedEvent = React.useCallback(
     (event: Lynx.BaseEventOrig<DetentChangedEventPayload>) => {
@@ -72,7 +57,8 @@ export const FormSheetNativeComponent = ({
       bindOnDidAppear={onDidAppear}
       bindOnWillDisappear={onWillDisappear}
       bindOnDidDisappear={onDidDisappear}
-      bindOnDismiss={onDismissEvent}
+      bindOnDismiss={onDismiss}
+      bindOnNativeDismiss={onNativeDismiss}
       bindOnNativeDismissPrevented={onNativeDismissPrevented}
       bindOnDetentChanged={onDetentChangedEvent}
       {...rest}
@@ -84,6 +70,7 @@ export const FormSheetNativeComponent = ({
           {children}
         </ls-form-sheet-content-wrapper>
       ) : (
+        // Adaptation: fixed-detent Lynx content needs a full-size native interaction container.
         <view
           native-interaction-enabled={true}
           style={{ width: '100%', height: '100%' }}

@@ -2,8 +2,8 @@ import type * as Lynx from '@lynx-js/types';
 
 export type FormSheetDetents = number[] | 'fitToContents';
 
-export type FormSheetNativeContainerStyle = {
-  backgroundColor?: string | undefined;
+export type FormSheetNativeContainerStyleProps = {
+  backgroundColor?: Lynx.CSSProperties['backgroundColor'] | undefined;
 };
 
 export type FormSheetProps = {
@@ -16,7 +16,7 @@ export type FormSheetProps = {
   initialDetentIndex?: number | 'last' | undefined;
   prefersScrollingExpandsWhenScrolledToEdge?: boolean | undefined;
   preventNativeDismiss?: boolean | undefined;
-  nativeContainerStyle?: FormSheetNativeContainerStyle | undefined;
+  nativeContainerStyle?: FormSheetNativeContainerStyleProps | undefined;
   onWillAppear?:
     | Lynx.EventHandler<Lynx.BaseEventOrig<Record<string, never>>>
     | undefined;
