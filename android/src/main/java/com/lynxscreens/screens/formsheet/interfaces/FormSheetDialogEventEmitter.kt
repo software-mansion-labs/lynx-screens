@@ -3,7 +3,9 @@ package com.lynxscreens.screens.formsheet.interfaces
 import com.lynxscreens.screens.common.event.ViewAppearanceEventEmitter
 
 internal interface FormSheetDialogEventEmitter : ViewAppearanceEventEmitter {
-    fun emitOnDismissEvent(isNativeDismiss: Boolean)
+    fun emitOnDismissEvent()
+
+    fun emitOnNativeDismissEvent()
 
     fun emitOnNativeDismissPreventedEvent()
 

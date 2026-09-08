@@ -16,8 +16,9 @@ internal class FormSheetHostEventEmitter(
 
     override fun emitOnDidDisappear() = emit(EVENT_DID_DISAPPEAR)
 
-    override fun emitOnDismissEvent(isNativeDismiss: Boolean) =
-        emit(EVENT_DISMISS, mapOf("isNativeDismiss" to isNativeDismiss))
+    override fun emitOnDismissEvent() = emit(EVENT_DISMISS)
+
+    override fun emitOnNativeDismissEvent() = emit(EVENT_NATIVE_DISMISS)
 
     override fun emitOnNativeDismissPreventedEvent() = emit(EVENT_NATIVE_DISMISS_PREVENTED)
 
@@ -35,6 +36,7 @@ internal class FormSheetHostEventEmitter(
         private const val EVENT_WILL_DISAPPEAR = "OnWillDisappear"
         private const val EVENT_DID_DISAPPEAR = "OnDidDisappear"
         private const val EVENT_DISMISS = "OnDismiss"
+        private const val EVENT_NATIVE_DISMISS = "OnNativeDismiss"
         private const val EVENT_NATIVE_DISMISS_PREVENTED = "OnNativeDismissPrevented"
         private const val EVENT_DETENT_CHANGED = "OnDetentChanged"
     }
