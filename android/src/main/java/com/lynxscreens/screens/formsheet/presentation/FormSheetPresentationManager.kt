@@ -11,7 +11,8 @@ import com.lynxscreens.screens.common.event.ViewAppearanceEventEmitter
 internal class FormSheetPresentationManager(
     private val presentationFactory: () -> FormSheetPresentation,
     private val dimmingManager: FormSheetDimmingManager,
-    private val onDismiss: (isNativeDismiss: Boolean) -> Unit,
+    private val onNativeDismiss: () -> Unit,
+    private val onDismiss: () -> Unit,
 ) {
     internal var appearanceEventEmitter: ViewAppearanceEventEmitter? = null
     internal var currentPresentation: FormSheetPresentation? = null
@@ -161,8 +162,8 @@ internal class FormSheetPresentationManager(
             state = FormSheetPresentationState.DISMISSED
             appearanceEventEmitter?.emitOnDidDisappear()
             when (dismissalOrigin) {
-                FormSheetDismissalOrigin.USER -> onDismiss(true)
-                FormSheetDismissalOrigin.PROGRAMMATIC -> onDismiss(false)
+                FormSheetDismissalOrigin.USER -> onNativeDismiss()
+                FormSheetDismissalOrigin.PROGRAMMATIC -> onDismiss()
                 FormSheetDismissalOrigin.UNSPECIFIED ->
                     Log.e(
                         "[RNScreens]",
