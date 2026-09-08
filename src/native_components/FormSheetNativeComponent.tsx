@@ -6,7 +6,7 @@ import {
   resolveLargestUndimmedDetentIndex,
   resolveNativeCornerRadius,
   resolveNativeDetents,
-} from './FormSheetUtils.js';
+} from '../utils/FormSheetUtils.js';
 
 type DetentChangedEventPayload = Readonly<{
   index: number;
@@ -70,6 +70,7 @@ export const FormSheetNativeComponent = ({
           {children}
         </ls-form-sheet-content-wrapper>
       ) : (
+        // Adaptation: fixed-detent Lynx content needs a full-size native interaction container.
         <view
           native-interaction-enabled={true}
           style={{ width: '100%', height: '100%' }}

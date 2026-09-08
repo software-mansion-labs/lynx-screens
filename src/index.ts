@@ -8,7 +8,7 @@ export type { ScrollViewMarkerProps } from './native_components/ScrollViewMarker
 export { FormSheetNativeComponent } from './native_components/FormSheetNativeComponent';
 export type {
   FormSheetDetents,
-  FormSheetNativeContainerStyle,
+  FormSheetNativeContainerStyleProps,
   FormSheetProps,
 } from './types/FormSheet';
 
