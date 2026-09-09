@@ -1,3 +1,7 @@
 <resources>
     <string name="app_name">LynxScreens</string>
+    <string name="home_url_hint">http://192.168.x.x:3000/main.lynx.bundle?fullscreen=true</string>
+    <string name="home_open">Open</string>
+    <string name="home_scan">Scan</string>
+    <string name="home_recent">Recent</string>
 </resources>

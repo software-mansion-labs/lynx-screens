@@ -1,5 +1,6 @@
 package com.lynxscreens
 
+import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import com.lynxscreens.providers.GenericResourceFetcher
@@ -18,11 +19,10 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        var uri = ""
-        uri = if (BuildConfig.DEBUG == true) {
-            "http://10.0.2.2:3000/main.lynx.bundle?fullscreen=true"
-        } else {
-            "main.lynx.bundle"
+        val uri = intent.getStringExtra(EXTRA_URL) ?: run {
+            startActivity(Intent(this, HomeActivity::class.java))
+            finish()
+            return
         }
 
         val lynxView: LynxView = buildLynxView()
@@ -30,7 +30,7 @@ class MainActivity : AppCompatActivity() {
 
         lynxView.renderTemplateUrl(uri, "")
     }
-    
+
     private fun buildLynxView(): LynxView {
         val viewBuilder: LynxViewBuilder = LynxViewBuilder()
         viewBuilder.addBehaviors(XElementBehaviors().create())
@@ -52,5 +52,9 @@ class MainActivity : AppCompatActivity() {
         })
 
         return viewBuilder.build(this)
+    }
+
+    companion object {
+        const val EXTRA_URL = "url"
     }
 }

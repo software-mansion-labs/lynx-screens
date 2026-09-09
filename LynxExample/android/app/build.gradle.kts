@@ -115,6 +115,8 @@ dependencies {
 
     implementation("com.squareup.okhttp3:okhttp:4.9.0")
 
+    implementation("com.journeyapps:zxing-android-embedded:4.3.0")
+
     // add devtool's dependencies
     implementation ("org.lynxsdk.lynx:lynx-devtool:4.0.1")
     implementation ("org.lynxsdk.lynx:lynx-service-devtool:4.0.1")
