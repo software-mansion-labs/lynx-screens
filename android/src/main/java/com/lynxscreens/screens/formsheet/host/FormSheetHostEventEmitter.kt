@@ -1,5 +1,6 @@
 package com.lynxscreens.screens.formsheet.host
 
+import com.lynxscreens.screens.formsheet.FormSheetNavigationTrace
 import com.lynx.tasm.behavior.LynxContext
 import com.lynx.tasm.event.LynxCustomEvent
 import com.lynxscreens.screens.formsheet.interfaces.FormSheetDialogEventEmitter
@@ -7,6 +8,7 @@ import com.lynxscreens.screens.formsheet.interfaces.FormSheetDialogEventEmitter
 internal class FormSheetHostEventEmitter(
     private val lynxContext: LynxContext,
     private val sign: Int,
+    internal val navigationTrace: FormSheetNavigationTrace,
 ) : FormSheetDialogEventEmitter {
     override fun emitOnWillAppear() = emit(EVENT_WILL_APPEAR)
 
@@ -26,8 +28,17 @@ internal class FormSheetHostEventEmitter(
 
     private fun emit(name: String, details: Map<String, Any>? = null) {
         val event = LynxCustomEvent(sign, name)
+        navigationTrace.eventTraceIdentity?.addTo(event)
         details?.forEach { (key, value) -> event.addDetail(key, value) }
         lynxContext.eventEmitter.sendCustomEvent(event)
+        if (name != EVENT_DETENT_CHANGED) {
+            navigationTrace.eventEmitted(
+                name,
+                name == EVENT_WILL_APPEAR || name == EVENT_DID_APPEAR ||
+                    name == EVENT_WILL_DISAPPEAR || name == EVENT_DID_DISAPPEAR,
+                details?.get("channel")?.toString(),
+            )
+        }
     }
 
     companion object {

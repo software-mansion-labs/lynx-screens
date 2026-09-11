@@ -19,11 +19,12 @@ import com.lynxscreens.screens.formsheet.model.FormSheetConfig
 
 @LynxElement(name = "ls-form-sheet")
 internal class FormSheetHostComponent(context: LynxContext) : UIGroup<FormSheetHostView>(context) {
-    private val eventEmitter by lazy { FormSheetHostEventEmitter(lynxContext, sign) }
+    private val eventEmitter by lazy { FormSheetHostEventEmitter(lynxContext, sign, view.navigationTrace) }
     private val shadowStateProxy by lazy { ShadowStateProxy(lynxContext, sign) }
     private lateinit var sheetContentView: FormSheetContentView
     private lateinit var controller: FormSheetController
 
+    private var traceScreenKey: String? = null
     private var isOpen = false
     private var detents: List<Double> = emptyList()
     private var prefersGrabberVisible = false
@@ -47,7 +48,7 @@ internal class FormSheetHostComponent(context: LynxContext) : UIGroup<FormSheetH
                 },
                 dispatchLynxTouchEvent = ::dispatchDialogTouchEvent,
             )
-        return FormSheetHostView(lynxContext)
+        return FormSheetHostView(lynxContext, "form-sheet-$sign") { traceScreenKey }
     }
 
     // Adaptation: retain Lynx's logical child tree while mounting native child views in the dialog.
@@ -104,6 +105,21 @@ internal class FormSheetHostComponent(context: LynxContext) : UIGroup<FormSheetH
     override fun destroy() {
         if (::controller.isInitialized) controller.dispose()
         super.destroy()
+    }
+
+    @LynxProp(name = "traceSession")
+    fun setTraceSession(value: String?) { view.setTraceSession(value) }
+    @LynxProp(name = "contentTraceContext")
+    fun setContentTraceContext(value: String?) { view.setContentTraceContext(value) }
+
+    @LynxProp(name = "traceScreenKey")
+    fun setTraceScreenKey(value: String?) {
+        traceScreenKey = value
+    }
+
+    @LynxProp(name = "navigationTraceContext")
+    fun setNavigationTraceContext(value: String?) {
+        view.setNavigationTraceContext(value)
     }
 
     @LynxProp(name = "isOpen")

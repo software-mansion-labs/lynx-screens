@@ -8,11 +8,16 @@ import android.widget.FrameLayout
 import androidx.fragment.app.FragmentManager
 import com.lynxscreens.screens.common.container.Container
 import com.lynxscreens.screens.common.container.ParentContainerItemRegistry
+import com.lynxscreens.screens.common.trace.LynxScreensTrace
+import com.lynxscreens.screens.common.trace.NavigationTraceContextStore
+import com.lynxscreens.screens.common.trace.NavigationTraceIdentity
 import com.lynxscreens.screens.ext.isMeasured
 import com.lynxscreens.screens.helpers.FragmentManagerHelper
 import com.lynxscreens.screens.helpers.ViewIdGenerator
 import com.lynxscreens.screens.screen.StackScreenComponent
 import com.lynxscreens.screens.screen.StackScreenFragment
+import com.lynxscreens.screens.screen.StackScreenTraceDelegate
+import com.lynxscreens.screens.screen.StackTransitionRole
 import java.lang.ref.WeakReference
 
 @SuppressLint("ViewConstructor") // Only we construct this view, it is never inflated.
@@ -21,7 +26,8 @@ internal class StackContainer(
     private val delegate: WeakReference<StackContainerDelegate>,
 ) : FrameLayout(context),
     Container,
-    FragmentManager.OnBackStackChangedListener {
+    FragmentManager.OnBackStackChangedListener,
+    StackScreenTraceDelegate {
     private var fragmentManager: FragmentManager? = null
 
     private fun requireFragmentManager(): FragmentManager =
@@ -48,6 +54,31 @@ internal class StackContainer(
 
     private val fragmentOpExecutor: FragmentOperationExecutor = FragmentOperationExecutor()
     private val fragmentOps: MutableList<FragmentOperation> = arrayListOf()
+    internal val navigationTraceContextStore = NavigationTraceContextStore()
+    private val traceContainerId by lazy { "stack:${java.util.UUID.randomUUID()}" }
+    private var pendingTraceBatch: com.lynxscreens.screens.common.trace.TraceBatch? = null
+    private var preparedTraceOperation: com.lynxscreens.screens.common.trace.NativeTransitionContext? = null
+    private var traceBatchCaptured = false
+    private var traceBatchAmbiguous = false
+    internal fun captureTraceBatch() {
+        val batch = navigationTraceContextStore.captureBatch()
+        if (traceBatchCaptured && pendingTraceBatch !== batch) traceBatchAmbiguous = true
+        traceBatchCaptured = true
+        pendingTraceBatch = batch
+    }
+    internal fun setTraceSession(value: String?) {
+        val previous = navigationTraceContextStore.session
+        com.lynxscreens.screens.common.trace.NavigatorTraceScopes.remove(context, previous, navigationTraceContextStore)
+        navigationTraceContextStore.setSession(value)
+        navigationTraceContextStore.session?.let { com.lynxscreens.screens.common.trace.NavigatorTraceScopes.register(context, it, navigationTraceContextStore) }
+    }
+    private fun contentIdentities() = (stackModel.map { it.stackScreen } + pendingPushOperations.map { it.screen }).mapNotNull { it.contentTraceIdentity?.takeIf { content -> content.session == navigationTraceContextStore.session } }.associateBy { it.screenKey }
+
+    private val navigationTrace =
+        StackNavigationTrace(
+            containerIdProvider = { traceContainerId },
+            navigationTraceContextStore = navigationTraceContextStore,
+        )
 
     init {
         id = ViewIdGenerator.generateViewId()
@@ -75,6 +106,7 @@ internal class StackContainer(
     }
 
     override fun onDetachedFromWindow() {
+        navigationTrace.cancel("container_detached")
         super.onDetachedFromWindow()
         requireFragmentManager().removeOnBackStackChangedListener(this)
         fragmentManager = null
@@ -110,9 +142,31 @@ internal class StackContainer(
         pendingPopOperations.add(PopOperation(stackScreen))
     }
 
+    internal fun setNavigationTraceContext(value: String?) {
+        navigationTraceContextStore.update(value)
+    }
+
     private fun performOperations(fragmentManager: FragmentManager) {
-        applyOperationsAndComputeFragmentManagerOperations()
-        fragmentOpExecutor.executeOperations(fragmentManager, fragmentOps, flushSync = false)
+        val popCount = pendingPopOperations.size
+        val pushCount = pendingPushOperations.size
+        val sourceScreenKey = stackModel.lastOrNull()?.stackScreen?.screenKey
+        val targetScreenKey =
+            pendingPushOperations.lastOrNull()?.screen?.screenKey
+                ?: stackModel.getOrNull(stackModel.size - popCount - 1)?.stackScreen?.screenKey
+
+        val before = stackModel.mapNotNull { it.stackScreen.screenKey }
+        val after = before.dropLast(popCount) + pendingPushOperations.mapNotNull { it.screen.screenKey }
+        val operation = navigationTrace.prepareOperations(sourceScreenKey, targetScreenKey, popCount, pushCount,
+            before, after, contentIdentities(), if (traceBatchAmbiguous) null else pendingTraceBatch, isLaidOut)
+        pendingTraceBatch = null
+        traceBatchCaptured = false
+        traceBatchAmbiguous = false
+        preparedTraceOperation = operation
+        if (navigationTraceContextStore.session != null) stackModel.forEach { it.bindTraceOperation(operation, traceContainerId) }
+        navigationTrace.traceApplyOperations(operation) {
+            applyOperationsAndComputeFragmentManagerOperations()
+            fragmentOpExecutor.executeOperations(fragmentManager, fragmentOps, flushSync = false)
+        }
 
         dumpStackModel()
     }
@@ -135,9 +189,10 @@ internal class StackContainer(
             // when last operation of the batch is "pop". Empty commit with only onCommit callback
             // attached is not a "pop" commit, therefore JS-pop commits have not been properly
             // recognized.
+            val traceOperation = preparedTraceOperation
             fragmentOps.add(
                 OnCommitCallbackOp(
-                    { updateTopFragment() },
+                    { updateTopFragment(); navigationTrace.committed(traceOperation) },
                     allowStateLoss = true,
                     flushSync = false,
                 ),
@@ -203,6 +258,8 @@ internal class StackContainer(
         canNavigateBack: Boolean,
     ): StackScreenFragment =
         StackScreenFragment(screen, canNavigateBack).also {
+            it.traceDelegate = this
+            if (navigationTraceContextStore.session != null) it.bindTraceOperation(preparedTraceOperation, traceContainerId)
             Log.d(TAG, "Created Fragment $it for screen ${screen.screenKey}")
         }
 
@@ -261,13 +318,46 @@ internal class StackContainer(
         while (stackModel.size > 1) {
             val topFragment = stackModel.last()
             if (addedFragments.contains(topFragment)) {
-                return
+                break
             }
 
+            navigationTrace.nativeDismissCommitted(topFragment.traceOperation, topFragment.stackScreen.screenKey)
             delegate.get()?.onScreenDismissCommitted(topFragment.stackScreen)
             onNativeFragmentPop(topFragment)
         }
+        stackModel.lastOrNull()?.traceOperation?.let { navigationTrace.committed(it) }
     }
+
+    // region StackScreenTraceDelegate
+
+    override fun onNativeTransition(context: com.lynxscreens.screens.common.trace.NativeTransitionContext?, screenKey: String?, role: StackTransitionRole, phase: String) {
+        navigationTrace.platformCallback(context, screenKey, role, phase)
+    }
+
+    override fun onNativeBackPressed(fragment: StackScreenFragment) {
+        val sourceIndex = stackModel.indexOf(fragment)
+        if (sourceIndex <= 0 || sourceIndex != stackModel.lastIndex) {
+            return
+        }
+        val operation = navigationTrace.nativeBackRequested(
+            sourceScreenKey = fragment.stackScreen.screenKey,
+            targetScreenKey = stackModel[sourceIndex - 1].stackScreen.screenKey,
+            contents = contentIdentities(), animated = isLaidOut,
+        )
+        if (navigationTraceContextStore.session != null) stackModel.forEach { it.bindTraceOperation(operation, traceContainerId) }
+    }
+
+    override fun onNativeDismissPrevented(fragment: StackScreenFragment) {
+        val sourceIndex = stackModel.indexOf(fragment)
+        val operation = navigationTrace.nativeDismissPrevented(
+            sourceScreenKey = fragment.stackScreen.screenKey,
+            targetScreenKey = stackModel.getOrNull(sourceIndex - 1)?.stackScreen?.screenKey,
+            contents = contentIdentities(),
+        )
+        if (operation != null) fragment.bindTraceOperation(operation, traceContainerId)
+    }
+
+    // endregion
 
     internal fun forceSubtreeMeasureAndLayoutPass() {
         measure(

@@ -47,17 +47,38 @@ internal class StackScreenFragment @Keep constructor() :
         get() = checkNotNull(preventNativeDismissBackPressedCallback) { "[RNScreens] Attempt to require nullish OnBackPressedCallback" }
 
     private var isTopFragment: Boolean = false
+    private val navigationTrace =
+        StackScreenNavigationTrace(
+            fragment = this,
+        )
+
+    internal var traceDelegate: StackScreenTraceDelegate?
+        get() = navigationTrace.delegate
+        set(value) {
+            navigationTrace.delegate = value
+        }
+
+    internal val traceOperation get() = navigationTrace.operation
+    internal fun bindTraceOperation(context: com.lynxscreens.screens.common.trace.NativeTransitionContext?, containerId: String) {
+        navigationTrace.operation = context
+        navigationTrace.containerId = containerId
+        if (isAdded) configureTransitions()
+    }
+    private fun configureTransitions() {
+        enterTransition = Slide(Gravity.RIGHT).also { it.addListener(navigationTrace.transitionListener(StackTransitionRole.ENTER)) }
+        exitTransition = Slide(Gravity.LEFT).also { it.addListener(navigationTrace.transitionListener(StackTransitionRole.EXIT)) }
+        returnTransition = Slide(Gravity.RIGHT).also { it.addListener(navigationTrace.transitionListener(StackTransitionRole.RETURN)) }
+        reenterTransition = Slide(Gravity.LEFT).also { it.addListener(navigationTrace.transitionListener(StackTransitionRole.REENTER)) }
+    }
 
     override fun onRuntimeCreate(savedInstanceState: Bundle?) {
+        stackScreen.traceIdentityProvider = navigationTrace.traceIdentityProvider
         setupPreventNativeDismissCallback()
 
         allowEnterTransitionOverlap = true
         allowReturnTransitionOverlap = true
 
-        enterTransition = Slide(Gravity.RIGHT)
-        exitTransition = Slide(Gravity.LEFT)
-        returnTransition = Slide(Gravity.RIGHT)
-        reenterTransition = Slide(Gravity.LEFT)
+        configureTransitions()
     }
 
     override fun onCreateRuntimeView(
@@ -88,6 +109,10 @@ internal class StackScreenFragment @Keep constructor() :
         if (generateSequence(parentFragment) { it.parentFragment }.none { it.isRemoving }) {
             stackScreen.onDismiss()
         }
+        if (stackScreen.traceIdentityProvider === navigationTrace.traceIdentityProvider) {
+            stackScreen.traceIdentityProvider = null
+        }
+        navigationTrace.dispose()
         teardownPreventNativeDismissCallback()
     }
 
@@ -119,7 +144,15 @@ internal class StackScreenFragment @Keep constructor() :
 
     private fun setupPreventNativeDismissCallback() {
         preventNativeDismissBackPressedCallback =
-            PreventNativeDismissCallback(this, stackScreen, canBeEnabled = false)
+            PreventNativeDismissCallback(
+                lifecycleOwner = this,
+                screen = stackScreen,
+                canNavigateBack = canNavigateBack,
+                onNativeBackPressed = navigationTrace::onNativeBackPressed,
+                onNativeDismissPrevented = navigationTrace::onNativeDismissPrevented,
+                forwardBackPressed = { requireActivity().onBackPressedDispatcher.onBackPressed() },
+                canBeEnabled = false,
+            )
         requireActivity().onBackPressedDispatcher.addCallback(
             requireNativeDismissBackPressedCallback,
         )

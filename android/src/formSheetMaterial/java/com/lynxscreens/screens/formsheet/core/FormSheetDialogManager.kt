@@ -15,6 +15,7 @@ internal class FormSheetDialogManager(
     contentView: View,
     private val eventEmitter: FormSheetDialogEventEmitter,
 ) : FormSheetController {
+    private val navigationTrace = (eventEmitter as? com.lynxscreens.screens.formsheet.host.FormSheetHostEventEmitter)?.navigationTrace
     private var formSheetConfig = FormSheetConfig()
     private val themedContext =
         ContextThemeWrapper(
@@ -27,6 +28,7 @@ internal class FormSheetDialogManager(
     private val presentationManager =
         FormSheetPresentationManager(
             presentationFactory = ::createPresentation,
+            navigationTrace = navigationTrace,
             dimmingManager = dimmingManager,
             onNativeDismiss = eventEmitter::emitOnNativeDismissEvent,
             onDismiss = eventEmitter::emitOnDismissEvent,
@@ -35,9 +37,19 @@ internal class FormSheetDialogManager(
         object : FormSheetPresentation.Callbacks {
             override fun onDetentChanged(index: Int) = eventEmitter.emitOnDetentChanged(index)
 
-            override fun onNativeDismissAllowed() = presentationManager.handleNativeDismiss()
+            override fun onNativeDismissAllowed() {
+                navigationTrace?.beginNativeDismiss()
+                presentationManager.handleNativeDismiss()
+            }
 
-            override fun onNativeDismissPrevented() = eventEmitter.emitOnNativeDismissPreventedEvent()
+            override fun onNativeDismissPrevented() {
+                navigationTrace?.beginNativeDismiss()
+                val operation = navigationTrace?.operation
+                navigationTrace?.nativeDismissPrevented()
+                val trace = navigationTrace
+                if (trace != null) trace.withOperation(operation) { eventEmitter.emitOnNativeDismissPreventedEvent() }
+                else eventEmitter.emitOnNativeDismissPreventedEvent()
+            }
         }
 
     init {
