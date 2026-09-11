@@ -5,6 +5,8 @@
 
 @interface RNSStackOperationCoordinator : NSObject
 
+- (void)captureTraceBatch:(nullable RNSTraceBatch *)batch;
+
 - (void)addPushOperation:(nonnull RNSStackScreenComponent *)screen;
 
 - (void)addPopOperation:(nonnull RNSStackScreenComponent *)screen;

@@ -30,6 +30,28 @@ not distinguish drag, backdrop and back dismissal sources: these use
 changes use `origin=lynx_patch`. The external FormSheet backend must supply its
 own instrumentation; the built-in backend is the reference implementation.
 
+## iOS
+
+`RNSNavigationTrace` writes through `LynxTraceEvent` when its header and the trace
+category are available. The current implementation covers Stack; there is no
+iOS FormSheet implementation in the base branch.
+
+Stack implements the events above except `NativeDismissPrevented`, since the
+current iOS Stack has no corresponding prevention hook. Raw operation requests
+are recorded before reconciliation. `ApplyOperations` surrounds the existing
+synchronous UIKit calls. `TransitionCallbackReceived` records the transition
+coordinator completion (end or cancel); it is separate from the guarded terminal
+event. A missing coordinator permits synchronous completion, while an unavailable
+completion registration cancels observation rather than claiming completion.
+
+Lifecycle emitters capture their operation/content identity. Later host
+lifecycle notifications do not revive a completed operation. Native removal is
+recorded at the existing parent-removal callback.
+
+The new trace header is private in the Pod. The existing explicit `common`
+source glob includes the implementation; no additional platform dependencies or
+new exported source directories are needed.
+
 ## Correlation
 
 `traceSession` enables navigation observation for a runtime and navigator.
