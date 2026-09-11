@@ -5,6 +5,7 @@ import android.util.Log
 import android.view.View
 import com.lynx.tasm.behavior.LynxContext
 import com.lynx.tasm.behavior.LynxElement
+import com.lynx.tasm.behavior.LynxProp
 import com.lynx.tasm.behavior.PatchFinishListener
 import com.lynx.tasm.behavior.event.EventTarget
 import com.lynx.tasm.behavior.ui.LynxBaseUI
@@ -22,7 +23,11 @@ internal class StackHostComponent(context: LynxContext) : UIGroup<StackHostView>
 
     override fun createView(context: Context?): StackHostView {
         val lynxContext = context as LynxContext
-        container = StackContainer(lynxContext, WeakReference(this))
+        container =
+            StackContainer(
+                context = lynxContext,
+                delegate = WeakReference(this),
+            )
 
         return StackHostView(lynxContext, container)
     }
@@ -196,6 +201,33 @@ internal class StackHostComponent(context: LynxContext) : UIGroup<StackHostView>
 
     override fun onPatchFinish() {
         containerUpdateCoordinator.executePendingOperationsIfNeeded(container, renderedScreens)
+    }
+
+    @LynxProp(name = "traceSession")
+    fun setTraceSession(value: String?) { container.setTraceSession(value) }
+
+    private var traceEnvelope: String? = null
+    private var traceEnvelopeUpdated = false
+
+    @LynxProp(name = "navigationTraceContext")
+    fun setNavigationTraceContext(value: String?) {
+        traceEnvelope = value
+        traceEnvelopeUpdated = true
+    }
+
+    override fun onPropsUpdated() {
+        super.onPropsUpdated()
+        if (traceEnvelopeUpdated) {
+            traceEnvelopeUpdated = false
+            container.setNavigationTraceContext(traceEnvelope)
+            val batch = container.navigationTraceContextStore.captureBatch()
+            view.post { container.navigationTraceContextStore.endBatch(batch) }
+        }
+    }
+
+    override fun destroy() {
+        container.setTraceSession(null)
+        super.destroy()
     }
 
     companion object {

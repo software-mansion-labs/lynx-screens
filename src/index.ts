@@ -58,3 +58,19 @@ export type {
   StackHeaderMenuItemOptionsIOS,
   StackHeaderMenuOptionsIOS,
 } from './types/StackHeaderConfig';
+
+// Framework-only protocol; applications do not construct these identities.
+export type {
+  TraceSession,
+  NavigationTraceEnvelope,
+  NavigationOperationBinding,
+  ExpectedChange,
+  ContentIdentity,
+  NativeTraceIdentity,
+  NativeEventContext,
+  ScreenBridgeObserver,
+  ScreenContentTraceProps,
+  ScreenInternalTraceProps,
+  HostInternalTraceProps,
+} from './internal/trace/types.js';
+export { decodeNativeEvent as UNSTABLE_decodeNativeTraceEvent } from './internal/trace/codec.js';

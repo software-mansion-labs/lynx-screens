@@ -1,6 +1,7 @@
 #pragma once
 
 #import "RNSContainer.h"
+#import "RNSNavigationTrace.h"
 #import "RNSStackNavigationBarCoordinator.h"
 #import "RNSStackScreenComponent.h"
 
@@ -11,6 +12,9 @@
 @property (nonatomic, weak, nullable) id<RNSViewFrameChangeDelegate> navigationBarFrameChangeDelegate;
 
 @property (nonatomic, readonly, nonnull) RNSStackNavigationBarCoordinator *navigationBarCoordinator;
+
+@property(nonatomic, copy, nullable) NSDictionary *traceSession;
+@property(nonatomic, strong, nullable) RNSTraceBatch *traceBatch;
 
 - (void)enqueuePushOperation:(nonnull RNSStackScreenComponent *)stackScreen;
 

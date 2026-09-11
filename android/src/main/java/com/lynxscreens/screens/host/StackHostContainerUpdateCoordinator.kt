@@ -10,6 +10,7 @@ internal class StackHostContainerUpdateCoordinator {
         get() = pendingPushOperations.isNotEmpty() || pendingPopOperations.isNotEmpty()
 
     internal fun addPushOperation(stackScreen: StackScreenComponent) {
+        if (stackScreen.traceSession != null) StackNavigationTrace.pushRequested(stackScreen.screenKey)
         // If a Push operation is detected for a screen already scheduled for a Pop,
         // both operations are canceled.
         val index = pendingPopOperations.indexOfFirst { it.screen == stackScreen }
@@ -22,6 +23,7 @@ internal class StackHostContainerUpdateCoordinator {
     }
 
     internal fun addPopOperation(stackScreen: StackScreenComponent) {
+        if (stackScreen.traceSession != null) StackNavigationTrace.popRequested(stackScreen.screenKey)
         // If a Pop operation is detected for a screen already scheduled for a Push,
         // both operations are canceled.
         val index = pendingPushOperations.indexOfFirst { it.screen == stackScreen }
@@ -52,6 +54,7 @@ internal class StackHostContainerUpdateCoordinator {
             .sortedBy { it.first }
             .forEach { (_, operation) -> container.enqueuePushOperation(operation.screen) }
 
+        container.captureTraceBatch()
         container.performContainerUpdateIfNeeded()
 
         pendingPopOperations.clear()

@@ -1,4 +1,5 @@
 #import "RNSStackScreenComponent.h"
+#import "RNSNavigationTrace.h"
 #import "RNSStackHeaderConfigComponent.h"
 #import "RNSStackHostComponent.h"
 #import "RNSStackScreenController.h"
@@ -73,6 +74,15 @@
 
 #pragma mark - Props
 
+LYNX_PROP_SETTER("traceSession", setTraceSession, NSString *)
+{
+    self.traceSession = requestReset ? nil : RNSTraceSession(value);
+}
+LYNX_PROP_SETTER("contentTraceContext", setContentTraceContext, NSString *)
+{
+    self.traceContent = requestReset ? nil : RNSTraceContent(value);
+}
+
 LYNX_PROP_SETTER("activityMode", setActivityMode, NSString *) {
     auto prevActivityMode = self.activityMode;
     
@@ -126,6 +136,16 @@ LYNX_PROP_SETTER("screenKey", setScreenKey, NSString *) {
                                                                       targetSign:[self sign]];
     }
     return _eventEmitter;
+}
+
+- (RNSStackScreenEventEmitter *)traceEventEmitter
+{
+    return [[self getEventEmitter] withTraceIdentity:[self.traceOperation identityForScreen:self.screenKey]];
+}
+
+- (RNSStackScreenEventEmitter *)lifecycleTraceEventEmitter
+{
+    return [[self getEventEmitter] withTraceIdentity:[self.traceOperation lifecycleIdentityForScreen:self.screenKey]];
 }
 
 - (void)notifyLifecycleChange:(RNSScreenLifecycleEvent)event {

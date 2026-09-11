@@ -4,6 +4,7 @@
 
 #import <Lynx/LynxComponentRegistry.h>
 #import <Lynx/LynxLog.h>
+#import <Lynx/LynxPropsProcessor.h>
 
 #import "RNSStackNavigationController.h"
 #import "RNSStackOperationCoordinator.h"
@@ -14,6 +15,10 @@
     RNSStackOperationCoordinator *_Nonnull _stackOperationCoordinator;
     NSMutableArray<RNSStackScreenComponent *> *_Nonnull _renderedScreens;
     BOOL _isMountingTransactionPending;
+    RNSNavigatorTraceScope *_traceScope;
+    NSDictionary *_traceSession;
+    NSString *_traceEnvelope;
+    BOOL _traceEnvelopeUpdated;
 }
 
 #pragma mark - Init
@@ -32,6 +37,30 @@
     _stackOperationCoordinator = [RNSStackOperationCoordinator new];
     _renderedScreens = [NSMutableArray new];
     _isMountingTransactionPending = NO;
+}
+
+LYNX_PROP_SETTER("traceSession", setTraceSession, NSString *)
+{
+    _traceSession = requestReset ? nil : RNSTraceSession(value);
+    _stackNavigationController.traceSession = _traceSession;
+    _traceScope = _traceSession ? [RNSNavigatorTraceScope scopeWithContext:self.context session:_traceSession] : nil;
+}
+LYNX_PROP_SETTER("navigationTraceContext", setNavigationTraceContext, NSString *)
+{
+    _traceEnvelope = requestReset ? nil : value;
+    _traceEnvelopeUpdated = YES;
+}
+- (void)propsDidUpdate
+{
+    if (_traceEnvelopeUpdated) {
+        _traceEnvelopeUpdated = NO;
+        RNSTraceBatch *batch = [_traceScope stage:_traceEnvelope];
+        [_stackOperationCoordinator captureTraceBatch:batch];
+        RNSNavigatorTraceScope *scope = _traceScope;
+        dispatch_async(dispatch_get_main_queue(), ^{
+          [scope endBatch:batch];
+        });
+    }
 }
 
 #pragma mark - View Management
