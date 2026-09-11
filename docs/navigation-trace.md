@@ -11,18 +11,18 @@ is still open for discussion.
 sections through `beginSection` / `endSection`, using the `lynx` category.
 A section encloses only the synchronous native work, including exception paths.
 
-| Prefix | Event suffix | Boundary |
-| --- | --- | --- |
-| `LynxScreens.Stack` | `OperationRequested` | A raw push/pop request, before reconciliation. |
-| `LynxScreens.Stack` | `OperationBatchPrepared` | The actual stack operation batch is prepared. |
-| `LynxScreens.Stack` | `ApplyOperations` | Synchronous submission of the batch (section). |
-| `LynxScreens.Stack` | `NativeBackRequested` | A native back intent is observed. |
-| `LynxScreens.Stack` | `TransitionCallbackReceived` | A Fragment transition callback, with screen, role and phase. |
-| `LynxScreens.FormSheet` | `PresentRequested`, `DismissRequested` | Presentation/dismissal intent at the Material backend boundary. |
-| Both | `NativeTransitionStart`, `NativeTransitionEnd`, `NativeTransitionCancelled` | Container transition start, completion or cancellation. |
-| Both | `NativeDismissCommitted`, `NativeDismissPrevented` | Removal is committed, or a native dismissal is prevented. |
-| Both | `LifecycleEventEmitted`, `DismissEventEmitted` | Native sends an existing lifecycle/dismissal message to JS. |
-| Both | `ScreenContentBound` | Available content identity is associated with the native operation's screen context. |
+| Prefix                  | Event suffix                                                                | Boundary                                                                             |
+| ----------------------- | --------------------------------------------------------------------------- | ------------------------------------------------------------------------------------ |
+| `LynxScreens.Stack`     | `OperationRequested`                                                        | A raw push/pop request, before reconciliation.                                       |
+| `LynxScreens.Stack`     | `OperationBatchPrepared`                                                    | The actual stack operation batch is prepared.                                        |
+| `LynxScreens.Stack`     | `ApplyOperations`                                                           | Synchronous submission of the batch (section).                                       |
+| `LynxScreens.Stack`     | `NativeBackRequested`                                                       | A native back intent is observed.                                                    |
+| `LynxScreens.Stack`     | `TransitionCallbackReceived`                                                | A Fragment transition callback, with screen, role and phase.                         |
+| `LynxScreens.FormSheet` | `PresentRequested`, `DismissRequested`                                      | Presentation/dismissal intent at the Material backend boundary.                      |
+| Both                    | `NativeTransitionStart`, `NativeTransitionEnd`, `NativeTransitionCancelled` | Container transition start, completion or cancellation.                              |
+| Both                    | `NativeDismissCommitted`, `NativeDismissPrevented`                          | Removal is committed, or a native dismissal is prevented.                            |
+| Both                    | `LifecycleEventEmitted`, `DismissEventEmitted`                              | Native sends an existing lifecycle/dismissal message to JS.                          |
+| Both                    | `ScreenContentBound`                                                        | Available content identity is associated with the native operation's screen context. |
 
 All events except `ApplyOperations` are points. Android's Material callback does
 not distinguish drag, backdrop and back dismissal sources: these use
@@ -75,3 +75,46 @@ navigation operation.
 Submitting operations, completing a transition and sending a lifecycle event
 are separate facts. None proves that pixels have been presented. This change has
 no first-frame probe and does not calculate screen performance metrics.
+
+## JS bridge
+
+The navigation adapter supplies `internalTrace` on the existing
+`StackHostNativeComponent`, `StackScreenNativeComponent` and
+`FormSheetNativeComponent` roots. Host props contain the session and operation
+envelope; screen props contain the session, optional content identity and
+optional bridge observer. A FormSheet needs a `traceScreenKey`, which can also
+be derived from its supplied content identity. The Host envelope remains the
+channel for a Sheet that is removed during an update.
+
+The bridge encodes native attributes and forwards callback context. It does not
+create navigation IDs, implement the navigation adapter or write JS trace
+events. `onRootCommitted` observes the JS wrapper's effect, not a native commit
+or a completed draw. `onEventForwarded` observes the current native message;
+observer failures do not suppress the original handler or catch its errors.
+
+Stack dismissal callbacks keep `screenKey` as their first argument and add an
+optional `NativeEventContext` as the second. FormSheet dismissal callbacks gain
+an optional context argument. Existing raw lifecycle/prevention handlers receive
+the original event. The exported `UNSTABLE_decodeNativeTraceEvent` helper can
+extract the versioned identity without relying on the latest navigation state.
+Missing or malformed trace data remains unlinked.
+
+Content identity is optional and independent of timing flags. This bridge does
+not generate or inject FCP timing flags, add layout nodes or install first-frame
+observers.
+
+## Validation and manual acceptance
+
+Use the library's `typecheck` and lint commands, build the example bundle and
+native examples, and run Android `testDebugUnitTest`. Codec tests run with
+`node --experimental-strip-types --test tests/navigation-trace.test.mjs` on Node
+22.6 or newer. Native builds and protocol tests do not establish runtime event
+ordering or confirm the absence of navigation regressions.
+
+With an adapter providing the versioned props, record push/pop, batched changes,
+preloaded screen activation, native back, dismissal prevention, rapid successive
+transitions and nested-container teardown. On Android also cover Material Sheet
+present/dismiss and cascading dismissal. Verify operation identities across
+callbacks, a single terminal event, unlinked ambiguous batches and unchanged
+behavior when observation is disabled. No screen FCP or presentation metric is
+claimed by these events.
