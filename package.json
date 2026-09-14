@@ -1,6 +1,6 @@
 {
   "name": "lynx-screens",
-  "version": "0.1.0",
+  "version": "1000.0.0",
   "description": "Native stack navigation primitives for Lynx, modeled after react-native-screens",
   "license": "MIT",
   "type": "module",
