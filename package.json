@@ -3,6 +3,14 @@
   "version": "1000.0.0",
   "description": "Native stack navigation primitives for Lynx, modeled after react-native-screens",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/software-mansion-labs/lynx-screens.git"
+  },
+  "homepage": "https://github.com/software-mansion-labs/lynx-screens#readme",
+  "bugs": {
+    "url": "https://github.com/software-mansion-labs/lynx-screens/issues"
+  },
   "type": "module",
   "main": "./src/index.ts",
   "files": [
