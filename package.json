@@ -1,13 +1,15 @@
 {
   "name": "lynx-screens",
-  "version": "0.1.0",
+  "version": "1000.0.0",
   "description": "Native stack navigation primitives for Lynx, modeled after react-native-screens",
   "license": "MIT",
   "type": "module",
   "main": "./src/index.ts",
   "files": [
-    "android",
-    "generated",
+    "android/src/main",
+    "android/src/formSheetMaterial",
+    "android/src/formSheetExternal",
+    "android/build.gradle.kts",
     "ios",
     "src",
     "lynx.lib.json",
