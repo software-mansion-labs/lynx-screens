@@ -10,36 +10,50 @@ import android.view.View
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import kotlin.math.roundToInt
 
-internal class FormSheetDimmingManager(private val context: Context) {
-    internal val maxAlpha = MAX_DIMMING_ALPHA_FRACTION
-    internal var isTransitionAnimationRunning = false
+internal class FormSheetDimmingManager(
+    private val context: Context,
+) {
+    // TODO: @t0maboro - consider exposing as a prop
+    internal val maxAlpha: Float = MAX_DIMMING_ALPHA_FRACTION
+
+    internal var isTransitionAnimationRunning: Boolean = false
+
+    // The drawable rendering this sheet's dimming, added to the overlay of dimmingHost which is
+    // Material's `design_bottom_sheet` component or the DecorView of the main application content.
     private var dimmingDrawable: ColorDrawable? = null
     private var dimmingHost: View? = null
+
     private val dimmingHostLayoutListener =
         View.OnLayoutChangeListener { view, _, _, _, _, _, _, _, _ ->
             dimmingDrawable?.setBounds(0, 0, view.width, view.height)
         }
 
-    internal var dimmingAlpha = 0f
+    internal var dimmingAlpha: Float = 0f
         set(value) {
             field = value
-            dimmingDrawable?.alpha = (value * 255).roundToInt().coerceIn(0, 255)
+            // We're transforming the value, because View.alpha is within [0.0, 1.0] range,
+            // while Drawable.alpha is an Integer in [0, 255] range.
+            dimmingDrawable?.alpha = (value * MAX_DRAWABLE_OVERLAY_ALPHA).roundToInt().coerceIn(0, MAX_DRAWABLE_OVERLAY_ALPHA)
         }
 
+    /**
+     * Called when the sheet is presented. [belowSheetView] is the `design_bottom_sheet` of the
+     * sheet directly below in the stack, or null when this sheet is the bottom-most one - the
+     * dimming then goes onto the decor of the activity hosting the sheets.
+     */
     internal fun attachDimming(belowSheetView: View?) {
         val host = belowSheetView ?: resolveActivityDecorView()
         if (host == null) {
-            Log.e(
-                TAG,
-                "[RNScreens] Neither a sheet below nor an activity decor found; the sheet will present undimmed.",
-            )
+            Log.e(TAG, "[RNScreens] Neither a sheet below nor an activity decor found; the sheet will present undimmed.")
             return
         }
+
         dimmingHost = host
-        dimmingDrawable = ColorDrawable(Color.BLACK).apply {
-            alpha = 0
-            setBounds(0, 0, host.width, host.height)
-        }
+        dimmingDrawable =
+            ColorDrawable(Color.BLACK).apply {
+                alpha = 0
+                setBounds(0, 0, host.width, host.height)
+            }
         host.overlay.add(dimmingDrawable!!)
         host.addOnLayoutChangeListener(dimmingHostLayoutListener)
     }
@@ -54,12 +68,24 @@ internal class FormSheetDimmingManager(private val context: Context) {
     internal fun attachToBehavior(behavior: BottomSheetBehavior<*>) {
         behavior.addBottomSheetCallback(
             object : BottomSheetBehavior.BottomSheetCallback() {
-                override fun onStateChanged(bottomSheet: View, newState: Int) = Unit
+                override fun onStateChanged(
+                    bottomSheet: View,
+                    newState: Int,
+                ) = Unit
 
-                override fun onSlide(bottomSheet: View, slideOffset: Float) {
-                    if (!isTransitionAnimationRunning) {
-                        dimmingAlpha = (if (slideOffset >= 0) 1f else 1f + slideOffset) * maxAlpha
+                override fun onSlide(
+                    bottomSheet: View,
+                    slideOffset: Float,
+                ) {
+                    // Prevent system updates from overriding alpha while running custom enter/exit animation.
+                    // When initialDetentIndex is snapping to a high detent, BottomSheetBehavior fires onSlide
+                    // events that conflict with our manual alpha animator, causing the backdrop to flash.
+                    if (isTransitionAnimationRunning) {
+                        return
                     }
+
+                    val fraction = if (slideOffset >= 0) 1f else 1f + slideOffset
+                    dimmingAlpha = fraction * maxAlpha
                 }
             },
         )
@@ -69,14 +95,18 @@ internal class FormSheetDimmingManager(private val context: Context) {
     private fun resolveActivityDecorView(): View? {
         var current: Context? = context
         while (current is ContextWrapper) {
-            if (current is Activity) return current.window?.decorView
+            if (current is Activity) {
+                return current.window?.decorView
+            }
             current = current.baseContext
         }
-        return (current as? Activity)?.window?.decorView
+        return null
     }
 
     companion object {
-        private const val TAG = "FormSheetDimmingManager"
+        const val TAG = "FormSheetDimmingManager"
+
         private const val MAX_DIMMING_ALPHA_FRACTION = 0.3f
+        private const val MAX_DRAWABLE_OVERLAY_ALPHA = 255
     }
 }

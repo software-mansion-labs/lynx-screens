@@ -85,10 +85,15 @@ internal class FormSheetHostComponent(context: LynxContext) : UIGroup<FormSheetH
                     contentView = sheetContentView,
                     eventEmitter = eventEmitter,
                 )
+            // Adaptation: forward Lynx content size changes to the pluggable controller.
             sheetContentView.contentSizeChangeDelegate =
-                FormSheetContentSizeChangeDelegate(controller::onContentHeightChanged)
+                object : FormSheetContentSizeChangeDelegate {
+                    override fun onContentHeightChanged(newHeight: Int) {
+                        controller.onContentHeightChanged(newHeight)
+                    }
+                }
         }
-        controller.apply(
+        controller.applyConfig(
             FormSheetConfig(
                 isOpen = isOpen,
                 detents = detents,
@@ -102,7 +107,7 @@ internal class FormSheetHostComponent(context: LynxContext) : UIGroup<FormSheetH
     }
 
     override fun destroy() {
-        if (::controller.isInitialized) controller.dispose()
+        if (::controller.isInitialized) controller.destroy()
         super.destroy()
     }
 
