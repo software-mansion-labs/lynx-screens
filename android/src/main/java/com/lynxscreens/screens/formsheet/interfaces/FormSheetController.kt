@@ -11,11 +11,11 @@ import com.lynxscreens.screens.formsheet.model.FormSheetConfig
  * the library module.
  */
 public interface FormSheetController {
-    fun apply(config: FormSheetConfig)
+    fun applyConfig(newConfig: FormSheetConfig)
 
     fun onContentHeightChanged(height: Int)
 
-    fun dispose()
+    fun destroy()
 }
 
 public fun interface FormSheetControllerFactory {
