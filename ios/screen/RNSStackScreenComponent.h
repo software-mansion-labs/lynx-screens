@@ -5,6 +5,8 @@
 NS_ASSUME_NONNULL_BEGIN
 
 @class RNSStackScreenController;
+@class RNSNavigationTraceOperation;
+@class RNSStackScreenEventEmitter;
 @class RNSStackHostComponent;
 
 typedef NS_ENUM(int, RNSStackScreenActivityMode) {
@@ -26,6 +28,11 @@ typedef NS_ENUM(NSInteger, RNSScreenLifecycleEvent) {
 @property (nonatomic, weak, readwrite, nullable) RNSStackHostComponent *stackHost;
 @property (nonatomic, strong, readonly, nonnull) RNSStackScreenController *controller;
 @property (nonatomic) BOOL isNativelyDismissed;
+@property(nonatomic, copy, nullable) NSDictionary *traceSession;
+@property(nonatomic, copy, nullable) NSDictionary *traceContent;
+@property(nonatomic, strong, nullable) RNSNavigationTraceOperation *traceOperation;
+- (RNSStackScreenEventEmitter *)traceEventEmitter;
+- (RNSStackScreenEventEmitter *)lifecycleTraceEventEmitter;
 
 - (void)registerDescendantScrollView:(nonnull UIScrollView *)scrollView
                           fromMarker:(nonnull RNSScrollViewMarkerComponent *)marker;

@@ -1,12 +1,17 @@
 #import "RNSStackScreenController.h"
-#import <Lynx/LynxLog.h>
 #import "RNSContainer.h"
 #import "RNSContainerItemSupport.h"
+#import "RNSNavigationTrace.h"
 #import "RNSStackScreenComponent.h"
+#import "RNSStackScreenEventEmitter.h"
 #import "RNSStackScreenHeaderCoordinator.h"
+#import <Lynx/LynxLog.h>
 
 @implementation RNSStackScreenController {
     RNSContainerItemSupport *_Nonnull _containerItemSupport;
+    RNSStackScreenEventEmitter *_appearEmitter;
+    RNSStackScreenEventEmitter *_disappearEmitter;
+    RNSNavigationTraceOperation *_disappearanceOperation;
 }
 
 - (instancetype)initWithComponent:(RNSStackScreenComponent *)component
@@ -47,25 +52,28 @@
 - (void)viewWillAppear:(BOOL)animated
 {
     [super viewWillAppear:animated];
-    [_screenComponent notifyLifecycleChange:RNSScreenLifecycleEventWillAppear];
+    _appearEmitter = [_screenComponent lifecycleTraceEventEmitter];
+    [_appearEmitter emitOnWillAppear];
 }
 
 - (void)viewDidAppear:(BOOL)animated
 {
     [super viewDidAppear:animated];
-    [_screenComponent notifyLifecycleChange:RNSScreenLifecycleEventDidAppear];
+    [_appearEmitter emitOnDidAppear];
 }
 
 - (void)viewWillDisappear:(BOOL)animated
 {
     [super viewWillDisappear:animated];
-    [_screenComponent notifyLifecycleChange:RNSScreenLifecycleEventWillDisappear];
+    _disappearanceOperation = _screenComponent.traceOperation.terminal ? nil : _screenComponent.traceOperation;
+    _disappearEmitter = [_screenComponent lifecycleTraceEventEmitter];
+    [_disappearEmitter emitOnWillDisappear];
 }
 
 - (void)viewDidDisappear:(BOOL)animated
 {
     [super viewDidDisappear:animated];
-    [_screenComponent notifyLifecycleChange:RNSScreenLifecycleEventDidDisappear];
+    [_disappearEmitter emitOnDidDisappear];
 }
 
 - (void)didMoveToParentViewController:(UIViewController *)parent
@@ -77,11 +85,12 @@
     [super didMoveToParentViewController:parent];
 
     if (parent == nil) {
+        [_disappearanceOperation mark:@"NativeDismissCommitted" fields:@{}];
         if (_screenComponent.activityMode == RNSStackScreenActivityModeDetached) {
-            [_screenComponent emitOnDismiss];
+            [(_disappearEmitter ?: [_screenComponent traceEventEmitter]) emitOnDismiss:NO];
         } else {
             _screenComponent.isNativelyDismissed = YES;
-            [_screenComponent emitOnNativeDismiss];
+            [(_disappearEmitter ?: [_screenComponent traceEventEmitter]) emitOnDismiss:YES];
         }
     }
 }

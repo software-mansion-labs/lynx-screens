@@ -19,5 +19,7 @@ Pod::Spec.new do |s|
 
   s.source_files = 'common/**/*.{h,m,mm}', 'header/**/*.{h,m,mm}', 'helpers/**/*.{h,m,mm}', 'host/**/*.{h,m,mm}', 'screen/**/*.{h,m,mm}', 'scroll-view-marker/**/*.{h,m,mm}', 'utils/**/*.{h,m,mm}'
 
+  s.private_header_files = 'common/trace/*.h'
+
   s.dependency 'Lynx'
 end

@@ -9,6 +9,10 @@ import androidx.lifecycle.LifecycleOwner
 internal class PreventNativeDismissCallback(
     lifecycleOwner: LifecycleOwner,
     private val screen: StackScreenComponent,
+    private val canNavigateBack: Boolean,
+    private val onNativeBackPressed: () -> Unit,
+    private val onNativeDismissPrevented: () -> Unit,
+    private val forwardBackPressed: () -> Unit,
     canBeEnabled: Boolean
 ) : OnBackPressedCallback(false),
     LifecycleEventObserver,
@@ -24,7 +28,9 @@ internal class PreventNativeDismissCallback(
         }
 
     private val shouldBeEnabled
-        get() = canBeEnabled && screen.isPreventNativeDismissEnabled
+        get() =
+            canBeEnabled &&
+                (screen.isPreventNativeDismissEnabled || canNavigateBack)
 
     init {
         lifecycleOwner.lifecycle.addObserver(this)
@@ -32,7 +38,23 @@ internal class PreventNativeDismissCallback(
 
     override fun handleOnBackPressed() {
         Log.i("RNScreens", "PreventNativeDismissCallback called for screen ${screen.screenKey}")
-        screen.onNativeDismissPrevented()
+        if (screen.isPreventNativeDismissEnabled) {
+            onNativeDismissPrevented()
+            screen.onNativeDismissPrevented()
+            return
+        }
+
+        if (!canNavigateBack) {
+            return
+        }
+
+        onNativeBackPressed()
+        isEnabled = false
+        try {
+            forwardBackPressed()
+        } finally {
+            determineEnabledStatus()
+        }
     }
 
     override fun onStateChanged(

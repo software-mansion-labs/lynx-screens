@@ -9,6 +9,7 @@ import com.lynx.tasm.behavior.ui.LynxBaseUI
 import com.lynx.tasm.behavior.ui.UIGroup
 import com.lynx.tasm.event.LynxCustomEvent
 import com.lynxscreens.screens.common.ShadowStateProxy
+import com.lynxscreens.screens.common.trace.NavigationTraceIdentity
 import com.lynxscreens.screens.header.config.OnHeaderConfigurationAttachListener
 import com.lynxscreens.screens.header.config.StackHeaderConfigComponent
 import com.lynxscreens.screens.host.StackHostComponent
@@ -45,7 +46,15 @@ internal class StackScreenComponent(context: LynxContext) : UIGroup<StackScreenV
         }
     }
 
+    internal var traceSession: com.lynxscreens.screens.common.trace.TraceSession? = null
+    internal var contentTraceIdentity: com.lynxscreens.screens.common.trace.ContentTraceIdentity? = null
+    @LynxProp(name = "traceSession")
+    fun setTraceSession(value: String?) { traceSession = com.lynxscreens.screens.common.trace.TraceSession.parse(value) }
+    @LynxProp(name = "contentTraceContext")
+    fun setContentTraceContext(value: String?) { contentTraceIdentity = com.lynxscreens.screens.common.trace.ContentTraceIdentity.parse(value) }
+
     internal var screenKey: String? = null
+    internal var traceIdentityProvider: (() -> NavigationTraceIdentity?)? = null
 
     private val shadowStateProxy: ShadowStateProxy by lazy {
         ShadowStateProxy(lynxContext, sign)
@@ -119,7 +128,12 @@ internal class StackScreenComponent(context: LynxContext) : UIGroup<StackScreenV
     }
 
     private val eventEmitter: StackScreenEventEmitter by lazy {
-        StackScreenEventEmitter(lynxContext, sign)
+        StackScreenEventEmitter(
+            lynxContext = lynxContext,
+            sign = sign,
+            screenKeyProvider = { screenKey },
+            traceIdentityProvider = { traceIdentityProvider?.invoke() },
+        )
     }
 
     /**
@@ -128,7 +142,7 @@ internal class StackScreenComponent(context: LynxContext) : UIGroup<StackScreenV
     internal var preventNativeDismissChangeObserver: PreventNativeDismissChangeObserver? = null
 
     internal fun createAppearanceEventsEmitter(viewLifecycleOwner: LifecycleOwner) =
-        StackScreenAppearanceEventsEmitter(viewLifecycleOwner.lifecycle, eventEmitter)
+        StackScreenAppearanceEventsEmitter(viewLifecycleOwner.lifecycle, eventEmitter.forViewLifecycle())
 
     override fun createView(context: Context?): StackScreenView =
         StackScreenView(context as LynxContext).also { view ->

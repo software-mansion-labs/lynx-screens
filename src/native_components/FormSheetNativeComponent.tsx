@@ -1,4 +1,5 @@
 import React from 'react';
+import { useScreenTrace } from '../internal/trace/bridge.js';
 import type * as Lynx from '@lynx-js/types';
 import type { FormSheetProps } from '../types/FormSheet.js';
 import {
@@ -14,6 +15,8 @@ type DetentChangedEventPayload = Readonly<{
 
 export const FormSheetNativeComponent = ({
   children,
+  internalTrace,
+  traceScreenKey,
   detents,
   initialDetentIndex,
   largestUndimmedDetentIndex,
@@ -29,6 +32,7 @@ export const FormSheetNativeComponent = ({
   onDetentChanged,
   ...rest
 }: FormSheetProps) => {
+  const trace = useScreenTrace(internalTrace);
   const nativeDetents = resolveNativeDetents(detents);
   const detentsCount = nativeDetents?.length ?? 0;
 
@@ -41,6 +45,11 @@ export const FormSheetNativeComponent = ({
 
   return (
     <ls-form-sheet
+      traceScreenKey={
+        traceScreenKey ?? internalTrace?.content?.identity.screenKey
+      }
+      traceSession={trace.props.traceSession}
+      contentTraceContext={trace.props.contentTraceContext}
       style={{ position: 'absolute', top: 0, left: 0 }}
       detents={nativeDetents}
       initialDetentIndex={resolveInitialDetentIndex(
@@ -53,13 +62,18 @@ export const FormSheetNativeComponent = ({
       )}
       preferredCornerRadius={resolveNativeCornerRadius(preferredCornerRadius)}
       nativeContainerBackgroundColor={nativeContainerStyle?.backgroundColor}
-      bindOnWillAppear={onWillAppear}
-      bindOnDidAppear={onDidAppear}
-      bindOnWillDisappear={onWillDisappear}
-      bindOnDidDisappear={onDidDisappear}
-      bindOnDismiss={onDismiss}
-      bindOnNativeDismiss={onNativeDismiss}
-      bindOnNativeDismissPrevented={onNativeDismissPrevented}
+      bindOnWillAppear={trace.forward('onWillAppear', onWillAppear)}
+      bindOnDidAppear={trace.forward('onDidAppear', onDidAppear)}
+      bindOnWillDisappear={trace.forward('onWillDisappear', onWillDisappear)}
+      bindOnDidDisappear={trace.forward('onDidDisappear', onDidDisappear)}
+      bindOnDismiss={(event) => onDismiss?.(trace.context(event, 'onDismiss'))}
+      bindOnNativeDismiss={(event) =>
+        onNativeDismiss?.(trace.context(event, 'onNativeDismiss'))
+      }
+      bindOnNativeDismissPrevented={trace.forward(
+        'onNativeDismissPrevented',
+        onNativeDismissPrevented,
+      )}
       bindOnDetentChanged={onDetentChangedEvent}
       {...rest}
     >

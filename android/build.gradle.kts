@@ -34,6 +34,7 @@ android {
 
 dependencies {
     implementation("org.lynxsdk.lynx:lynx:4.0.1")
+    implementation("org.lynxsdk.lynx:lynx-trace:4.0.1")
     implementation("org.lynxsdk.lynx:service-api:4.0.1")
     kapt("org.lynxsdk.lynx:lynx-processor:4.0.1")
 

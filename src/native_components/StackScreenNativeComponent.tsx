@@ -1,4 +1,5 @@
 import React from 'react';
+import { useScreenTrace } from '../internal/trace/bridge.js';
 import * as Lynx from '@lynx-js/types';
 import type {
   OnDismissEventPayload,
@@ -7,6 +8,7 @@ import type {
 
 export const StackScreenNativeComponent = ({
   children,
+  internalTrace,
   // Control
   activityMode,
   screenKey,
@@ -21,21 +23,22 @@ export const StackScreenNativeComponent = ({
   // Configuration
   preventNativeDismiss,
 }: StackScreenProps) => {
+  const trace = useScreenTrace(internalTrace);
   const onDismissWrapper = React.useCallback(
     (event: Lynx.BaseEventOrig<OnDismissEventPayload>) => {
       if (event.detail.isNativeDismiss) {
-        console.log('isNativeDismiss');
-        onNativeDismiss?.(screenKey);
+        onNativeDismiss?.(screenKey, trace.context(event, 'onNativeDismiss'));
       } else {
-        console.log('isDismiss');
-        onDismiss?.(screenKey);
+        onDismiss?.(screenKey, trace.context(event, 'onDismiss'));
       }
     },
-    [onDismiss, onNativeDismiss, screenKey],
+    [onDismiss, onNativeDismiss, screenKey, trace],
   );
 
   return (
     <ls-stack-screen
+      traceSession={trace.props.traceSession}
+      contentTraceContext={trace.props.contentTraceContext}
       style={{
         position: 'absolute',
         left: 0,
@@ -47,12 +50,15 @@ export const StackScreenNativeComponent = ({
       activityMode={activityMode}
       screenKey={screenKey}
       // Events
-      bindOnWillAppear={onWillAppear}
-      bindOnDidAppear={onDidAppear}
-      bindOnWillDisappear={onWillDisappear}
-      bindOnDidDisappear={onDidDisappear}
+      bindOnWillAppear={trace.forward('onWillAppear', onWillAppear)}
+      bindOnDidAppear={trace.forward('onDidAppear', onDidAppear)}
+      bindOnWillDisappear={trace.forward('onWillDisappear', onWillDisappear)}
+      bindOnDidDisappear={trace.forward('onDidDisappear', onDidDisappear)}
       bindOnDismiss={onDismissWrapper}
-      bindOnNativeDismissPrevented={onNativeDismissPrevented}
+      bindOnNativeDismissPrevented={trace.forward(
+        'onNativeDismissPrevented',
+        onNativeDismissPrevented,
+      )}
       // Configuration
       preventNativeDismiss={preventNativeDismiss}
     >

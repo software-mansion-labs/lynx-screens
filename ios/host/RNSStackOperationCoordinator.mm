@@ -6,6 +6,9 @@
 @implementation RNSStackOperationCoordinator {
     NSMutableArray<RNSPushOperation *> *_Nonnull _pendingPushOperations;
     NSMutableArray<RNSPopOperation *> *_Nonnull _pendingPopOperations;
+    RNSTraceBatch *_traceBatch;
+    BOOL _hasTraceBatch;
+    BOOL _ambiguousTraceBatch;
 }
 
 - (instancetype)init
@@ -22,6 +25,14 @@
     _pendingPopOperations = [NSMutableArray array];
 }
 
+- (void)captureTraceBatch:(RNSTraceBatch *)batch
+{
+    if (_hasTraceBatch && _traceBatch != batch)
+        _ambiguousTraceBatch = YES;
+    _hasTraceBatch = YES;
+    _traceBatch = batch;
+}
+
 - (BOOL)hasPendingOperations
 {
     return _pendingPushOperations.count > 0 || _pendingPopOperations.count > 0;
@@ -29,12 +40,26 @@
 
 - (void)addPushOperation:(nonnull RNSStackScreenComponent *)stackScreen
 {
+    if (stackScreen.traceSession) {
+        NSMutableDictionary *fields =
+            [NSMutableDictionary dictionaryWithDictionary:@{@"operation" : @"push", @"origin" : @"lynx_patch"}];
+        if (stackScreen.screenKey)
+            fields[@"screen_key"] = stackScreen.screenKey;
+        RNSTraceInstant(@"LynxScreens.Stack.OperationRequested", fields);
+    }
     RNSPushOperation *operation = [[RNSPushOperation alloc] initWithScreen:stackScreen];
     [_pendingPushOperations addObject:operation];
 }
 
 - (void)addPopOperation:(nonnull RNSStackScreenComponent *)stackScreen
 {
+    if (stackScreen.traceSession) {
+        NSMutableDictionary *fields =
+            [NSMutableDictionary dictionaryWithDictionary:@{@"operation" : @"pop", @"origin" : @"lynx_patch"}];
+        if (stackScreen.screenKey)
+            fields[@"screen_key"] = stackScreen.screenKey;
+        RNSTraceInstant(@"LynxScreens.Stack.OperationRequested", fields);
+    }
     RNSPopOperation *operation = [[RNSPopOperation alloc] initWithScreen:stackScreen];
     [_pendingPopOperations addObject:operation];
 }
@@ -53,6 +78,9 @@
                      withRenderedScreens:(nonnull NSMutableArray<RNSStackScreenComponent *> *)renderedScreens
 {
     if (![self hasPendingOperations]) {
+        _traceBatch = nil;
+        _hasTraceBatch = NO;
+        _ambiguousTraceBatch = NO;
         return;
     }
 
@@ -120,7 +148,12 @@
         [controller enqueuePushOperation:screen];
     }
 
+    controller.traceBatch = _ambiguousTraceBatch ? nil : _traceBatch;
     [controller performContainerUpdateIfNeeded];
+    controller.traceBatch = nil;
+    _traceBatch = nil;
+    _hasTraceBatch = NO;
+    _ambiguousTraceBatch = NO;
 
     [_pendingPopOperations removeAllObjects];
     [_pendingPushOperations removeAllObjects];

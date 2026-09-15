@@ -1,8 +1,13 @@
 import type { ReactNode, Ref } from '@lynx-js/react';
 import type * as Lynx from '@lynx-js/types';
+import type { NativeTraceIdentity } from './internal/trace/types.js';
 
-declare module "@lynx-js/types" {
+declare module '@lynx-js/types' {
   type EmptyEventPayload = Record<string, never>;
+
+  type NavigationTraceEventPayload = Readonly<{
+    traceIdentity?: NativeTraceIdentity | undefined;
+  }>;
 
   type StackHeaderIconIOSAttr =
     | {
@@ -35,9 +40,10 @@ declare module "@lynx-js/types" {
     children: (StackHeaderMenuAttr | StackHeaderMenuItemAttr)[];
   };
 
-  type OnDismissEventPayload = Readonly<{
-    isNativeDismiss: boolean;
-  }>;
+  type OnDismissEventPayload = NavigationTraceEventPayload &
+    Readonly<{
+      isNativeDismiss: boolean;
+    }>;
 
   type FormSheetDetentChangedEventPayload = Readonly<{
     index: number;
@@ -80,6 +86,10 @@ declare module "@lynx-js/types" {
 
   interface IntrinsicElements extends Lynx.IntrinsicElements {
     'ls-form-sheet': {
+      traceSession?: string | undefined;
+      contentTraceContext?: string | undefined;
+      traceScreenKey?: string | undefined;
+      navigationTraceContext?: string | undefined;
       className?: string | undefined;
       children?: ReactNode | undefined;
       id?: string | undefined;
@@ -93,13 +103,20 @@ declare module "@lynx-js/types" {
       prefersScrollingExpandsWhenScrolledToEdge?: boolean | undefined;
       preventNativeDismiss?: boolean | undefined;
       nativeContainerBackgroundColor?: string | undefined;
-      bindOnWillAppear?: Lynx.EventHandler<Lynx.BaseEventOrig<EmptyEventPayload>> | undefined;
-      bindOnDidAppear?: Lynx.EventHandler<Lynx.BaseEventOrig<EmptyEventPayload>> | undefined;
-      bindOnWillDisappear?: Lynx.EventHandler<Lynx.BaseEventOrig<EmptyEventPayload>> | undefined;
-      bindOnDidDisappear?: Lynx.EventHandler<Lynx.BaseEventOrig<EmptyEventPayload>> | undefined;
-      bindOnDismiss?: Lynx.EventHandler<Lynx.BaseEventOrig<EmptyEventPayload>> | undefined;
-      bindOnNativeDismiss?: Lynx.EventHandler<Lynx.BaseEventOrig<EmptyEventPayload>> | undefined;
-      bindOnNativeDismissPrevented?: Lynx.EventHandler<Lynx.BaseEventOrig<EmptyEventPayload>> | undefined;
+      bindOnWillAppear?:
+        Lynx.EventHandler<Lynx.BaseEventOrig<EmptyEventPayload>> | undefined;
+      bindOnDidAppear?:
+        Lynx.EventHandler<Lynx.BaseEventOrig<EmptyEventPayload>> | undefined;
+      bindOnWillDisappear?:
+        Lynx.EventHandler<Lynx.BaseEventOrig<EmptyEventPayload>> | undefined;
+      bindOnDidDisappear?:
+        Lynx.EventHandler<Lynx.BaseEventOrig<EmptyEventPayload>> | undefined;
+      bindOnDismiss?:
+        Lynx.EventHandler<Lynx.BaseEventOrig<EmptyEventPayload>> | undefined;
+      bindOnNativeDismiss?:
+        Lynx.EventHandler<Lynx.BaseEventOrig<EmptyEventPayload>> | undefined;
+      bindOnNativeDismissPrevented?:
+        Lynx.EventHandler<Lynx.BaseEventOrig<EmptyEventPayload>> | undefined;
       bindOnDetentChanged?:
         | Lynx.EventHandler<
             Lynx.BaseEventOrig<FormSheetDetentChangedEventPayload>
@@ -112,13 +129,17 @@ declare module "@lynx-js/types" {
       id?: string | undefined;
       style?: string | Lynx.CSSProperties | undefined;
     };
-    "ls-stack-host": {
+    'ls-stack-host': {
+      traceSession?: string | undefined;
       className?: string | undefined;
       children: ReactNode;
       id?: string | undefined;
       style?: string | Lynx.CSSProperties | undefined;
+      navigationTraceContext?: string | undefined;
     };
-    "ls-stack-screen": {
+    'ls-stack-screen': {
+      traceSession?: string | undefined;
+      contentTraceContext?: string | undefined;
       className?: string | undefined;
       children: ReactNode;
       id?: string | undefined;
@@ -127,16 +148,23 @@ declare module "@lynx-js/types" {
       activityMode?: 'detached' | 'attached' | undefined;
       screenKey?: string | undefined;
       // Events
-      bindOnWillAppear?: Lynx.EventHandler<Lynx.BaseEventOrig<EmptyEventPayload>> | undefined;
-      bindOnDidAppear?: Lynx.EventHandler<Lynx.BaseEventOrig<EmptyEventPayload>> | undefined;
-      bindOnWillDisappear?: Lynx.EventHandler<Lynx.BaseEventOrig<EmptyEventPayload>> | undefined;
-      bindOnDidDisappear?: Lynx.EventHandler<Lynx.BaseEventOrig<EmptyEventPayload>> | undefined;
-      bindOnDismiss?: Lynx.EventHandler<Lynx.BaseEventOrig<OnDismissEventPayload>> | undefined;
-      bindOnNativeDismissPrevented?: Lynx.EventHandler<Lynx.BaseEventOrig<EmptyEventPayload>> | undefined;
+      bindOnWillAppear?:
+        Lynx.EventHandler<Lynx.BaseEventOrig<EmptyEventPayload>> | undefined;
+      bindOnDidAppear?:
+        Lynx.EventHandler<Lynx.BaseEventOrig<EmptyEventPayload>> | undefined;
+      bindOnWillDisappear?:
+        Lynx.EventHandler<Lynx.BaseEventOrig<EmptyEventPayload>> | undefined;
+      bindOnDidDisappear?:
+        Lynx.EventHandler<Lynx.BaseEventOrig<EmptyEventPayload>> | undefined;
+      bindOnDismiss?:
+        | Lynx.EventHandler<Lynx.BaseEventOrig<OnDismissEventPayload>>
+        | undefined;
+      bindOnNativeDismissPrevented?:
+        Lynx.EventHandler<Lynx.BaseEventOrig<EmptyEventPayload>> | undefined;
       // Configuration
       preventNativeDismiss?: boolean | undefined;
     };
-    "ls-stack-header-config": {
+    'ls-stack-header-config': {
       ref?: Ref<Lynx.NodesRef> | undefined;
       className?: string | undefined;
       children?: ReactNode | undefined;
@@ -172,8 +200,7 @@ declare module "@lynx-js/types" {
         | undefined;
       toolbarMenuGroupDividerEnabled?: boolean | undefined;
       bindOnToolbarMenuItemPress?:
-        | Lynx.EventHandler<Lynx.BaseEventOrig<{ id: string }>>
-        | undefined;
+        Lynx.EventHandler<Lynx.BaseEventOrig<{ id: string }>> | undefined;
       bindOnToolbarMenuGroupSelectionChange?:
         | Lynx.EventHandler<
             Lynx.BaseEventOrig<{ groupId: string; selectedIds: string[] }>
@@ -191,13 +218,13 @@ declare module "@lynx-js/types" {
           >
         | undefined;
     };
-    "ls-scroll-view-marker": {
+    'ls-scroll-view-marker': {
       className?: string | undefined;
       children: ReactNode;
       id?: string | undefined;
       style?: string | Lynx.CSSProperties | undefined;
     };
-    "ls-stack-header-subview-android": {
+    'ls-stack-header-subview-android': {
       className?: string | undefined;
       children?: ReactNode | undefined;
       id?: string | undefined;
@@ -205,7 +232,7 @@ declare module "@lynx-js/types" {
       type?: 'background' | 'leading' | 'center' | 'trailing' | undefined;
       collapseMode?: 'off' | 'parallax' | undefined;
     };
-    "ls-stack-header-item-ios": {
+    'ls-stack-header-item-ios': {
       className?: string | undefined;
       children?: ReactNode | undefined;
       id?: string | undefined;
@@ -226,7 +253,7 @@ declare module "@lynx-js/types" {
         | Lynx.EventHandler<Lynx.BaseEventOrig<Record<string, never>>>
         | undefined;
     };
-    "ls-stack-header-item-spacer-ios": {
+    'ls-stack-header-item-spacer-ios': {
       className?: string | undefined;
       id?: string | undefined;
       style?: string | Lynx.CSSProperties | undefined;

@@ -1,3 +1,7 @@
+import type {
+  ScreenInternalTraceProps,
+  NativeEventContext,
+} from '../internal/trace/types.js';
 import type * as Lynx from '@lynx-js/types';
 
 export type StackScreenActivityMode = 'detached' | 'attached';
@@ -10,6 +14,8 @@ export type OnDismissEventPayload = Readonly<{
 }>;
 
 export type StackScreenProps = {
+  /** @internal Navigation framework diagnostics. */
+  internalTrace?: ScreenInternalTraceProps | undefined;
   children?: Lynx.ViewProps['children'] | undefined;
 
   // Control
@@ -18,24 +24,21 @@ export type StackScreenProps = {
 
   // Events
   onWillAppear?:
-    | Lynx.EventHandler<Lynx.BaseEventOrig<EmptyEventPayload>>
-    | undefined;
+    Lynx.EventHandler<Lynx.BaseEventOrig<EmptyEventPayload>> | undefined;
   onDidAppear?:
-    | Lynx.EventHandler<Lynx.BaseEventOrig<EmptyEventPayload>>
-    | undefined;
+    Lynx.EventHandler<Lynx.BaseEventOrig<EmptyEventPayload>> | undefined;
   onWillDisappear?:
-    | Lynx.EventHandler<Lynx.BaseEventOrig<EmptyEventPayload>>
-    | undefined;
+    Lynx.EventHandler<Lynx.BaseEventOrig<EmptyEventPayload>> | undefined;
   onDidDisappear?:
-    | Lynx.EventHandler<Lynx.BaseEventOrig<EmptyEventPayload>>
-    | undefined;
+    Lynx.EventHandler<Lynx.BaseEventOrig<EmptyEventPayload>> | undefined;
 
-  onDismiss?: ((screenKey: string) => void) | undefined;
-  onNativeDismiss?: ((screenKey: string) => void) | undefined;
+  onDismiss?:
+    ((screenKey: string, context?: NativeEventContext) => void) | undefined;
+  onNativeDismiss?:
+    ((screenKey: string, context?: NativeEventContext) => void) | undefined;
 
   onNativeDismissPrevented?:
-    | Lynx.EventHandler<Lynx.BaseEventOrig<EmptyEventPayload>>
-    | undefined;
+    Lynx.EventHandler<Lynx.BaseEventOrig<EmptyEventPayload>> | undefined;
 
   // Configuration
   preventNativeDismiss?: boolean | undefined;
