@@ -1,11 +1,27 @@
 import './lynx-elements';
 
-export { StackHostNativeComponent } from './native_components/StackHostNativeComponent';
-export { StackScreenNativeComponent } from './native_components/StackScreenNativeComponent';
-export { StackHeaderConfigNativeComponent } from './native_components/StackHeaderConfigNativeComponent';
+import { FormSheetNativeComponent } from './native_components/FormSheetNativeComponent';
+import { StackHeaderConfigNativeComponent } from './native_components/StackHeaderConfigNativeComponent';
+import { StackHostNativeComponent } from './native_components/StackHostNativeComponent';
+import { StackScreenNativeComponent } from './native_components/StackScreenNativeComponent';
+
 export { ScrollViewMarker } from './native_components/ScrollViewMarkerNativeComponent';
 export type { ScrollViewMarkerProps } from './native_components/ScrollViewMarkerNativeComponent';
-export { FormSheetNativeComponent } from './native_components/FormSheetNativeComponent';
+
+export {
+  StackHostNativeComponent,
+  StackScreenNativeComponent,
+  StackHeaderConfigNativeComponent,
+};
+
+export const Stack = {
+  Host: StackHostNativeComponent,
+  Screen: StackScreenNativeComponent,
+  HeaderConfig: StackHeaderConfigNativeComponent,
+};
+
+export { FormSheetNativeComponent, FormSheetNativeComponent as FormSheet };
+
 export type {
   FormSheetDetents,
   FormSheetNativeContainerStyleProps,
