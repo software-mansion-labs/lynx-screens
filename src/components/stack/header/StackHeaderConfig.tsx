@@ -9,46 +9,46 @@ import {
 } from '@lynx-js/react';
 import type { BaseEventOrig, EventHandler, NodesRef } from '@lynx-js/types';
 import type {
-  PlatformIconAndroid,
   StackHeaderConfigProps,
-  StackHeaderConfigPropsAndroid,
   StackHeaderConfigRef,
-  StackHeaderInlineCustomItemIOS,
-  StackHeaderInlineItemIOS,
-  StackHeaderMenuIOS,
-  StackHeaderSpacerItemIOS,
-  StackHeaderTitleCustomItemIOS,
+} from './StackHeaderConfig.types.js';
+import type {
+  StackHeaderConfigPropsAndroid,
   StackHeaderToolbarMenuBaseAndroid,
   StackHeaderToolbarMenuElementAndroid,
   StackHeaderToolbarMenuGroupAndroid,
   StackHeaderToolbarMenuItemAndroid,
   StackHeaderToolbarMenuItemBaseAndroid,
-  StackHeaderMenuItemOptionsIOS,
-  StackHeaderMenuOptionsIOS,
   StackHeaderToolbarMenuElementOptionsAndroid,
   StackHeaderToolbarMenuElementUpdateAndroid,
   StackHeaderTypeAndroid,
-} from '../types/StackHeaderConfig.js';
+} from './StackHeaderConfig.android.types.js';
+import type {
+  StackHeaderInlineCustomItemIOS,
+  StackHeaderInlineItemIOS,
+  StackHeaderSpacerItemIOS,
+  StackHeaderTitleCustomItemIOS,
+  StackHeaderMenuItemOptionsIOS,
+  StackHeaderMenuOptionsIOS,
+} from './StackHeaderConfig.ios.types.js';
+import type { StackHeaderMenuIOS } from './ios/StackHeaderMenu.ios.types.js';
+import type { PlatformIconAndroid } from '../../shared/types.js';
 import {
   findMenuElementByIdInMenus,
   parseMenuElementToAttr,
   validateMenuCallbacks,
   type StackHeaderMenuAttr,
 } from './utils.js';
-import { StackHeaderSubviewAndroidNativeComponent } from './StackHeaderSubviewAndroidNativeComponent.js';
-import { parseAndroidIconToNativeProps } from '../shared/index.js';
-import {
-  StackHeaderItemIOSNativeComponent,
-  type StackHeaderItemPlacement,
-} from './StackHeaderItemIOSNativeComponent.js';
-import {
-  StackHeaderItemSpacerIOSNativeComponent,
-  type StackHeaderItemSpacerPlacement,
-} from './StackHeaderItemSpacerIOSNativeComponent.js';
+import { StackHeaderSubview } from './android/StackHeaderSubview.android.js';
+import { parseAndroidIconToNativeProps } from '../../shared/index.js';
+import type { StackHeaderItemPlacement } from './ios/StackHeaderItem.ios.types.js';
+import type { StackHeaderItemSpacerPlacement } from './ios/StackHeaderItemSpacer.ios.types.js';
+import { StackHeaderItemSpacer } from './ios/StackHeaderItemSpacer.ios.js';
+import { StackHeaderItem } from './ios/StackHeaderItem.ios.js';
 
 // RNS splits the header config into platform files resolved at build time; a
 // Lynx bundle serves both platforms, so the split happens at runtime instead.
-const StackHeaderConfigNativeComponentInner = (
+const StackHeaderConfigInner = (
   props: StackHeaderConfigProps,
   forwardedRef: Ref<StackHeaderConfigRef>,
 ) =>
@@ -231,7 +231,7 @@ function makeItemViewFromItem(
     }
 
     return (
-      <StackHeaderItemSpacerIOSNativeComponent
+      <StackHeaderItemSpacer
         key={id}
         placement={placement as StackHeaderItemSpacerPlacement}
         {...rest}
@@ -242,12 +242,7 @@ function makeItemViewFromItem(
   const { id, ...rest } = item;
 
   return (
-    <StackHeaderItemIOSNativeComponent
-      key={id}
-      itemId={id}
-      placement={placement}
-      {...rest}
-    />
+    <StackHeaderItem key={id} itemId={id} placement={placement} {...rest} />
   );
 }
 
@@ -329,27 +324,27 @@ const StackHeaderConfigAndroid = (props: PlatformInnerProps) => {
         the order in native StackHeaderConfigComponent.getConfigSubviewAt.
         */}
       {backgroundSubview && (
-        <StackHeaderSubviewAndroidNativeComponent
+        <StackHeaderSubview
           type="background"
           collapseMode={backgroundSubview.collapseMode}
         >
           {backgroundSubview.render()}
-        </StackHeaderSubviewAndroidNativeComponent>
+        </StackHeaderSubview>
       )}
       {leadingSubview && (
-        <StackHeaderSubviewAndroidNativeComponent type="leading">
+        <StackHeaderSubview type="leading">
           {leadingSubview.render()}
-        </StackHeaderSubviewAndroidNativeComponent>
+        </StackHeaderSubview>
       )}
       {centerSubview && (
-        <StackHeaderSubviewAndroidNativeComponent type="center">
+        <StackHeaderSubview type="center">
           {centerSubview.render()}
-        </StackHeaderSubviewAndroidNativeComponent>
+        </StackHeaderSubview>
       )}
       {trailingSubview && (
-        <StackHeaderSubviewAndroidNativeComponent type="trailing">
+        <StackHeaderSubview type="trailing">
           {trailingSubview.render()}
-        </StackHeaderSubviewAndroidNativeComponent>
+        </StackHeaderSubview>
       )}
     </ls-stack-header-config>
   );
@@ -835,7 +830,7 @@ function resolveScrollFlags(
   };
 }
 
-export const StackHeaderConfigNativeComponent = forwardRef<
+export const StackHeaderConfig = forwardRef<
   StackHeaderConfigRef,
   StackHeaderConfigProps
->(StackHeaderConfigNativeComponentInner);
+>(StackHeaderConfigInner);

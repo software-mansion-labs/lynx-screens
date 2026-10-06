@@ -8,9 +8,3 @@ export interface ScrollViewMarkerProps {
   // Adaptation from RNS: the iOS-only `scrollEdgeEffects` prop is not exposed -
   // the scroll edge effect part of the ScrollViewMarker epic is not ported.
 }
-
-export function ScrollViewMarker(props: ScrollViewMarkerProps) {
-  const { children, ...rest } = props;
-
-  return <ls-scroll-view-marker {...rest}>{children}</ls-scroll-view-marker>;
-}

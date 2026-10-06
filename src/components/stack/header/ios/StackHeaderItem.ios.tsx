@@ -1,30 +1,9 @@
 import { useCallback } from 'react';
-import type { ReactElement } from '@lynx-js/react';
 import type { BaseEventOrig, EventHandler } from '@lynx-js/types';
-import type {
-  PlatformIconIOS,
-  StackHeaderMenuIOS,
-} from '../types/StackHeaderConfig.js';
-import { parseMenuElementToAttr, type StackHeaderMenuAttr } from './utils.js';
+import type { StackHeaderItemProps } from './StackHeaderItem.ios.types.js';
+import { parseMenuElementToAttr, type StackHeaderMenuAttr } from '../utils.js';
 
-export type StackHeaderItemPlacement =
-  | 'leading'
-  | 'trailing'
-  | 'title'
-  | 'subtitle'
-  | 'largeSubtitle';
-
-export type StackHeaderItemProps = {
-  placement: StackHeaderItemPlacement;
-  itemId?: string | undefined;
-  title?: string | undefined;
-  icon?: PlatformIconIOS | undefined;
-  render?: (() => ReactElement) | undefined;
-  menu?: StackHeaderMenuIOS | undefined;
-  onPress?: (() => void) | undefined;
-};
-
-export const StackHeaderItemIOSNativeComponent = ({
+export const StackHeaderItem = ({
   placement,
   itemId,
   title,

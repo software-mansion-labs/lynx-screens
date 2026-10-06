@@ -1,5 +1,5 @@
 import { useState } from '@lynx-js/react';
-import { FormSheetNativeComponent, ScrollViewMarker } from 'lynx-screens';
+import { FormSheet, ScrollViewMarker } from 'lynx-screens';
 import {
   Heading,
   SettingsButton,
@@ -152,7 +152,7 @@ export default function App() {
         </scroll-view>
       </ScrollViewMarker>
 
-      <FormSheetNativeComponent
+      <FormSheet
         isOpen={isOpen}
         detents={resolveDetents(detents)}
         initialDetentIndex={initialDetent === 'last' ? 'last' : 0}
@@ -202,7 +202,7 @@ export default function App() {
             onTap={() => close('dismiss requested from JS')}
           />
         </view>
-      </FormSheetNativeComponent>
+      </FormSheet>
     </view>
   );
 }

@@ -1,4 +1,4 @@
-import type { PlatformIconAndroid } from '../types/StackHeaderConfig.js';
+import type { PlatformIconAndroid } from './types.js';
 
 // RNS resolves RN assets through Image.resolveAssetSource here; on Lynx icons
 // are referenced by plain URI strings, so the parse step only splits the icon

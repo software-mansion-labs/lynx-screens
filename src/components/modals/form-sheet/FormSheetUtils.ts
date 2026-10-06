@@ -1,4 +1,4 @@
-import type { FormSheetProps } from '../types/FormSheet.js';
+import type { FormSheetProps } from './FormSheet.types.js';
 
 // Predefined value for `fitToContents`. Keep in sync with native counterpart.
 const FORM_SHEET_NATIVE_FIT_TO_CONTENTS = -1.0;

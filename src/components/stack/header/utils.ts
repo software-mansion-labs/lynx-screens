@@ -1,8 +1,8 @@
+import type { PlatformIconIOS } from '../../shared/types.js';
 import type {
-  PlatformIconIOS,
   StackHeaderMenuElementIOS,
   StackHeaderMenuIOS,
-} from '../types/StackHeaderConfig.js';
+} from './ios/StackHeaderMenu.ios.types.js';
 
 export type StackHeaderMenuItemAttr = {
   id: string;
