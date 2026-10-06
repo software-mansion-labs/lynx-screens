@@ -2,7 +2,7 @@ import type {
   PlatformIconIOS,
   StackHeaderMenuElementIOS,
   StackHeaderMenuIOS,
-} from '../types/StackHeaderConfig.js';
+} from './StackHeaderConfig.types.js';
 
 export type StackHeaderMenuItemAttr = {
   id: string;

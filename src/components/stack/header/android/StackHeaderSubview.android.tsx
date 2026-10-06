@@ -1,4 +1,4 @@
-import type { StackHeaderSubviewProps } from '../types/StackHeaderConfig.js';
+import type { StackHeaderSubviewProps } from '../StackHeaderConfig.types.js';
 
 export const StackHeaderSubviewAndroidNativeComponent = ({
   children,

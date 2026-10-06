@@ -28,23 +28,23 @@ import type {
   StackHeaderToolbarMenuElementOptionsAndroid,
   StackHeaderToolbarMenuElementUpdateAndroid,
   StackHeaderTypeAndroid,
-} from '../types/StackHeaderConfig.js';
+} from './StackHeaderConfig.types.js';
 import {
   findMenuElementByIdInMenus,
   parseMenuElementToAttr,
   validateMenuCallbacks,
   type StackHeaderMenuAttr,
 } from './utils.js';
-import { StackHeaderSubviewAndroidNativeComponent } from './StackHeaderSubviewAndroidNativeComponent.js';
-import { parseAndroidIconToNativeProps } from '../shared/index.js';
+import { StackHeaderSubviewAndroidNativeComponent } from './android/StackHeaderSubview.android.js';
+import { parseAndroidIconToNativeProps } from '../../shared/index.js';
 import {
   StackHeaderItemIOSNativeComponent,
   type StackHeaderItemPlacement,
-} from './StackHeaderItemIOSNativeComponent.js';
+} from './ios/StackHeaderItem.ios.js';
 import {
   StackHeaderItemSpacerIOSNativeComponent,
   type StackHeaderItemSpacerPlacement,
-} from './StackHeaderItemSpacerIOSNativeComponent.js';
+} from './ios/StackHeaderItemSpacer.ios.js';
 
 // RNS splits the header config into platform files resolved at build time; a
 // Lynx bundle serves both platforms, so the split happens at runtime instead.

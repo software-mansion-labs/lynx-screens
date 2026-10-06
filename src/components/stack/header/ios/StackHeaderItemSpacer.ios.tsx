@@ -1,4 +1,4 @@
-import type { StackHeaderItemPlacement } from './StackHeaderItemIOSNativeComponent.js';
+import type { StackHeaderItemPlacement } from './StackHeaderItem.ios.js';
 
 export type StackHeaderItemSpacerPlacement = Extract<
   StackHeaderItemPlacement,

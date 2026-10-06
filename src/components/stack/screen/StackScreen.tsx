@@ -3,7 +3,7 @@ import * as Lynx from '@lynx-js/types';
 import type {
   OnDismissEventPayload,
   StackScreenProps,
-} from '../types/StackScreen.js';
+} from './StackScreen.types.js';
 
 export const StackScreen = ({
   children,

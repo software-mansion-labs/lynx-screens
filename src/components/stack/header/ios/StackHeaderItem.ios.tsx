@@ -4,8 +4,8 @@ import type { BaseEventOrig, EventHandler } from '@lynx-js/types';
 import type {
   PlatformIconIOS,
   StackHeaderMenuIOS,
-} from '../types/StackHeaderConfig.js';
-import { parseMenuElementToAttr, type StackHeaderMenuAttr } from './utils.js';
+} from '../StackHeaderConfig.types.js';
+import { parseMenuElementToAttr, type StackHeaderMenuAttr } from '../utils.js';
 
 export type StackHeaderItemPlacement =
   | 'leading'

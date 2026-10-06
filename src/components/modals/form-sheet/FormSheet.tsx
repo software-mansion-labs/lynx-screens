@@ -1,12 +1,12 @@
 import React from 'react';
 import type * as Lynx from '@lynx-js/types';
-import type { FormSheetProps } from '../types/FormSheet.js';
+import type { FormSheetProps } from './FormSheet.types.js';
 import {
   resolveInitialDetentIndex,
   resolveLargestUndimmedDetentIndex,
   resolveNativeCornerRadius,
   resolveNativeDetents,
-} from '../utils/FormSheetUtils.js';
+} from './FormSheetUtils.js';
 
 type DetentChangedEventPayload = Readonly<{
   index: number;
