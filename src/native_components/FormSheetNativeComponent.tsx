@@ -12,7 +12,7 @@ type DetentChangedEventPayload = Readonly<{
   index: number;
 }>;
 
-export const FormSheetNativeComponent = ({
+export const FormSheet = ({
   children,
   detents,
   initialDetentIndex,

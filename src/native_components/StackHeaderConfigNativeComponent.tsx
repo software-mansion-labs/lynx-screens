@@ -48,7 +48,7 @@ import {
 
 // RNS splits the header config into platform files resolved at build time; a
 // Lynx bundle serves both platforms, so the split happens at runtime instead.
-const StackHeaderConfigNativeComponentInner = (
+const StackHeaderConfigInner = (
   props: StackHeaderConfigProps,
   forwardedRef: Ref<StackHeaderConfigRef>,
 ) =>
@@ -835,7 +835,7 @@ function resolveScrollFlags(
   };
 }
 
-export const StackHeaderConfigNativeComponent = forwardRef<
+export const StackHeaderConfig = forwardRef<
   StackHeaderConfigRef,
   StackHeaderConfigProps
->(StackHeaderConfigNativeComponentInner);
+>(StackHeaderConfigInner);

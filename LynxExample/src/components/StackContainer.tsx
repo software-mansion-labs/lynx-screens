@@ -15,11 +15,7 @@ import {
   StackNavigationContext,
   type StackNavigationContextPayload,
 } from '../contexts/StackNavigationContext';
-import {
-  StackHeaderConfigNativeComponent,
-  StackHostNativeComponent,
-  StackScreenNativeComponent,
-} from 'lynx-screens';
+import { Stack } from 'lynx-screens';
 import { useParentNavigationEffect } from '../hooks/useParentNavigationEffect';
 import { useComponentsByName } from '../hooks/useComponentsByName';
 
@@ -60,7 +56,7 @@ export function StackContainer({ routeConfigs }: StackContainerProps) {
   );
 
   return (
-    <StackHostNativeComponent>
+    <Stack.Host>
       {stackNavState.stack.map(
         ({ options: { headerConfig, headerConfigRef, ...options } = {}, activityMode, routeKey, name }) => {
           const stackNavigationContext: StackNavigationContextPayload = {
@@ -81,7 +77,7 @@ export function StackContainer({ routeConfigs }: StackContainerProps) {
           }
 
         return (
-          <StackScreenNativeComponent
+          <Stack.Screen
             key={routeKey}
             {...options}
             activityMode={activityMode}
@@ -92,16 +88,16 @@ export function StackContainer({ routeConfigs }: StackContainerProps) {
             <StackNavigationContext.Provider value={stackNavigationContext}>
               <Component />
               {headerConfig !== undefined && (
-                <StackHeaderConfigNativeComponent
+                <Stack.HeaderConfig
                   ref={headerConfigRef}
                   {...headerConfig}
                 />
               )}
             </StackNavigationContext.Provider>
-          </StackScreenNativeComponent>
+          </Stack.Screen>
         );
       })}
-    </StackHostNativeComponent>
+    </Stack.Host>
   );
 }
 

@@ -1,6 +1,6 @@
 import * as Lynx from '@lynx-js/types';
 
-export const StackHostNativeComponent = ({
+export const StackHost = ({
   children,
 }: {
   children: NonNullable<Lynx.ViewProps['children']>;

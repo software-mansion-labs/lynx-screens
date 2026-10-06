@@ -5,7 +5,7 @@ import type {
   StackScreenProps,
 } from '../types/StackScreen.js';
 
-export const StackScreenNativeComponent = ({
+export const StackScreen = ({
   children,
   // Control
   activityMode,
