@@ -1,13 +1,18 @@
 import type * as Lynx from '@lynx-js/types';
 
-export type StackScreenActivityMode = 'detached' | 'attached';
-
-// copied form react-native-screens/src/components/gamma/stack/StackScreen.types.ts
-export type EmptyEventPayload = Record<string, never>;
-
 export type OnDismissEventPayload = Readonly<{
   isNativeDismiss: boolean;
 }>;
+
+export type EmptyEventPayload = Record<string, never>;
+
+export type OnDismissEvent = Lynx.BaseEventOrig<OnDismissEventPayload>;
+
+export type StackScreenActivityMode = 'detached' | 'attached';
+
+export type StackScreenEventHandler = Lynx.EventHandler<
+  Lynx.BaseEventOrig<EmptyEventPayload>
+>;
 
 export type StackScreenProps = {
   children?: Lynx.ViewProps['children'] | undefined;
@@ -17,25 +22,14 @@ export type StackScreenProps = {
   screenKey: string;
 
   // Events
-  onWillAppear?:
-    | Lynx.EventHandler<Lynx.BaseEventOrig<EmptyEventPayload>>
-    | undefined;
-  onDidAppear?:
-    | Lynx.EventHandler<Lynx.BaseEventOrig<EmptyEventPayload>>
-    | undefined;
-  onWillDisappear?:
-    | Lynx.EventHandler<Lynx.BaseEventOrig<EmptyEventPayload>>
-    | undefined;
-  onDidDisappear?:
-    | Lynx.EventHandler<Lynx.BaseEventOrig<EmptyEventPayload>>
-    | undefined;
+  onWillAppear?: StackScreenEventHandler | undefined;
+  onDidAppear?: StackScreenEventHandler | undefined;
+  onWillDisappear?: StackScreenEventHandler | undefined;
+  onDidDisappear?: StackScreenEventHandler | undefined;
 
   onDismiss?: ((screenKey: string) => void) | undefined;
   onNativeDismiss?: ((screenKey: string) => void) | undefined;
-
-  onNativeDismissPrevented?:
-    | Lynx.EventHandler<Lynx.BaseEventOrig<EmptyEventPayload>>
-    | undefined;
+  onNativeDismissPrevented?: StackScreenEventHandler | undefined;
 
   // Configuration
   preventNativeDismiss?: boolean | undefined;

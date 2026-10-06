@@ -1,9 +1,5 @@
 import React from 'react';
-import * as Lynx from '@lynx-js/types';
-import type {
-  OnDismissEventPayload,
-  StackScreenProps,
-} from './StackScreen.types.js';
+import type { OnDismissEvent, StackScreenProps } from './StackScreen.types.js';
 
 export const StackScreen = ({
   children,
@@ -22,7 +18,7 @@ export const StackScreen = ({
   preventNativeDismiss,
 }: StackScreenProps) => {
   const onDismissWrapper = React.useCallback(
-    (event: Lynx.BaseEventOrig<OnDismissEventPayload>) => {
+    (event: OnDismissEvent) => {
       if (event.detail.isNativeDismiss) {
         console.log('isNativeDismiss');
         onNativeDismiss?.(screenKey);

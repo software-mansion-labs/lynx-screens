@@ -7,7 +7,9 @@ export type { StackHostProps } from './host';
 export type {
   OnDismissEventPayload,
   EmptyEventPayload, // TODO: Remove this from public types (we need one shared type for this)
+  OnDismissEvent,
   StackScreenActivityMode,
+  StackScreenEventHandler,
   StackScreenProps,
 } from './screen';
 
