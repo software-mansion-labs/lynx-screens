@@ -1,5 +1,7 @@
 export type {
   PlatformIconShared,
+  PlatformIconAndroidDrawableResource,
+  PlatformIconIOSTemplate,
   PlatformIconIOSSfSymbol,
   PlatformIconIOSXcasset,
   PlatformIconIOS,

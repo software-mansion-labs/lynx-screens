@@ -6,12 +6,17 @@ export type PlatformIconShared = {
   uri: string;
 };
 
-export type PlatformIconAndroid =
-  | {
-      type: 'drawableResource';
-      name: string;
-    }
-  | PlatformIconShared;
+export type PlatformIconAndroidDrawableResource = {
+  type: 'drawableResource';
+  name: string;
+};
+
+// Adaptation from RNS: image and template sources are plain uri strings
+// (Lynx has no require()-based assets / resolveAssetSource).
+export type PlatformIconIOSTemplate = {
+  type: 'templateSource';
+  uri: string;
+};
 
 export type PlatformIconIOSSfSymbol = {
   type: 'sfSymbol';
@@ -23,13 +28,12 @@ export type PlatformIconIOSXcasset = {
   name: string;
 };
 
-// Adaptation from RNS: image and template sources are plain uri strings
-// (Lynx has no require()-based assets / resolveAssetSource).
 export type PlatformIconIOS =
   | PlatformIconIOSSfSymbol
   | PlatformIconIOSXcasset
-  | {
-      type: 'templateSource';
-      uri: string;
-    }
+  | PlatformIconIOSTemplate
+  | PlatformIconShared;
+
+export type PlatformIconAndroid =
+  | PlatformIconAndroidDrawableResource
   | PlatformIconShared;
