@@ -1,19 +1,6 @@
-import type { StackHeaderItemPlacement } from './StackHeaderItem.ios.js';
+import type { StackHeaderItemSpacerProps } from './StackHeaderItemSpacer.ios.types.js';
 
-export type StackHeaderItemSpacerPlacement = Extract<
-  StackHeaderItemPlacement,
-  'leading' | 'trailing'
->;
-
-export type StackHeaderItemSpacerProps = {
-  placement: StackHeaderItemSpacerPlacement;
-  sizing?: 'fixed' | 'flexible' | undefined;
-  width?: number | undefined;
-};
-
-export const StackHeaderItemSpacerIOSNativeComponent = (
-  props: StackHeaderItemSpacerProps,
-) => {
+export const StackHeaderItemSpacer = (props: StackHeaderItemSpacerProps) => {
   return (
     <ls-stack-header-item-spacer-ios
       style={{

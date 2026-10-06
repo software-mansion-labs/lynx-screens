@@ -2,6 +2,8 @@ import { StackHost } from './host';
 import { StackScreen } from './screen';
 import { StackHeaderConfig } from './header';
 
+export type { StackHostProps } from './host';
+
 export type {
   OnDismissEventPayload,
   EmptyEventPayload, // TODO: Remove this from public types (we need one shared type for this)
@@ -30,11 +32,6 @@ export type {
   StackHeaderToolbarMenuElementUpdateAndroid,
   StackHeaderToolbarMenuItemShowAsActionAndroid,
   StackHeaderToolbarMenuItemTypeAndroid,
-  PlatformIconShared,
-  PlatformIconAndroid,
-  PlatformIconIOS,
-  PlatformIconIOSSfSymbol,
-  PlatformIconIOSXcasset,
   // iOS
   StackHeaderConfigPropsIOS,
   StackHeaderInlineItemIOS,
