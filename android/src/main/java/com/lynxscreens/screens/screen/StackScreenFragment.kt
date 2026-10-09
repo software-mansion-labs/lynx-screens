@@ -54,7 +54,8 @@ internal class StackScreenFragment @Keep constructor() :
         allowEnterTransitionOverlap = true
         allowReturnTransitionOverlap = true
 
-        enterTransition = Slide(Gravity.RIGHT)
+        // The root screen appears immediately when the stack is first mounted.
+        enterTransition = if (canNavigateBack) Slide(Gravity.RIGHT) else null
         exitTransition = Slide(Gravity.LEFT)
         returnTransition = Slide(Gravity.RIGHT)
         reenterTransition = Slide(Gravity.LEFT)
