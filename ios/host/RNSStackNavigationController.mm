@@ -1,10 +1,14 @@
 #import "RNSStackNavigationController.h"
 #import <Lynx/LynxLog.h>
 #import "RNSContainer.h"
+#import "RNSDefines.h"
 #import "RNSParentContainerItemRegistry.h"
 #import "RNSStackOperation.h"
 #import "RNSStackScreenController.h"
 #import "RNSViewFrameChangeDelegate.h"
+
+@interface RNSStackNavigationController () <UIGestureRecognizerDelegate>
+@end
 
 @implementation RNSStackNavigationController {
     NSMutableArray<RNSPushOperation *> *_Nonnull _pendingPushOperations;
@@ -27,6 +31,30 @@
     _pendingPushOperations = [NSMutableArray array];
     _pendingPopOperations = [NSMutableArray array];
     _parentContainerRegistry = [RNSParentContainerItemRegistry new];
+}
+
+- (void)viewDidLoad
+{
+    [super viewDidLoad];
+
+    self.interactivePopGestureRecognizer.delegate = self;
+#if RNS_IPHONE_OS_VERSION_AVAILABLE(26_0)
+    if (@available(iOS 26.0, *)) {
+        self.interactiveContentPopGestureRecognizer.delegate = self;
+    }
+#endif
+}
+
+- (BOOL)gestureRecognizerShouldBegin:(UIGestureRecognizer *)gestureRecognizer
+{
+    // Keep root screens and in-flight transitions protected when taking over
+    // UIKit's pop gesture delegates.
+    if (self.viewControllers.count < 2 || self.transitionCoordinator != nil) {
+        return NO;
+    }
+    UIViewController *topController = self.topViewController;
+    return [topController isKindOfClass:RNSStackScreenController.class] &&
+        ((RNSStackScreenController *)topController).screenComponent.gestureEnabled;
 }
 
 #pragma mark - RNSContainer
