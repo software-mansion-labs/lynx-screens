@@ -194,15 +194,14 @@
 
 - (BOOL)presentationControllerShouldDismiss:(UIPresentationController *)presentationController
 {
-  if (_behaviorProvider.preventNativeDismiss) {
-    return NO;
-  }
-  return YES;
+  return _behaviorProvider.gestureEnabled && !_behaviorProvider.preventNativeDismiss;
 }
 
 - (void)presentationControllerDidAttemptToDismiss:(UIPresentationController *)presentationController
 {
-  [self.delegate sheetControllerDidPreventNativeDismiss:self];
+  if (_behaviorProvider.gestureEnabled && _behaviorProvider.preventNativeDismiss) {
+    [self.delegate sheetControllerDidPreventNativeDismiss:self];
+  }
 }
 
 - (void)presentationControllerDidDismiss:(UIPresentationController *)presentationController
@@ -247,6 +246,17 @@
   if (gesture.state == UIGestureRecognizerStateRecognized) {
     if (_behaviorProvider.preventNativeDismiss) {
       [self.delegate sheetControllerDidPreventNativeDismiss:self];
+    } else if (!_behaviorProvider.gestureEnabled && self.presentingViewController != nil &&
+               !self.isBeingPresented && !self.isBeingDismissed) {
+      // modalInPresentation blocks UIKit's backdrop dismissal too. Preserve
+      // backdrop behavior and report it as a native dismissal exactly once.
+      __weak auto weakSelf = self;
+      [self dismissViewControllerAnimated:YES completion:^{
+        auto strongSelf = weakSelf;
+        if (strongSelf && [strongSelf->_presentationManager handleNativeDismiss]) {
+          [strongSelf.delegate sheetControllerDidNativeDismiss:strongSelf];
+        }
+      }];
     }
   }
 }
@@ -256,9 +266,8 @@
 - (BOOL)gestureRecognizer:(UIGestureRecognizer *)gestureRecognizer shouldReceiveTouch:(UITouch *)touch
 {
   if (gestureRecognizer == _backdropTapGestureRecognizer) {
-    // When native dismissal is not being prevented, this recognizer should not
-    // participate in handling touches to avoid interfering with UIKit.
-    if (!_behaviorProvider.preventNativeDismiss) {
+    // UIKit handles backdrop taps when both dismissal gates are open.
+    if (_behaviorProvider.gestureEnabled && !_behaviorProvider.preventNativeDismiss) {
       return NO;
     }
 

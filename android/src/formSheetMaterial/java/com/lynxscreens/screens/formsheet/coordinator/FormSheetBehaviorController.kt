@@ -72,6 +72,8 @@ internal class FormSheetBehaviorController(
                         contentHeightForFitToContents,
                         nativeContainerPaddingBottom,
                     )
+                // A single detent has no smaller collapsed stop when hiding is disabled.
+                peekHeight = maxHeight
                 state = BottomSheetBehavior.STATE_EXPANDED
             }
             return
@@ -83,6 +85,7 @@ internal class FormSheetBehaviorController(
                     skipCollapsed = true
                     isFitToContents = true
                     maxHeight = detents.maxAllowedHeight(sheetAvailableSpace)
+                    peekHeight = maxHeight
                     state = BottomSheetBehavior.STATE_EXPANDED
                 }
             2 ->

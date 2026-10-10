@@ -32,6 +32,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (NSInteger)initialDetentIndex;
 - (BOOL)prefersScrollingExpandsWhenScrolledToEdge;
 - (BOOL)preventNativeDismiss;
+- (BOOL)gestureEnabled;
 - (CGFloat)reactContentsHeight;
 
 @end

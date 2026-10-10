@@ -60,6 +60,7 @@ internal class FormSheetPresentation(
     internal fun onContentHeightChanged(height: Int) = dimensionsCoordinator.onContentHeightChanged(height)
 
     internal fun applyInitialConfig(config: FormSheetConfig, contentHeight: Int) {
+        sheetBehavior?.isHideable = config.gestureEnabled
         onContentHeightChanged(contentHeight)
         dimensionsCoordinator.updateFormSheetDimensions(
             resolveDetents(config.detents),
@@ -73,6 +74,9 @@ internal class FormSheetPresentation(
     }
 
     internal fun applyConfigUpdate(oldConfig: FormSheetConfig, newConfig: FormSheetConfig) {
+        if (oldConfig.gestureEnabled != newConfig.gestureEnabled) {
+            sheetBehavior?.isHideable = newConfig.gestureEnabled
+        }
         if (oldConfig.detents != newConfig.detents) {
             dimensionsCoordinator.updateFormSheetDimensions(
                 resolveDetents(newConfig.detents),

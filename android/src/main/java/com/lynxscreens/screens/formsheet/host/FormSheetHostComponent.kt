@@ -25,6 +25,7 @@ internal class FormSheetHostComponent(context: LynxContext) : UIGroup<FormSheetH
     private lateinit var controller: FormSheetController
 
     private var isOpen = false
+    private var gestureEnabled = true
     private var detents: List<Double> = emptyList()
     private var prefersGrabberVisible = false
     private var preferredCornerRadius = FormSheetConfig.SYSTEM_DEFAULT_CORNER_RADIUS
@@ -91,6 +92,7 @@ internal class FormSheetHostComponent(context: LynxContext) : UIGroup<FormSheetH
         controller.apply(
             FormSheetConfig(
                 isOpen = isOpen,
+                gestureEnabled = gestureEnabled,
                 detents = detents,
                 prefersGrabberVisible = prefersGrabberVisible,
                 initialDetentIndex = initialDetentIndex,
@@ -109,6 +111,11 @@ internal class FormSheetHostComponent(context: LynxContext) : UIGroup<FormSheetH
     @LynxProp(name = "isOpen")
     fun setIsOpen(value: Boolean?) {
         isOpen = value == true
+    }
+
+    @LynxProp(name = "gestureEnabled", defaultBoolean = true)
+    fun setGestureEnabled(value: Boolean) {
+        gestureEnabled = value
     }
 
     @LynxProp(name = "detents")

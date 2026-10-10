@@ -42,6 +42,8 @@
 
   // Behavior data
 
+  controller.modalInPresentation = !behaviorProvider.gestureEnabled;
+
   NSArray<UISheetPresentationControllerDetent *> *nativeDetents =
       [RNSFormSheetDetentResolver buildSheetDetentsWithBehaviorProvider:behaviorProvider];
 
