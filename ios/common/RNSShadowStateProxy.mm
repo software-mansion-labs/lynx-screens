@@ -34,7 +34,7 @@
         return;
     }
 
-    // findShadowNodeAndRunTask hops to the Lynx layout thread and resolves the
+    // Adaptation: findShadowNodeAndRunTask hops to the Lynx layout thread and resolves the
     // shadow node by sign - the counterpart of RNS's state->updateState().
     [ui.context findShadowNodeAndRunTask:ui.sign
                                     task:^(LynxShadowNode *node) {

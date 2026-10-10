@@ -5,6 +5,8 @@ import android.widget.FrameLayout
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.lynxscreens.screens.formsheet.model.FormSheetDetents
 
+// Divergence from RNS: this port configures detents inline, without the upstream
+// keyboardLift input or inset-adjusted fractional peek-height calculations.
 internal class FormSheetBehaviorController(
     sheetView: FrameLayout,
     private val onDetentChanged: ((index: Int) -> Unit)? = null,
@@ -72,7 +74,8 @@ internal class FormSheetBehaviorController(
                         contentHeightForFitToContents,
                         nativeContainerPaddingBottom,
                     )
-                // A single detent has no smaller collapsed stop when hiding is disabled.
+                // Divergence from RNS: a single detent has no smaller collapsed stop
+                // when hiding is disabled; skipCollapsed alone only governs hiding.
                 peekHeight = maxHeight
                 state = BottomSheetBehavior.STATE_EXPANDED
             }
@@ -85,6 +88,7 @@ internal class FormSheetBehaviorController(
                     skipCollapsed = true
                     isFitToContents = true
                     maxHeight = detents.maxAllowedHeight(sheetAvailableSpace)
+                    // Divergence from RNS: keep the collapsed stop at the sole detent.
                     peekHeight = maxHeight
                     state = BottomSheetBehavior.STATE_EXPANDED
                 }

@@ -85,6 +85,7 @@ declare module "@lynx-js/types" {
       id?: string | undefined;
       style?: string | Lynx.CSSProperties | undefined;
       isOpen?: boolean | undefined;
+      // Divergence from RNS: bridge the additional drag-dismissal option to native.
       gestureEnabled?: boolean | undefined;
       detents?: number[] | undefined;
       prefersGrabberVisible?: boolean | undefined;

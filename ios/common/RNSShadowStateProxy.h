@@ -6,7 +6,8 @@
 NS_ASSUME_NONNULL_BEGIN
 
 /**
- * Counterpart of RNS RNSStackHeader*ShadowStateProxy (and of the Android
+ * Adaptation: shared replacement for RNS RNSStackHeader*ShadowStateProxy and
+ * RNSFormSheetHostShadowStateProxy (and for the Android
  * `ShadowStateProxy`): tracks native frame changes and forwards them to the
  * owning element's shadow node, which conforms to RNSShadowStateUpdating.
  *

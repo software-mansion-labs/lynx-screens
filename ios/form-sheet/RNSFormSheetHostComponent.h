@@ -27,6 +27,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, readonly) NSInteger initialDetentIndex;
 @property (nonatomic, readonly) BOOL prefersScrollingExpandsWhenScrolledToEdge;
 @property (nonatomic, readonly) BOOL preventNativeDismiss;
+// Divergence from RNS: expose a drag-only dismissal gate independently of prevention.
 @property (nonatomic, readonly) BOOL gestureEnabled;
 @property (nonatomic, readonly, nullable) UIColor *nativeContainerBackgroundColor;
 

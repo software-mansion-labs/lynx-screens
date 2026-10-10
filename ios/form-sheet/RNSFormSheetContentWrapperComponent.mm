@@ -2,6 +2,8 @@
 
 #import <Lynx/LynxComponentRegistry.h>
 
+// Adaptation: Lynx registers a component by tag and creates its backing view
+// through createView, replacing Fabric's descriptor and component-view factory.
 @LynxElement("ls-form-sheet-content-wrapper")
 @implementation RNSFormSheetContentWrapperComponent {
   CGFloat _lastReportedHeight;

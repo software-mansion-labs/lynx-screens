@@ -42,6 +42,8 @@
 
   // Behavior data
 
+  // Divergence from RNS: disable interactive dismissal without disabling detent
+  // changes. The content controller handles backdrop taps separately.
   controller.modalInPresentation = !behaviorProvider.gestureEnabled;
 
   NSArray<UISheetPresentationControllerDetent *> *nativeDetents =

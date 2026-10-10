@@ -17,6 +17,8 @@ import com.lynxscreens.screens.formsheet.interfaces.FormSheetContentSizeChangeDe
 import com.lynxscreens.screens.formsheet.interfaces.FormSheetController
 import com.lynxscreens.screens.formsheet.model.FormSheetConfig
 
+// Adaptation: Lynx UIGroup combines RNS's Host and ViewManager responsibilities;
+// prop setters collect configuration for onPropsUpdated instead of Fabric props/state.
 @LynxElement(name = "ls-form-sheet")
 internal class FormSheetHostComponent(context: LynxContext) : UIGroup<FormSheetHostView>(context) {
     private val eventEmitter by lazy { FormSheetHostEventEmitter(lynxContext, sign) }
@@ -115,6 +117,7 @@ internal class FormSheetHostComponent(context: LynxContext) : UIGroup<FormSheetH
 
     @LynxProp(name = "gestureEnabled", defaultBoolean = true)
     fun setGestureEnabled(value: Boolean) {
+        // Divergence from RNS: expose the drag-only gate, including its removal default.
         gestureEnabled = value
     }
 

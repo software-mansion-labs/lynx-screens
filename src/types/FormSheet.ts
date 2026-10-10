@@ -10,6 +10,7 @@ export type FormSheetProps = {
   children?: Lynx.ViewProps['children'] | undefined;
   isOpen: boolean;
   /**
+   * Divergence from RNS: expose a drag-only gate alongside native dismissal prevention.
    * Allows dragging down to dismiss. Defaults to true.
    * When false, detent changes remain enabled and drag attempts do not emit
    * onNativeDismissPrevented. Backdrop taps and programmatic closes are unaffected.

@@ -1,5 +1,6 @@
 package com.lynxscreens.screens.formsheet.model
 
+// Adaptation: public so host-provided controller backends can consume the same config.
 public data class FormSheetConfig(
     val isOpen: Boolean = false,
     val detents: List<Double> = emptyList(),
@@ -8,6 +9,7 @@ public data class FormSheetConfig(
     val preferredCornerRadius: Float = SYSTEM_DEFAULT_CORNER_RADIUS,
     val preventNativeDismiss: Boolean = false,
     val nativeContainerBackgroundColor: Int? = null,
+    // Divergence from RNS: a drag-only gate, independent of native dismissal prevention.
     val gestureEnabled: Boolean = true,
 ) {
     val shouldPreventNativeDismiss: Boolean

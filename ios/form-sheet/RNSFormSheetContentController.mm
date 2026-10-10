@@ -194,11 +194,14 @@
 
 - (BOOL)presentationControllerShouldDismiss:(UIPresentationController *)presentationController
 {
+  // Divergence from RNS: drag permission is a separate gate from JS prevention.
   return _behaviorProvider.gestureEnabled && !_behaviorProvider.preventNativeDismiss;
 }
 
 - (void)presentationControllerDidAttemptToDismiss:(UIPresentationController *)presentationController
 {
+  // Divergence from RNS: a disabled drag is silent; only prevention requests
+  // reach JS. Backdrop prevention is emitted by handleBackdropTap:.
   if (_behaviorProvider.gestureEnabled && _behaviorProvider.preventNativeDismiss) {
     [self.delegate sheetControllerDidPreventNativeDismiss:self];
   }
@@ -248,7 +251,7 @@
       [self.delegate sheetControllerDidPreventNativeDismiss:self];
     } else if (!_behaviorProvider.gestureEnabled && self.presentingViewController != nil &&
                !self.isBeingPresented && !self.isBeingDismissed) {
-      // modalInPresentation blocks UIKit's backdrop dismissal too. Preserve
+      // Divergence from RNS: modalInPresentation blocks UIKit's backdrop dismissal too. Preserve
       // backdrop behavior and report it as a native dismissal exactly once.
       __weak auto weakSelf = self;
       [self dismissViewControllerAnimated:YES completion:^{
@@ -266,7 +269,8 @@
 - (BOOL)gestureRecognizer:(UIGestureRecognizer *)gestureRecognizer shouldReceiveTouch:(UITouch *)touch
 {
   if (gestureRecognizer == _backdropTapGestureRecognizer) {
-    // UIKit handles backdrop taps when both dismissal gates are open.
+    // Divergence from RNS: also observe backdrop taps when drag dismissal is
+    // disabled, so modalInPresentation does not change their close behavior.
     if (_behaviorProvider.gestureEnabled && !_behaviorProvider.preventNativeDismiss) {
       return NO;
     }

@@ -32,6 +32,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (NSInteger)initialDetentIndex;
 - (BOOL)prefersScrollingExpandsWhenScrolledToEdge;
 - (BOOL)preventNativeDismiss;
+// Divergence from RNS: the behavior provider also supplies the drag-dismissal gate.
 - (BOOL)gestureEnabled;
 - (CGFloat)reactContentsHeight;
 

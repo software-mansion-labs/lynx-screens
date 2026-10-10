@@ -1,6 +1,8 @@
 #import "RNSFormSheetHostEventEmitter.h"
 #import <Lynx/LynxLog.h>
 
+// Adaptation: each Fabric event becomes a LynxDetailEvent addressed by sign;
+// payload fields stay equivalent, and Lynx logging replaces RCTLog diagnostics.
 @implementation RNSFormSheetHostEventEmitter {
   // Adaptation: Lynx owns the emitter; native events target the component sign.
   __weak LynxEventEmitter *_lynxEventEmitter;

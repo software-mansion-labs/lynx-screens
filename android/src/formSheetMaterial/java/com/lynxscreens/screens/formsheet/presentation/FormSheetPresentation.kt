@@ -14,6 +14,8 @@ import com.lynxscreens.screens.formsheet.core.FormSheetDialog
 import com.lynxscreens.screens.formsheet.model.FormSheetConfig
 import com.lynxscreens.screens.formsheet.model.FormSheetDetents
 
+// Divergence from RNS: the upstream keyboard coordinator and keyboard-tracking
+// lifecycle are not integrated in this port's presentation pipeline.
 internal class FormSheetPresentation(
     themedContext: Context,
     private val container: FormSheetContainer,
@@ -60,6 +62,8 @@ internal class FormSheetPresentation(
     internal fun onContentHeightChanged(height: Int) = dimensionsCoordinator.onContentHeightChanged(height)
 
     internal fun applyInitialConfig(config: FormSheetConfig, contentHeight: Int) {
+        // Divergence from RNS: gate hiding, not dragging, so detent changes remain
+        // available and dialog cancel/backdrop handling keeps its existing policy.
         sheetBehavior?.isHideable = config.gestureEnabled
         onContentHeightChanged(contentHeight)
         dimensionsCoordinator.updateFormSheetDimensions(
@@ -75,6 +79,7 @@ internal class FormSheetPresentation(
 
     internal fun applyConfigUpdate(oldConfig: FormSheetConfig, newConfig: FormSheetConfig) {
         if (oldConfig.gestureEnabled != newConfig.gestureEnabled) {
+            // Divergence from RNS: apply the drag-dismissal gate to an already open sheet.
             sheetBehavior?.isHideable = newConfig.gestureEnabled
         }
         if (oldConfig.detents != newConfig.detents) {
