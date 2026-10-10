@@ -73,8 +73,10 @@ export default function App() {
     useState<BackgroundColorOption>('white');
   const [prefersGrabberVisible, setPrefersGrabberVisible] = useState(true);
   const [preventNativeDismiss, setPreventNativeDismiss] = useState(false);
+  const [gestureEnabled, setGestureEnabled] = useState(true);
   const [prefersScrollingExpands, setPrefersScrollingExpands] = useState(true);
   const [lastEvent, setLastEvent] = useState('none');
+  const [preventedCount, setPreventedCount] = useState(0);
   const [currentDetentIndex, setCurrentDetentIndex] = useState(0);
 
   const resolvedBackgroundColor = resolveBackgroundColor(backgroundColor);
@@ -131,12 +133,21 @@ export default function App() {
               onValueChange={setPreventNativeDismiss}
             />
             <SettingsSwitch
+              label="gestureEnabled"
+              value={gestureEnabled}
+              onValueChange={setGestureEnabled}
+            />
+            <SettingsSwitch
               label="prefersScrollingExpandsWhenScrolledToEdge (iOS)"
               value={prefersScrollingExpands}
               onValueChange={setPrefersScrollingExpands}
             />
 
             <Heading label="Result" />
+            <text style={{ color: 'black' }}>
+              Drag dismissal: {gestureEnabled ? 'enabled' : 'disabled'}
+            </text>
+            <text style={{ color: 'black' }}>Prevention events: {preventedCount}</text>
             <text style={{ color: 'black' }}>Last event: {lastEvent}</text>
             <text style={{ color: 'black' }}>
               Current detent index: {currentDetentIndex}
@@ -164,6 +175,7 @@ export default function App() {
         }
         prefersGrabberVisible={prefersGrabberVisible}
         preventNativeDismiss={preventNativeDismiss}
+        gestureEnabled={gestureEnabled}
         prefersScrollingExpandsWhenScrolledToEdge={prefersScrollingExpands}
         nativeContainerStyle={{ backgroundColor: resolvedBackgroundColor }}
         onWillAppear={() => setLastEvent('will appear')}
@@ -172,9 +184,10 @@ export default function App() {
         onDidDisappear={() => setLastEvent('did disappear')}
         onDismiss={() => close('dismissed from JS')}
         onNativeDismiss={() => close('dismissed natively')}
-        onNativeDismissPrevented={() =>
-          setLastEvent('native dismiss prevented')
-        }
+        onNativeDismissPrevented={() => {
+          setPreventedCount((count) => count + 1);
+          setLastEvent('native dismiss prevented');
+        }}
         onDetentChanged={(index) => {
           setCurrentDetentIndex(index);
           setLastEvent(`detent changed to ${index}`);
@@ -196,11 +209,26 @@ export default function App() {
           </text>
           <text style={{ color: 'black' }}>detents: {detents}</text>
           <text style={{ color: 'black' }}>
+            Drag dismissal: {gestureEnabled ? 'enabled' : 'disabled'}
+          </text>
+          <text style={{ color: 'black' }}>Sheet detent: {currentDetentIndex}</text>
+          <text style={{ color: 'black' }}>Prevention events: {preventedCount}</text>
+          <text style={{ color: 'black' }}>
             native dismiss: {preventNativeDismiss ? 'prevented' : 'allowed'}
           </text>
           <SettingsButton
             label="Dismiss from JS"
             onTap={() => close('dismiss requested from JS')}
+          />
+          <SettingsSwitch
+            label="gestureEnabled"
+            value={gestureEnabled}
+            onValueChange={setGestureEnabled}
+          />
+          <SettingsSwitch
+            label="preventNativeDismiss"
+            value={preventNativeDismiss}
+            onValueChange={setPreventNativeDismiss}
           />
         </view>
       </FormSheetNativeComponent>

@@ -8,6 +8,8 @@ public data class FormSheetConfig(
     val preferredCornerRadius: Float = SYSTEM_DEFAULT_CORNER_RADIUS,
     val preventNativeDismiss: Boolean = false,
     val nativeContainerBackgroundColor: Int? = null,
+    // Divergence from RNS: a drag-only gate, independent of native dismissal prevention.
+    val gestureEnabled: Boolean = true,
 ) {
     val shouldPreventNativeDismiss: Boolean
         get() = preventNativeDismiss && isOpen

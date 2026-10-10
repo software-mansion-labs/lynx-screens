@@ -60,6 +60,9 @@ internal class FormSheetPresentation(
     internal fun onContentHeightChanged(height: Int) = dimensionsCoordinator.onContentHeightChanged(height)
 
     internal fun applyInitialConfig(config: FormSheetConfig, contentHeight: Int) {
+        // Divergence from RNS: gate hiding, not dragging, so detent changes remain
+        // available and dialog cancel/backdrop handling keeps its existing policy.
+        sheetBehavior?.isHideable = config.gestureEnabled
         onContentHeightChanged(contentHeight)
         dimensionsCoordinator.updateFormSheetDimensions(
             resolveDetents(config.detents),
@@ -73,6 +76,10 @@ internal class FormSheetPresentation(
     }
 
     internal fun applyConfigUpdate(oldConfig: FormSheetConfig, newConfig: FormSheetConfig) {
+        if (oldConfig.gestureEnabled != newConfig.gestureEnabled) {
+            // Divergence from RNS: apply the drag-dismissal gate to an already open sheet.
+            sheetBehavior?.isHideable = newConfig.gestureEnabled
+        }
         if (oldConfig.detents != newConfig.detents) {
             dimensionsCoordinator.updateFormSheetDimensions(
                 resolveDetents(newConfig.detents),

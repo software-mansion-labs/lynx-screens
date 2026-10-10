@@ -76,6 +76,7 @@
   NSInteger _initialDetentIndex;
   BOOL _prefersScrollingExpandsWhenScrolledToEdge;
   BOOL _preventNativeDismiss;
+  BOOL _gestureEnabled;
   UIColor *_Nullable _nativeContainerBackgroundColor;
 
   CGFloat _reactContentsHeight;
@@ -110,6 +111,8 @@
   _initialDetentIndex = 0;
   _prefersScrollingExpandsWhenScrolledToEdge = YES;
   _preventNativeDismiss = NO;
+  // Divergence from RNS: dragging may dismiss by default; disabling it is opt-in.
+  _gestureEnabled = YES;
   _nativeContainerBackgroundColor = nil;
 
   _reactContentsHeight = 0.0;
@@ -329,6 +332,16 @@ LYNX_PROP_SETTER("preventNativeDismiss", setPreventNativeDismiss, BOOL) {
   BOOL nextValue = requestReset ? NO : value;
   if (_preventNativeDismiss != nextValue) {
     _preventNativeDismiss = nextValue;
+    [_controller setNeedsBehaviorUpdate];
+  }
+}
+
+LYNX_PROP_SETTER("gestureEnabled", setGestureEnabled, BOOL) {
+  // Divergence from RNS: this additional behavior prop resets to YES when
+  // removed and participates in the same batched configuration updates.
+  BOOL nextValue = requestReset ? YES : value;
+  if (_gestureEnabled != nextValue) {
+    _gestureEnabled = nextValue;
     [_controller setNeedsBehaviorUpdate];
   }
 }
