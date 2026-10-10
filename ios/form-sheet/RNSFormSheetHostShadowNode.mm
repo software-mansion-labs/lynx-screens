@@ -12,7 +12,6 @@
   CGFloat _frameHeight;
 }
 
-// Adaptation: register the custom-measure node by Lynx tag instead of a Fabric descriptor.
 #if LYNX_LAZY_LOAD
 LYNX_LAZY_REGISTER_SHADOW_NODE("ls-form-sheet")
 #else
@@ -50,8 +49,6 @@ LYNX_REGISTER_SHADOW_NODE("ls-form-sheet")
   CGFloat height = _frameHeight > 0 ? _frameHeight : (std::isfinite(param.height) ? param.height : 0);
   BOOL fitsToContents = [self.children.firstObject.tagName isEqualToString:@"ls-form-sheet-content-wrapper"];
 
-  // Adaptation: let the wrapper measure intrinsic height for fitToContents;
-  // fixed-detent children receive the dimensions resolved by UIKit.
   MeasureParam *childParam = [[MeasureParam alloc] initWithWidth:width
                                                        WidthMode:LynxMeasureModeDefinite
                                                           Height:height
@@ -69,7 +66,6 @@ LYNX_REGISTER_SHADOW_NODE("ls-form-sheet")
 
 - (void)customAlignLayoutNode:(AlignParam *)param alignContext:(AlignContext *)context
 {
-  // Adaptation: align the teleported children in sheet-local coordinates.
   for (LynxShadowNode *child in self.children) {
     AlignParam *childParam = [AlignParam new];
     [childParam SetAlignOffsetWithLeft:0 Top:0];

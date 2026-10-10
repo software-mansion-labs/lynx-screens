@@ -5,8 +5,6 @@ import android.widget.FrameLayout
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.lynxscreens.screens.formsheet.model.FormSheetDetents
 
-// Divergence from RNS: this port configures detents inline, without the upstream
-// keyboardLift input or inset-adjusted fractional peek-height calculations.
 internal class FormSheetBehaviorController(
     sheetView: FrameLayout,
     private val onDetentChanged: ((index: Int) -> Unit)? = null,

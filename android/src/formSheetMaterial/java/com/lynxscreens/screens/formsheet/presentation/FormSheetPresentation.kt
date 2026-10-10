@@ -14,8 +14,6 @@ import com.lynxscreens.screens.formsheet.core.FormSheetDialog
 import com.lynxscreens.screens.formsheet.model.FormSheetConfig
 import com.lynxscreens.screens.formsheet.model.FormSheetDetents
 
-// Divergence from RNS: the upstream keyboard coordinator and keyboard-tracking
-// lifecycle are not integrated in this port's presentation pipeline.
 internal class FormSheetPresentation(
     themedContext: Context,
     private val container: FormSheetContainer,

@@ -48,15 +48,13 @@
 
 - (nullable UIView *)hitTest:(CGPoint)point withEvent:(nullable UIEvent *)event
 {
-  // Adaptation: the actual Lynx children are "teleported" into the separate sheet hierarchy.
+  // The actual Lynx children are "teleported" into the separate sheet hierarchy.
   // Returning nil keeps this host from intercepting touches meant for the underlying screen.
   return nil;
 }
 
 @end
 
-// Adaptation: Lynx owns tag registration and backing-view creation rather than
-// Fabric's component descriptor, component-view factory and recycling hooks.
 @LynxElement("ls-form-sheet")
 @implementation RNSFormSheetHostComponent {
   RNSFormSheetHostEventEmitter *_Nonnull _lynxEventEmitter;
@@ -105,7 +103,6 @@
 
 - (void)resetProps
 {
-  // Adaptation: native defaults replace Fabric's generated default Props object.
   _isOpen = NO;
   _detents = {};
   _prefersGrabberVisible = NO;
@@ -160,7 +157,6 @@
 
 - (nullable UIWindow *)hostWindow
 {
-  // Adaptation: LynxUI is not a UIView; the backing view owns the window.
   return self.view.window;
 }
 
@@ -245,8 +241,6 @@
 
 - (void)sheetControllerDidDisappear:(RNSFormSheetContentController *)controller
 {
-  // Adaptation: deactivate the fragment event root and release its shared
-  // gesture-arena slot while the sheet is outside the visible modal hierarchy.
   [self updatePlatformEventRootActiveForFragmentLayer:NO];
   if (_sheetEventHandlerIndex >= 0) {
     [_sheetEventHandler removeGestureArenaManager:_sheetEventHandlerIndex];
@@ -442,8 +436,6 @@ LYNX_PROP_SETTER("initialDetentIndex", setInitialDetentIndex, NSInteger) {
     _controller.contentView.lynxRootUI = self;
   }
   if (_sheetEventHandlerIndex < 0) {
-    // Adaptation: the secondary handler joins the page's gesture arena once
-    // per visible presentation; sheetControllerDidDisappear: releases the slot.
     _sheetEventHandlerIndex = [_sheetEventHandler
         setGestureArenaManagerAndGetIndex:self.context.eventHandler.gestureArenaManager];
   }
@@ -451,8 +443,6 @@ LYNX_PROP_SETTER("initialDetentIndex", setInitialDetentIndex, NSInteger) {
 
 - (void)updatePlatformEventRootActiveForFragmentLayer:(BOOL)active
 {
-  // Adaptation: mirror UIKit visibility and the sheet's root-relative offset
-  // into Lynx's Fragment Layer renderer, which does not use RCTSurfaceTouchHandler.
   LynxUIContext *uiContext = self.context.uiOwner.uiContext;
   if (!uiContext.lynxContext.isFragmentLayerRenderOn) {
     return;

@@ -30,8 +30,6 @@
 
   LynxUI *rootUI = self.lynxRootUI;
   if (rootUI.context.lynxContext.isFragmentLayerRenderOn) {
-    // Adaptation: Fragment Layer hit-testing is owned by LynxTemplateRender;
-    // use its event-through decision for the teleported sheet event root.
     UIView *rootView = rootUI.context.rootView;
     if (![rootView isKindOfClass:LynxView.class]) {
       return view;

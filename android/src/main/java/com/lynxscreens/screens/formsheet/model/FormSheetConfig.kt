@@ -1,6 +1,5 @@
 package com.lynxscreens.screens.formsheet.model
 
-// Adaptation: public so host-provided controller backends can consume the same config.
 public data class FormSheetConfig(
     val isOpen: Boolean = false,
     val detents: List<Double> = emptyList(),
