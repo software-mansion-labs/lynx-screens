@@ -26,6 +26,7 @@ typedef NS_ENUM(NSInteger, RNSScreenLifecycleEvent) {
 @property (nonatomic, weak, readwrite, nullable) RNSStackHostComponent *stackHost;
 @property (nonatomic, strong, readonly, nonnull) RNSStackScreenController *controller;
 @property (nonatomic) BOOL isNativelyDismissed;
+@property (nonatomic) BOOL gestureEnabled;
 
 - (void)registerDescendantScrollView:(nonnull UIScrollView *)scrollView
                           fromMarker:(nonnull RNSScrollViewMarkerComponent *)marker;
