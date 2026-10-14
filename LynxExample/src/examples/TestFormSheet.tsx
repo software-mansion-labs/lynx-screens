@@ -175,9 +175,9 @@ export default function App() {
         onNativeDismissPrevented={() =>
           setLastEvent('native dismiss prevented')
         }
-        onDetentChanged={(index) => {
-          setCurrentDetentIndex(index);
-          setLastEvent(`detent changed to ${index}`);
+        onDetentChanged={(e) => {
+          setCurrentDetentIndex(e.detail.index);
+          setLastEvent(`detent changed to ${e.detail.index}`);
         }}
       >
         <view

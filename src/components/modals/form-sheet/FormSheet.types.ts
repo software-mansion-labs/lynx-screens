@@ -1,5 +1,14 @@
 import type * as Lynx from '@lynx-js/types';
 
+export type EmptyEventPayload = Record<string, never>;
+
+// Lynx custom events are `BaseEventOrig<T>`, so the payload lives on `event.detail`.
+export type FormSheetEventHandler<T> = Lynx.EventHandler<Lynx.BaseEventOrig<T>>;
+
+export interface FormSheetDetentChangedEvent {
+  index: number;
+}
+
 export type FormSheetDetents = number[] | 'fitToContents';
 
 export type FormSheetNativeContainerStyleProps = {
@@ -17,22 +26,19 @@ export type FormSheetProps = {
   prefersScrollingExpandsWhenScrolledToEdge?: boolean | undefined;
   preventNativeDismiss?: boolean | undefined;
   nativeContainerStyle?: FormSheetNativeContainerStyleProps | undefined;
-  onWillAppear?:
-    | Lynx.EventHandler<Lynx.BaseEventOrig<Record<string, never>>>
+
+  // Events
+
+  onWillAppear?: FormSheetEventHandler<EmptyEventPayload> | undefined;
+  onDidAppear?: FormSheetEventHandler<EmptyEventPayload> | undefined;
+  onWillDisappear?: FormSheetEventHandler<EmptyEventPayload> | undefined;
+  onDidDisappear?: FormSheetEventHandler<EmptyEventPayload> | undefined;
+  onDismiss?: FormSheetEventHandler<EmptyEventPayload> | undefined;
+  onNativeDismiss?: FormSheetEventHandler<EmptyEventPayload> | undefined;
+  onDetentChanged?:
+    | FormSheetEventHandler<FormSheetDetentChangedEvent>
     | undefined;
-  onDidAppear?:
-    | Lynx.EventHandler<Lynx.BaseEventOrig<Record<string, never>>>
-    | undefined;
-  onWillDisappear?:
-    | Lynx.EventHandler<Lynx.BaseEventOrig<Record<string, never>>>
-    | undefined;
-  onDidDisappear?:
-    | Lynx.EventHandler<Lynx.BaseEventOrig<Record<string, never>>>
-    | undefined;
-  onDismiss?: (() => void) | undefined;
-  onNativeDismiss?: (() => void) | undefined;
   onNativeDismissPrevented?:
-    | Lynx.EventHandler<Lynx.BaseEventOrig<Record<string, never>>>
+    | FormSheetEventHandler<EmptyEventPayload>
     | undefined;
-  onDetentChanged?: ((index: number) => void) | undefined;
 };

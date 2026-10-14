@@ -1,5 +1,7 @@
 export type {
   FormSheetDetents,
+  FormSheetDetentChangedEvent,
+  FormSheetEventHandler,
   FormSheetProps,
   FormSheetNativeContainerStyleProps,
 } from './FormSheet.types';
