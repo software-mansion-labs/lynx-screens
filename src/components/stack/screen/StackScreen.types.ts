@@ -33,7 +33,7 @@ export type StackScreenProps = {
   /**
    * @summary Called when the screen has appeared.
    *
-   * Android: lands after the enter transition. 
+   * Android: lands after the enter transition.
    * iOS: called by UIKit once the transition completes.
    *
    * @platform android, ios
