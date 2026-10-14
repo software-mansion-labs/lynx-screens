@@ -134,12 +134,6 @@
   return view;
 }
 
-- (BOOL)hasCustomLayout
-{
-  // Adaptation: children are laid out against dimensions reported by UIKit.
-  return YES;
-}
-
 - (void)viewDidMoveToWindow
 {
   if (self.view.window != nil) {
@@ -391,16 +385,19 @@ LYNX_PROP_SETTER("initialDetentIndex", setInitialDetentIndex, NSInteger) {
   }
 
   // Adaptation: the shared Lynx proxy forwards dimensions to the custom shadow node.
-  [_shadowStateProxy updateShadowStateWithFrame:_controller.contentView.bounds];
+  [_shadowStateProxy updateShadowStateImmediatelyWithFrame:_controller.contentView.bounds];
 }
 
 #pragma mark - Touch Handling overrides
 
 - (BOOL)shouldHitTest:(CGPoint)point withEvent:(nullable UIEvent *)event
 {
-  // Adaptation: unlike UIKit, Lynx also hit-tests the logical tree. Exclude the
-  // teleported subtree until the sheet is presented so it cannot cover the host screen.
-  return _isOpen && _controller.contentView.window != nil;
+  // Counterpart of the upstream `hitTest:` override returning nil: the host must never
+  // intercept touches meant for the underlying screen (e.g. while an undimmed detent keeps
+  // it interactive). Lynx hit-tests the logical tree, so the exclusion goes through
+  // shouldHitTest. The sheet's own event handler enters through hitTest, so the teleported
+  // subtree stays reachable.
+  return NO;
 }
 
 #pragma mark - Touch Handling helpers

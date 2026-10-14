@@ -4,6 +4,7 @@
 #import <Lynx/LynxLog.h>
 #import <Lynx/LynxShadowNode.h>
 #import <Lynx/LynxUIContext.h>
+#import <Lynx/LynxView+Internal.h>
 
 @implementation RNSShadowStateProxy {
     LynxUI *__weak _ui;
@@ -51,6 +52,25 @@
                                                               frameHeight:frame.size.height];
                                     }];
     _previousFrame = frame;
+}
+
+- (void)updateShadowStateImmediatelyWithFrame:(CGRect)frame
+{
+    if (CGRectEqualToRect(frame, _previousFrame)) {
+        return;
+    }
+    LynxUI *ui = _ui;
+    if (ui == nil) {
+        return;
+    }
+    [self updateShadowStateWithFrame:frame];
+
+    // Same call LynxView makes from its own layoutSubviews: runs the layout
+    // block if a layout was requested, no-op otherwise.
+    UIView *rootView = ui.context.rootView;
+    if ([rootView isKindOfClass:LynxView.class]) {
+        [((LynxView *)rootView).templateRender triggerLayoutInTick];
+    }
 }
 
 - (void)invalidate
