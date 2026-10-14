@@ -2,7 +2,6 @@ import type * as Lynx from '@lynx-js/types';
 
 export type EmptyEventPayload = Record<string, never>;
 
-// Lynx custom events are `BaseEventOrig<T>`, so the payload lives on `event.detail`.
 export type FormSheetEventHandler<T> = Lynx.EventHandler<Lynx.BaseEventOrig<T>>;
 
 export interface FormSheetDetentChangedEvent {
