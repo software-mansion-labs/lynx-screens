@@ -1,5 +1,3 @@
-import React from 'react';
-import type * as Lynx from '@lynx-js/types';
 import type { FormSheetProps } from './FormSheet.types.js';
 import {
   resolveInitialDetentIndex,
@@ -8,10 +6,6 @@ import {
   resolveNativeDetents,
 } from './FormSheetUtils.js';
 
-type DetentChangedEventPayload = Readonly<{
-  index: number;
-}>;
-
 export const FormSheet = ({
   children,
   detents,
@@ -19,25 +13,19 @@ export const FormSheet = ({
   largestUndimmedDetentIndex,
   preferredCornerRadius,
   nativeContainerStyle,
+  // Events
   onWillAppear,
   onDidAppear,
   onWillDisappear,
   onDidDisappear,
   onDismiss,
   onNativeDismiss,
-  onNativeDismissPrevented,
   onDetentChanged,
+  onNativeDismissPrevented,
   ...rest
 }: FormSheetProps) => {
   const nativeDetents = resolveNativeDetents(detents);
   const detentsCount = nativeDetents?.length ?? 0;
-
-  const onDetentChangedEvent = React.useCallback(
-    (event: Lynx.BaseEventOrig<DetentChangedEventPayload>) => {
-      onDetentChanged?.(event.detail.index);
-    },
-    [onDetentChanged],
-  );
 
   return (
     <ls-form-sheet
@@ -59,8 +47,8 @@ export const FormSheet = ({
       bindOnDidDisappear={onDidDisappear}
       bindOnDismiss={onDismiss}
       bindOnNativeDismiss={onNativeDismiss}
+      bindOnDetentChanged={onDetentChanged}
       bindOnNativeDismissPrevented={onNativeDismissPrevented}
-      bindOnDetentChanged={onDetentChangedEvent}
       {...rest}
     >
       {detents === 'fitToContents' ? (
