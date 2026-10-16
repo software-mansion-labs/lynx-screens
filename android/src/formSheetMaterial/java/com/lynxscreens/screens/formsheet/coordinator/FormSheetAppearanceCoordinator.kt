@@ -71,6 +71,7 @@ internal class FormSheetAppearanceCoordinator(
             defaultShapeAppearanceModel?.let { background.shapeAppearanceModel = it }
             return
         }
+
         val radiusInPx = view.dpToPx(currentCornerRadius)
 
         val baseModel = defaultShapeAppearanceModel ?: background.shapeAppearanceModel

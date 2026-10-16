@@ -1,5 +1,6 @@
 package com.lynxscreens.screens.formsheet.model
 
+// Adaptation: configuration crosses the public pluggable-controller boundary.
 public data class FormSheetConfig(
     val isOpen: Boolean = false,
     val detents: List<Double> = emptyList(),

@@ -11,10 +11,12 @@ internal class FormSheetNativeDismissCoordinator(
 ) : FormSheetDialog.CancelRequestInterceptor {
     private val preventNativeDismissBackPressCallback =
         object : OnBackPressedCallback(false) {
-            override fun handleOnBackPressed() = handleCancelRequest()
+            override fun handleOnBackPressed() {
+                handleCancelRequest()
+            }
         }
 
-    internal var shouldPreventDismiss = false
+    internal var shouldPreventDismiss: Boolean = false
         set(value) {
             field = value
             preventNativeDismissBackPressCallback.isEnabled = value
@@ -34,8 +36,9 @@ internal class FormSheetNativeDismissCoordinator(
         if (shouldPreventDismiss) {
             onDismissPrevented()
             behaviorController?.restoreLastStableState()
-        } else {
-            onDismissAllowed()
+            return
         }
+
+        onDismissAllowed()
     }
 }
