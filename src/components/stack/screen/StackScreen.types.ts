@@ -32,5 +32,7 @@ export type StackScreenProps = {
   onNativeDismissPrevented?: StackScreenEventHandler | undefined;
 
   // Configuration
+  /** Whether iOS back gestures are enabled. Defaults to true. */
+  gestureEnabled?: boolean | undefined;
   preventNativeDismiss?: boolean | undefined;
 };

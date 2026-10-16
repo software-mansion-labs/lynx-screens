@@ -43,5 +43,6 @@ export interface NativeProps {
 
   // Configuration
 
+  gestureEnabled?: boolean | undefined;
   preventNativeDismiss?: boolean | undefined;
 }
