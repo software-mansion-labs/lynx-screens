@@ -188,6 +188,7 @@ export default function App() {
             paddingBottom: '28px',
             gap: '12px',
             backgroundColor: resolvedBackgroundColor,
+            height: detents === 'fitToContents' ? undefined : '100%',
           }}
         >
           <text style={{ color: 'black', fontSize: '24px', fontWeight: 'bold' }}>

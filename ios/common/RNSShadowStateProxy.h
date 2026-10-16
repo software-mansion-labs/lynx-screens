@@ -25,6 +25,14 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)updateShadowStateWithFrame:(CGRect)frame;
 
 /**
+ * Like updateShadowStateWithFrame:, but also runs the pending Lynx layout pass
+ * before returning, so the resulting frames of the element's subtree are
+ * applied inside the caller's UIKit layout pass. Counterpart of RNS's
+ * `EventQueue::UpdateMode::unstable_Immediate`, which the FormSheet proxy uses.
+ */
+- (void)updateShadowStateImmediatelyWithFrame:(CGRect)frame;
+
+/**
  * Resets internal properties.
  */
 - (void)invalidate;
