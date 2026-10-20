@@ -44,6 +44,13 @@ export interface NativeProps {
   id?: string | undefined;
   style?: string | Lynx.CSSProperties | undefined;
   type?: 'small' | 'medium' | 'large' | undefined;
+  titleCentered?: boolean | undefined;
+  subtitleCentered?: boolean | undefined;
+  expandedTitleHorizontalGravity?: 'start' | 'center' | 'end' | undefined;
+  expandedTitleVerticalGravity?: 'top' | 'center' | 'bottom' | undefined;
+  collapsedTitleHorizontalGravity?: 'start' | 'center' | 'end' | undefined;
+  collapsedTitleVerticalGravity?: 'top' | 'center' | 'bottom' | undefined;
+  collapsedTitleGravityMode?: 'entireSpace' | 'availableSpace' | undefined;
   title?: string | undefined;
   subtitle?: string | undefined;
   hidden?: boolean | undefined;
