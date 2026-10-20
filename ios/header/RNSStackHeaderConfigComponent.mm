@@ -52,6 +52,7 @@ static void RNSAssertIsValidHeaderChild(id child)
     _largeTitle = nil;
     _largeSubtitle = nil;
     _largeTitleEnabled = NO;
+    _prompt = nil;
     _backButtonTitle = nil;
     _backButtonDisplayMode = UINavigationItemBackButtonDisplayModeDefault;
     _backButtonMenuEnabled = YES;
@@ -280,6 +281,13 @@ LYNX_PROP_SETTER("largeTitleEnabled", setLargeTitleEnabled, BOOL) {
         value = NO;
     }
     _largeTitleEnabled = value;
+}
+
+LYNX_PROP_SETTER("prompt", setPrompt, NSString *) {
+    if (requestReset || value.length == 0) {
+        value = nil;
+    }
+    _prompt = value;
 }
 
 LYNX_PROP_SETTER("backButtonTitle", setBackButtonTitle, NSString *) {
