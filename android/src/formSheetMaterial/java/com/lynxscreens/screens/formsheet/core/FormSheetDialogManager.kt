@@ -1,6 +1,8 @@
 package com.lynxscreens.screens.formsheet.core
 
+import android.app.Activity
 import android.content.Context
+import android.content.ContextWrapper
 import android.view.ContextThemeWrapper
 import android.view.View
 import com.lynxscreens.screens.formsheet.interfaces.FormSheetContentSizeChangeDelegate
@@ -12,10 +14,15 @@ import com.lynxscreens.screens.formsheet.presentation.FormSheetPresentation
 import com.lynxscreens.screens.formsheet.presentation.FormSheetPresentationManager
 import kotlin.properties.Delegates
 
+/**
+ * @param activityProvider returns the activity whose decor view hosts the sheet's dimming. The default walks the
+ * [ContextWrapper] chain of [context]; hosts whose context does not wrap an activity must provide their own.
+ */
 // Adaptation: the Material backend implements the public pluggable-controller contract.
 class FormSheetDialogManager(
     context: Context,
     private val contentView: View,
+    activityProvider: () -> Activity? = { context.findActivity() },
 ) : FormSheetController {
     // Adaptation: accept the emitter supplied by the pluggable controller factory.
     constructor(
@@ -56,7 +63,7 @@ class FormSheetDialogManager(
             }
         }
 
-    private val dimmingManager = FormSheetDimmingManager(context)
+    private val dimmingManager = FormSheetDimmingManager(activityProvider)
 
     private val presentationManager =
         FormSheetPresentationManager(
@@ -100,4 +107,15 @@ class FormSheetDialogManager(
 
     // Adaptation: forward controller content measurements to the RNS delegate.
     override fun onContentHeightChanged(height: Int) = contentSizeChangeDelegate.onContentHeightChanged(height)
+}
+
+private fun Context.findActivity(): Activity? {
+    var current: Context? = this
+    while (current is ContextWrapper) {
+        if (current is Activity) {
+            return current
+        }
+        current = current.baseContext
+    }
+    return null
 }
