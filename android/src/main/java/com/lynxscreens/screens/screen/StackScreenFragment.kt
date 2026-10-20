@@ -76,10 +76,10 @@ internal class StackScreenFragment @Keep constructor() :
         allowReturnTransitionOverlap = true
 
         // The root screen appears immediately when the stack is first mounted.
-        enterTransition = if (canNavigateBack) Slide(Gravity.RIGHT) else null
-        exitTransition = Slide(Gravity.LEFT)
-        returnTransition = Slide(Gravity.RIGHT)
-        reenterTransition = Slide(Gravity.LEFT)
+        enterTransition = if (canNavigateBack) Slide(Gravity.END) else null
+        exitTransition = Slide(Gravity.START)
+        returnTransition = Slide(Gravity.END)
+        reenterTransition = Slide(Gravity.START)
     }
 
     override fun onCreateRuntimeView(

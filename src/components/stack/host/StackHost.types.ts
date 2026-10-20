@@ -1,11 +1,37 @@
 import type * as Lynx from '@lynx-js/types';
-import type { ColorScheme } from '../../shared/types.js';
+import type { ColorScheme, Direction } from '../../shared/types.js';
 
 export type StackHostColorScheme = ColorScheme | 'inherit';
+
+export type StackHostDirection = Direction | 'inherit';
 
 export type StackHostProps = {
   // General
   children: NonNullable<Lynx.ViewProps['children']>;
+  /**
+   * @summary Specifies the layout direction of the native container, its views
+   * and child containers.
+   *
+   * The following values are currently supported:
+   * - `inherit` - uses parent's layout direction,
+   * - `ltr` - forces left-to-right layout direction,
+   * - `rtl` - forces right-to-left layout direction.
+   *
+   * @remarks
+   * Layout direction isn't currently supported on iOS.
+   *
+   * On Android, this property sets the native Android `layoutDirection` View
+   * property of the host (RNS relies on `react-native`'s `style.direction`
+   * for the same effect; Lynx's CSS `direction` does not touch the native
+   * property). It is propagated via the native view hierarchy, so `inherit`
+   * falls back to the direction set on one of the parent views. The Lynx
+   * layout of the screen content is not affected.
+   *
+   * @default inherit
+   *
+   * @platform android
+   */
+  direction?: StackHostDirection | undefined;
   /**
    * @summary Specifies the color scheme used by the container and any child
    * containers.

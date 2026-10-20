@@ -3,7 +3,6 @@ package com.lynxscreens.screens.header.config
 import android.content.Context
 import android.graphics.Color
 import android.graphics.drawable.Drawable
-import android.util.LayoutDirection
 import android.util.Log
 import android.view.Gravity
 import com.lynx.react.bridge.Callback
@@ -210,9 +209,6 @@ internal class StackHeaderConfigComponent(
     override val collapsedSubtitleAppearance = ReactTextAppearance(lynxContext, ::invalidateTextAppearance)
 
     private fun invalidateTextAppearance() = invalidate(StackHeaderInvalidationFlags.TITLE_APPEARANCE)
-
-    override val isRTL: Boolean
-        get() = view.layoutDirection == LayoutDirection.RTL
 
     // endregion
 
