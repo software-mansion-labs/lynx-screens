@@ -45,6 +45,7 @@
     [self setMenuRepresentationProp:nil];
     _placement = RNSHeaderItemPlacementTrailing;
     _didSetHeaderItemPlacement = NO;
+    _style = UIBarButtonItemStylePlain;
     _disabled = NO;
     _respondsToOnPress = NO;
     _hidesSharedBackground = NO;
@@ -318,6 +319,33 @@ LYNX_PROP_SETTER("icon", setIcon, NSDictionary *) {
     }
     [self setIconProp:[RNSStackHeaderIconMapper iconFromDictionary:value]];
     _needsUpdate = YES;
+}
+
+// Adaptation: RNS converts the codegen enum in RNSConversions-Stack; on Lynx
+// the string value is mapped here.
+LYNX_PROP_SETTER("variant", setVariant, NSString *) {
+    UIBarButtonItemStyle style;
+    if (requestReset || value == nil || [value isEqualToString:@"plain"]) {
+        style = UIBarButtonItemStylePlain;
+    } else if ([value isEqualToString:@"prominent"]) {
+#if RNS_IPHONE_OS_VERSION_AVAILABLE(26_0)
+        if (@available(iOS 26.0, *)) {
+            style = UIBarButtonItemStyleProminent;
+        } else
+#endif // RNS_IPHONE_OS_VERSION_AVAILABLE(26_0)
+        {
+            // Bold text look, closest counterpart of prominent style before iOS 26
+            style = UIBarButtonItemStyleDone;
+        }
+    } else {
+        LLogError(@"[RNScreens] Invalid StackHeaderItem variant: %@", value);
+        style = UIBarButtonItemStylePlain;
+    }
+
+    if (_style != style) {
+        _style = style;
+        _needsUpdate = YES;
+    }
 }
 
 LYNX_PROP_SETTER("disabled", setDisabled, BOOL) {
