@@ -2,7 +2,9 @@ package com.lynxscreens.screens.header
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.os.Parcelable
 import android.util.Log
+import android.util.SparseArray
 import android.view.ViewGroup.LayoutParams.MATCH_PARENT
 import android.widget.FrameLayout
 import androidx.activity.OnBackPressedDispatcherOwner
@@ -311,6 +313,22 @@ internal class StackHeaderCoordinatorLayout(
             stackScreenWrapper.layoutParams = params
             stackScreenWrapper.requestLayout()
         }
+    }
+
+    // endregion
+
+    // region Instance state
+
+    override fun dispatchSaveInstanceState(container: SparseArray<Parcelable>) {
+        // Do nothing. This view is the root of a fragment-managed, Lynx-owned hierarchy that
+        // Lynx keeps alive, so there is no need to serialize/deserialize native view
+        // state. View ids in this subtree are assigned by Lynx (element signs), which are not
+        // stable identities - restoring state by id can apply state saved by one view type to
+        // a different one, crashing e.g. in CompoundButton (see RNS #4523).
+    }
+
+    override fun dispatchRestoreInstanceState(container: SparseArray<Parcelable>) {
+        // Ignore restoring instance state too, as we are not saving anything anyways.
     }
 
     // endregion
