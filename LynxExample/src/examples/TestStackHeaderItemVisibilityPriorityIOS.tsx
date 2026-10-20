@@ -92,7 +92,9 @@ function PriorityScreen() {
 
   return (
     <scroll-view scroll-y style={{ width: '100%', height: '100%' }}>
-      <view style={{ padding: '16px', paddingTop: CONTENT_PADDING_TOP, gap: '8px' }}>
+      <view
+        style={{ padding: '16px', paddingTop: CONTENT_PADDING_TOP, gap: '8px' }}
+      >
         <SettingsButton
           label={`square visibilityPriority: ${squarePriority}`}
           onTap={() =>
@@ -119,7 +121,25 @@ function PriorityScreen() {
 export default function TestStackHeaderItemVisibilityPriorityIOS() {
   return (
     <StackContainer
-      routeConfigs={[{ name: 'Home', Component: PriorityScreen }]}
+      routeConfigs={[
+        {
+          name: 'Home',
+          Component: PriorityScreen,
+          // Initial header config (default state, no-op callbacks) so the
+          // screen mounts its header in the same commit as the screen - the
+          // setRouteOptions layout effect lands in a later native update on
+          // Lynx, so the nested stack would otherwise start with a hidden
+          // navigation bar and animate it in during the push. The screen's
+          // effect replaces it with the live config right after mount.
+          options: {
+            headerConfig: buildHeaderConfig(
+              PRIORITIES[0]!,
+              PRIORITIES[0]!,
+              PRIORITIES[0]!,
+            ),
+          },
+        },
+      ]}
     />
   );
 }
