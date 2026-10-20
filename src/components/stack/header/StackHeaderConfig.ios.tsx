@@ -102,6 +102,8 @@ export const StackHeaderConfigIOS = (props: PlatformInnerProps) => {
     largeSubtitle,
     largeTitleEnabled,
     prompt,
+    minimizationBehavior,
+    restorationBehavior,
     backButtonTitle,
     backButtonDisplayMode,
     backButtonMenuEnabled,
@@ -189,6 +191,8 @@ export const StackHeaderConfigIOS = (props: PlatformInnerProps) => {
       largeSubtitle={largeSubtitle}
       largeTitleEnabled={!!largeTitleEnabled}
       prompt={prompt}
+      minimizationBehavior={minimizationBehavior}
+      restorationBehavior={restorationBehavior}
       standardAppearance={mapAppearanceToNativeProp(standardAppearance)}
       scrollEdgeAppearance={mapAppearanceToNativeProp(scrollEdgeAppearance)}
       titleMenu={parsedTitleMenu}
