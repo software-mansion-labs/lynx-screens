@@ -1,5 +1,5 @@
 import { useState } from '@lynx-js/react';
-import { FormSheetNativeComponent } from 'lynx-screens';
+import { FormSheet } from 'lynx-screens';
 import { Heading, SettingsButton } from '../components/SettingsControls';
 
 export default function TestFormSheetImplicitAnimationIOS() {
@@ -26,7 +26,7 @@ export default function TestFormSheetImplicitAnimationIOS() {
       </text>
       <SettingsButton label="Open FormSheet" onTap={() => setIsOpen(true)} />
 
-      <FormSheetNativeComponent
+      <FormSheet
         isOpen={isOpen}
         detents={[0.4, 0.9]}
         initialDetentIndex={0}
@@ -129,7 +129,7 @@ export default function TestFormSheetImplicitAnimationIOS() {
             </view>
           </view>
         </view>
-      </FormSheetNativeComponent>
+      </FormSheet>
     </view>
   );
 }
