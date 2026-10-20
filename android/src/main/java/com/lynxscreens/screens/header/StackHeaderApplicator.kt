@@ -221,6 +221,10 @@ internal class StackHeaderApplicator(
         appBar: StackHeaderAppBarLayout,
         config: StackHeaderConfigurationProviding,
     ) {
+        // Defaults are resolved from wrappedContext, not the widget's own context: MaterialToolbar
+        // wraps its context (materialThemeOverlay) in a ContextThemeWrapper whose theme is a
+        // one-time copy, so it never sees later setTheme calls on wrappedContext (color scheme
+        // changes).
         when (appBar) {
             is StackHeaderAppBarLayout.Small -> {
                 val toolbar = appBar.toolbar
@@ -232,7 +236,7 @@ internal class StackHeaderApplicator(
                     view = toolbar,
                     defaults =
                         TextAppearanceDefaults.resolve(
-                            toolbar.context,
+                            wrappedContext,
                             R.attr.textAppearanceTitleLarge,
                             R.attr.colorOnSurface,
                         ),
@@ -245,7 +249,7 @@ internal class StackHeaderApplicator(
                     view = toolbar,
                     defaults =
                         TextAppearanceDefaults.resolve(
-                            toolbar.context,
+                            wrappedContext,
                             R.attr.textAppearanceLabelMedium,
                             R.attr.colorOnSurfaceVariant,
                         ),
@@ -279,7 +283,7 @@ internal class StackHeaderApplicator(
                 applySlot(
                     view = ctl,
                     defaults =
-                        TextAppearanceDefaults.resolve(ctl.context, expandedTitleAttr, R.attr.colorOnSurface),
+                        TextAppearanceDefaults.resolve(wrappedContext, expandedTitleAttr, R.attr.colorOnSurface),
                     appearance = config.expandedTitleAppearance,
                     setColor = { ctl.setExpandedTitleTextColor(ColorStateList.valueOf(it)) },
                     setTypeface = { ctl.setExpandedTitleTypeface(it) },
@@ -288,7 +292,7 @@ internal class StackHeaderApplicator(
                 applySlot(
                     view = ctl,
                     defaults =
-                        TextAppearanceDefaults.resolve(ctl.context, R.attr.textAppearanceTitleLarge, R.attr.colorOnSurface),
+                        TextAppearanceDefaults.resolve(wrappedContext, R.attr.textAppearanceTitleLarge, R.attr.colorOnSurface),
                     appearance = config.collapsedTitleAppearance,
                     setColor = { ctl.setCollapsedTitleTextColor(it) },
                     setTypeface = { ctl.setCollapsedTitleTypeface(it) },
@@ -297,7 +301,7 @@ internal class StackHeaderApplicator(
                 applySlot(
                     view = ctl,
                     defaults =
-                        TextAppearanceDefaults.resolve(ctl.context, expandedSubtitleAttr, R.attr.colorOnSurfaceVariant),
+                        TextAppearanceDefaults.resolve(wrappedContext, expandedSubtitleAttr, R.attr.colorOnSurfaceVariant),
                     appearance = config.expandedSubtitleAppearance,
                     setColor = { ctl.setExpandedSubtitleTextColor(ColorStateList.valueOf(it)) },
                     setTypeface = { ctl.setExpandedSubtitleTypeface(it) },
@@ -306,7 +310,7 @@ internal class StackHeaderApplicator(
                 applySlot(
                     view = ctl,
                     defaults =
-                        TextAppearanceDefaults.resolve(ctl.context, R.attr.textAppearanceLabelMedium, R.attr.colorOnSurfaceVariant),
+                        TextAppearanceDefaults.resolve(wrappedContext, R.attr.textAppearanceLabelMedium, R.attr.colorOnSurfaceVariant),
                     appearance = config.collapsedSubtitleAppearance,
                     setColor = { ctl.setCollapsedSubtitleTextColor(it) },
                     setTypeface = { ctl.setCollapsedSubtitleTypeface(it) },
@@ -369,7 +373,7 @@ internal class StackHeaderApplicator(
         val baseDrawable =
             config.backButtonIcon
                 ?.let { getResizedDrawable(toolbar, it) }
-                ?: resolveDefaultBackButtonIcon()
+                ?: resolveDefaultBackButtonIcon(toolbar)
 
         val tintList =
             buildTintList(
@@ -397,7 +401,7 @@ internal class StackHeaderApplicator(
         val baseDrawable =
             config.overflowIcon
                 ?.let { getResizedDrawable(toolbar, it) }
-                ?: resolveDefaultOverflowIcon()
+                ?: resolveDefaultOverflowIcon(toolbar)
 
         val tintList =
             buildTintList(
@@ -594,14 +598,21 @@ internal class StackHeaderApplicator(
         }
     }
 
-    private fun resolveDefaultBackButtonIcon(): Drawable? =
-        resolveDrawableAttr(wrappedContext, androidx.appcompat.R.attr.homeAsUpIndicator)
+    // Default icon drawables must load through the toolbar's snapshot context, not
+    // wrappedContext: on Android 14+ the framework's themed resource cache returns stale
+    // entries for a Theme mutated in place by setTheme (ThemeKey dedup + shallow clone),
+    // freezing the icon tint after a color scheme change. The toolbar wrapper's theme is
+    // created fresh on every rebuild, so its cache entries always match the current palette.
+    // Plain attribute resolution (e.g. text appearance defaults) doesn't hit that cache and
+    // stays on the live wrappedContext.
+    private fun resolveDefaultBackButtonIcon(toolbar: MaterialToolbar): Drawable? =
+        resolveDrawableAttr(toolbar.context, androidx.appcompat.R.attr.homeAsUpIndicator)
 
     // Mirrors how the toolbar's own overflow button obtains its icon: an AppCompatImageView built
     // with actionOverflowButtonStyle resolves the theme's srcCompat and applies AppCompat's
     // colorControlNormal auto-tint.
-    private fun resolveDefaultOverflowIcon(): Drawable? =
-        AppCompatImageView(wrappedContext, null, androidx.appcompat.R.attr.actionOverflowButtonStyle).drawable
+    private fun resolveDefaultOverflowIcon(toolbar: MaterialToolbar): Drawable? =
+        AppCompatImageView(toolbar.context, null, androidx.appcompat.R.attr.actionOverflowButtonStyle).drawable
 
     private fun maybeApplyRTLCollapsingToolbarLayoutWorkaround(
         coordinatorLayout: StackHeaderCoordinatorLayout,

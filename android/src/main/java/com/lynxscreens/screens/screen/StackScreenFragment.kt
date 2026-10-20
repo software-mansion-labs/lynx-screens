@@ -1,5 +1,6 @@
 package com.lynxscreens.screens.screen
 
+import android.content.res.Configuration
 import android.os.Bundle
 import android.view.Gravity
 import android.view.LayoutInflater
@@ -8,10 +9,12 @@ import android.view.ViewGroup
 import androidx.annotation.Keep
 import androidx.transition.Slide
 import com.lynxscreens.screens.header.StackHeaderCoordinatorLayout
+import java.lang.ref.WeakReference
 
 internal data class StackScreenRuntimeState(
     val stackScreen: StackScreenComponent,
     val canNavigateBack: Boolean,
+    val delegate: WeakReference<StackScreenFragmentDelegate>,
 )
 
 internal class StackScreenFragment @Keep constructor() :
@@ -19,11 +22,13 @@ internal class StackScreenFragment @Keep constructor() :
     internal constructor(
         stackScreen: StackScreenComponent,
         canNavigateBack: Boolean,
+        delegate: WeakReference<StackScreenFragmentDelegate>,
     ) : this() {
         initializeRuntimeState(
             StackScreenRuntimeState(
                 stackScreen = stackScreen,
                 canNavigateBack = canNavigateBack,
+                delegate = delegate,
             ),
         )
     }
@@ -90,6 +95,14 @@ internal class StackScreenFragment @Keep constructor() :
             stackScreen.onDismiss()
         }
         teardownPreventNativeDismissCallback()
+    }
+
+    override fun onConfigurationChanged(newConfig: Configuration) {
+        super.onConfigurationChanged(newConfig)
+        // Restored placeholders have no runtime state (and no delegate to notify).
+        if (!isRestoredPlaceholder) {
+            runtimeState.delegate.get()?.onFragmentConfigurationChanged(newConfig)
+        }
     }
 
     /**

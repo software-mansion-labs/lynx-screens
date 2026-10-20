@@ -2,6 +2,7 @@ package com.lynxscreens.screens.header
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.content.res.Configuration
 import android.os.Parcelable
 import android.util.Log
 import android.util.SparseArray
@@ -13,6 +14,9 @@ import androidx.coordinatorlayout.widget.CoordinatorLayout
 import com.google.android.material.R
 import com.google.android.material.appbar.AppBarLayout
 import com.google.android.material.appbar.MaterialToolbar
+import com.lynxscreens.screens.common.colorscheme.ColorSchemeCoordinator
+import com.lynxscreens.screens.common.colorscheme.ColorSchemeListener
+import com.lynxscreens.screens.common.colorscheme.ColorSchemeProviding
 import com.lynxscreens.screens.header.appbar.StackHeaderAppBarLayout
 import com.lynxscreens.screens.header.appbar.StackHeaderScrollingViewBehavior
 import com.lynxscreens.screens.header.config.OnHeaderConfigurationAttachListener
@@ -35,7 +39,8 @@ internal class StackHeaderCoordinatorLayout(
     context: Context,
     internal val stackScreen: StackScreenComponent,
     private val canNavigateBack: Boolean,
-) : CoordinatorLayout(context) {
+) : CoordinatorLayout(context),
+    ColorSchemeProviding {
     // region Config attach / detach
 
     private var currentProvider: StackHeaderConfigurationProviding? = null
@@ -172,8 +177,12 @@ internal class StackHeaderCoordinatorLayout(
             ?.onBackPressed()
     }
 
-    private fun processUpdate(provider: StackHeaderConfigurationProviding) {
-        val needsRebuild = provider.invalidationFlags.needsRebuild
+    private fun processUpdate(
+        provider: StackHeaderConfigurationProviding,
+        forcedFlags: StackHeaderInvalidationFlags = StackHeaderInvalidationFlags.NONE,
+    ) {
+        val effectiveFlags = provider.invalidationFlags or forcedFlags
+        val needsRebuild = effectiveFlags.needsRebuild
         if (needsRebuild) {
             resetHeader()
             if (provider.hidden) {
@@ -195,42 +204,42 @@ internal class StackHeaderCoordinatorLayout(
 
         val appBar = appBarLayout
         if (appBar != null) {
-            if (needsRebuild || provider.invalidationFlags.containsAny(StackHeaderInvalidationFlags.TITLE)) {
+            if (needsRebuild || effectiveFlags.containsAny(StackHeaderInvalidationFlags.TITLE)) {
                 applicator.applyTitleAndSubtitle(appBar, provider, isAppBarFullyCollapsed)
                 provider.clearInvalidationFlags(StackHeaderInvalidationFlags.TITLE)
             }
 
-            if (needsRebuild || provider.invalidationFlags.containsAny(StackHeaderInvalidationFlags.TITLE_APPEARANCE)) {
+            if (needsRebuild || effectiveFlags.containsAny(StackHeaderInvalidationFlags.TITLE_APPEARANCE)) {
                 applicator.applyTitleAndSubtitleAppearance(appBar, provider)
                 provider.clearInvalidationFlags(StackHeaderInvalidationFlags.TITLE_APPEARANCE)
             }
 
-            if (needsRebuild || provider.invalidationFlags.containsAny(StackHeaderInvalidationFlags.TITLE_POSITIONING)) {
+            if (needsRebuild || effectiveFlags.containsAny(StackHeaderInvalidationFlags.TITLE_POSITIONING)) {
                 applicator.applyTitlePositioning(appBar, provider)
                 provider.clearInvalidationFlags(StackHeaderInvalidationFlags.TITLE_POSITIONING)
             }
 
-            if (needsRebuild || provider.invalidationFlags.containsAny(StackHeaderInvalidationFlags.CONTENT_INSETS)) {
+            if (needsRebuild || effectiveFlags.containsAny(StackHeaderInvalidationFlags.CONTENT_INSETS)) {
                 applicator.applyContentInsets(appBar, provider)
                 provider.clearInvalidationFlags(StackHeaderInvalidationFlags.CONTENT_INSETS)
             }
 
-            if (needsRebuild || provider.invalidationFlags.containsAny(StackHeaderInvalidationFlags.BACK_BUTTON)) {
+            if (needsRebuild || effectiveFlags.containsAny(StackHeaderInvalidationFlags.BACK_BUTTON)) {
                 applicator.applyBackButton(appBar.toolbar, provider, canNavigateBack, onNavigationIconClick)
                 provider.clearInvalidationFlags(StackHeaderInvalidationFlags.BACK_BUTTON)
             }
 
-            if (needsRebuild || provider.invalidationFlags.containsAny(StackHeaderInvalidationFlags.SCROLL_FLAGS)) {
+            if (needsRebuild || effectiveFlags.containsAny(StackHeaderInvalidationFlags.SCROLL_FLAGS)) {
                 applicator.applyScrollFlags(appBar, provider)
                 provider.clearInvalidationFlags(StackHeaderInvalidationFlags.SCROLL_FLAGS)
             }
 
-            if (needsRebuild || provider.invalidationFlags.containsAny(StackHeaderInvalidationFlags.BACKGROUND_COLORS)) {
+            if (needsRebuild || effectiveFlags.containsAny(StackHeaderInvalidationFlags.BACKGROUND_COLORS)) {
                 applicator.applyBackgroundColors(appBar, provider)
                 provider.clearInvalidationFlags(StackHeaderInvalidationFlags.BACKGROUND_COLORS)
             }
 
-            if (needsRebuild || provider.invalidationFlags.containsAny(StackHeaderInvalidationFlags.LIFT_ON_SCROLL)) {
+            if (needsRebuild || effectiveFlags.containsAny(StackHeaderInvalidationFlags.LIFT_ON_SCROLL)) {
                 // Lift-on-scroll is disabled in transparent mode: there is no content
                 // scrolling behavior installed and the app bar overlays the content.
                 applicator.applyLiftOnScroll(
@@ -241,7 +250,7 @@ internal class StackHeaderCoordinatorLayout(
                 provider.clearInvalidationFlags(StackHeaderInvalidationFlags.LIFT_ON_SCROLL)
             }
 
-            if (provider.invalidationFlags.containsAny(StackHeaderInvalidationFlags.TOOLBAR_MENU)) {
+            if (needsRebuild || effectiveFlags.containsAny(StackHeaderInvalidationFlags.TOOLBAR_MENU)) {
                 val (forwardIdMap, reverseIdMap) =
                     StackHeaderToolbarMenuApplicator.generateToolbarMenuItemMappings(
                         provider.toolbarMenu,
@@ -280,13 +289,72 @@ internal class StackHeaderCoordinatorLayout(
                 provider.clearInvalidationFlags(StackHeaderInvalidationFlags.TOOLBAR_MENU)
             }
 
-            if (needsRebuild || provider.invalidationFlags.containsAny(StackHeaderInvalidationFlags.OVERFLOW_ICON)) {
+            if (needsRebuild || effectiveFlags.containsAny(StackHeaderInvalidationFlags.OVERFLOW_ICON)) {
                 applicator.applyOverflowIcon(appBar.toolbar, provider)
                 provider.clearInvalidationFlags(StackHeaderInvalidationFlags.OVERFLOW_ICON)
             }
         }
 
         onMaybeHeaderLayoutChanged()
+    }
+
+    // endregion
+
+    // region Color scheme
+
+    private val colorSchemeCoordinator = ColorSchemeCoordinator()
+
+    // Night mode the header visuals were last applied against. Unlike the coordinator's
+    // internal dedupe (reset on every setup()), this survives detach/reattach, skipping
+    // redundant full re-applies e.g. on tab switches.
+    private var appliedUiNightMode: Int =
+        context.resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK
+
+    override fun getResolvedUiNightMode() = colorSchemeCoordinator.getResolvedUiNightMode()
+
+    override fun addColorSchemeListener(listener: ColorSchemeListener) = colorSchemeCoordinator.addColorSchemeListener(listener)
+
+    override fun removeColorSchemeListener(listener: ColorSchemeListener) = colorSchemeCoordinator.removeColorSchemeListener(listener)
+
+    // No onConfigurationChanged override is needed: this view never sets its own colorScheme,
+    // so resolution always delegates to the parent provider, which does handle system changes.
+
+    override fun onAttachedToWindow() {
+        super.onAttachedToWindow()
+        colorSchemeCoordinator.setup(this) { applyUiNightMode(it) }
+    }
+
+    override fun onDetachedFromWindow() {
+        colorSchemeCoordinator.teardown()
+        super.onDetachedFromWindow()
+    }
+
+    private fun applyUiNightMode(uiNightMode: Int) {
+        wrappedContext.setTheme(
+            when (uiNightMode) {
+                Configuration.UI_MODE_NIGHT_YES -> R.style.Theme_Material3Expressive_Dark_NoActionBar
+                Configuration.UI_MODE_NIGHT_NO -> R.style.Theme_Material3Expressive_Light_NoActionBar
+                else -> R.style.Theme_Material3Expressive_DayNight_NoActionBar
+            },
+        )
+
+        if (uiNightMode == appliedUiNightMode) {
+            return
+        }
+
+        appliedUiNightMode = uiNightMode
+        currentProvider?.let {
+            // A rebuild is forced because MaterialToolbar snapshots its theme at construction:
+            // ripples, the overflow popup and menu item views resolve from that frozen copy, so
+            // only view recreation refreshes them.
+            val wasFullyCollapsed = isAppBarFullyCollapsed
+            processUpdate(it, forcedFlags = StackHeaderInvalidationFlags.STRUCTURE)
+            // The rebuilt app bar starts expanded; restore the fully-collapsed resting state
+            // so a scrolled-down screen doesn't jump. Fractional offsets reset.
+            if (wasFullyCollapsed) {
+                appBarLayout?.setExpanded(false, false)
+            }
+        }
     }
 
     // endregion
@@ -396,6 +464,8 @@ internal class StackHeaderCoordinatorLayout(
     // region Teardown
 
     internal fun tearDown() {
+        colorSchemeCoordinator.teardown()
+
         removeHeader()
 
         stackScreenWrapper.removeView(stackScreen.view)

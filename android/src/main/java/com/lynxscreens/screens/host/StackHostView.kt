@@ -5,6 +5,7 @@ import android.util.Log
 import android.view.View
 import android.view.ViewGroup
 import com.lynx.tasm.behavior.LynxContext
+import com.lynxscreens.screens.common.colorscheme.ColorScheme
 
 @SuppressLint("ViewConstructor") // should never be restored
 internal class StackHostView(
@@ -12,6 +13,8 @@ internal class StackHostView(
     private val container: StackContainer,
 ) : ViewGroup(lynxContext), StackContainerParent {
     private var isLayoutEnqueued = false
+
+    internal var colorScheme: ColorScheme by container::colorScheme
 
     init {
         addView(container)
