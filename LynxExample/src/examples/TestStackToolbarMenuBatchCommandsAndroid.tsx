@@ -5,12 +5,19 @@ import type {
   StackHeaderToolbarMenuBaseAndroid,
 } from 'lynx-screens';
 import { ScrollViewMarker } from 'lynx-screens';
-import { Heading, SettingsButton } from '../components/SettingsControls';
+import bundledPhoto from '../assets/lynx-logo.png';
+import {
+  Heading,
+  SettingsButton,
+  SettingsSwitch,
+} from '../components/SettingsControls';
 import { StackContainer } from '../components/StackContainer';
 import { useStackNavigationContext } from '../hooks/useStackNavigationContext';
 
 // Port of RNS single-feature-tests/stack-v5/test-stack-toolbar-menu-batch-commands-android.
-// Adaptation: imageSource icons take plain uri strings (no RN asset objects).
+// Adaptations: imageSource icons take plain uri strings (no RN asset objects)
+// and the bundled photo is the existing lynx-logo asset (the RNS SFT bundles a
+// 3 MB trees.jpg).
 
 const FRUIT_IDS = ['apple', 'banana', 'cherry', 'date'] as const;
 
@@ -96,6 +103,7 @@ function MainScreen() {
   const [eventLog, setEventLog] = useState<string[]>([]);
   const [eventCount, setEventCount] = useState(0);
   const [appleInToolbar, setAppleInToolbar] = useState(false);
+  const [useBundledImage, setUseBundledImage] = useState(true);
 
   const headerConfigRef = useRef<StackHeaderConfigRef>(null);
   const { setRouteOptions, routeKey } = useStackNavigationContext();
@@ -121,17 +129,30 @@ function MainScreen() {
     });
   }, [setRouteOptions, routeKey, handleGroupChange]);
 
-  // A large image with a random seed each call, so every download is unique and
-  // uncached (even across app restarts) and the async load stays visibly slow.
-  // Requires network access. The icon is only visible while Apple is shown in
-  // the toolbar (overflow menu items don't render icons).
+  // The photo icon used by the image cases. The icon is only visible while
+  // Apple is shown in the toolbar (overflow menu items don't render icons).
+  //
+  // Bundled (default, used by e2e): no network needed. Image icons are always
+  // resolved asynchronously on Android, so this still exercises the async path
+  // that the queue must serialize.
+  //
+  // Remote (manual testing): a large image with a random seed each call, so
+  // every download is unique and uncached (even across app restarts) and the
+  // async load stays visibly slow. Requires network access.
   const nextPhotoIcon = useCallback((): PlatformIconAndroid => {
-    const seed = Math.floor(Math.random() * 1_000_000_000);
-    return {
-      type: 'imageSource',
-      uri: `https://picsum.photos/seed/rns-${seed}/5000`,
-    };
-  }, []);
+    if (useBundledImage) {
+      return {
+        type: 'imageSource',
+        uri: bundledPhoto,
+      };
+    } else {
+      const seed = Math.floor(Math.random() * 1_000_000_000);
+      return {
+        type: 'imageSource',
+        uri: `https://picsum.photos/seed/rns-${seed}/5000`,
+      };
+    }
+  }, [useBundledImage]);
 
   // A guaranteed-to-fail image. The load never yields a drawable; the queue
   // must still complete the batch (icon cleared) rather than wait forever for a
@@ -202,11 +223,11 @@ function MainScreen() {
     ]);
   }, [nextPhotoIcon]);
 
-  // Case #5: two back-to-back commands on Apple. The first loads a slow remote
-  // image alongside checked:true; the second unchecks Apple synchronously. With
-  // the queue they are serialized, so the LAST event reflects the SECOND
-  // command (Apple absent). Without it, the first command's late download would
-  // land last and wrongly re-check Apple.
+  // Case #5: two back-to-back commands on Apple. The first loads an image
+  // asynchronously alongside checked:true; the second unchecks Apple
+  // synchronously. With the queue they are serialized, so the LAST event
+  // reflects the SECOND command (Apple absent). Without it, the first command
+  // would resolve after the second and wrongly re-check Apple.
   const runOrderingRace = useCallback(() => {
     const android = headerConfigRef.current?.android;
     android?.updateToolbarMenuElements([
@@ -254,6 +275,11 @@ function MainScreen() {
       >
         <view style={{ padding: '10px', paddingBottom: '50px', gap: '6px' }}>
           <Heading label="Batch Commands" />
+          <SettingsSwitch
+            label="Bundled image"
+            value={useBundledImage}
+            onValueChange={setUseBundledImage}
+          />
           <SettingsButton label="Select All (1 event)" onTap={selectAll} />
           <SettingsButton label="Deselect All (1 event)" onTap={deselectAll} />
           <SettingsButton
@@ -292,7 +318,9 @@ function MainScreen() {
             Move Apple to the toolbar to see its loaded icon (overflow items don't
             render icons); its checkbox is only visible in the overflow menu. Icon
             & showAsAction changes emit no events. Menu checked state persists
-            across taps — Reset log clears only the counter and log.
+            across taps — Reset log clears only the counter and log. Turn off
+            "Bundled image" to load the photo from the web instead (slow,
+            uncached; needs network).
           </text>
 
           <Heading label={`Events received: ${eventCount}`} />
