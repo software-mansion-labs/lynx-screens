@@ -85,18 +85,22 @@ static NSSet<NSString *> *const kRNSAllowedMenuItemKeys = [NSSet
 
 + (void)validateMenuKeys:(NSDictionary *)dict
 {
+#ifndef NS_BLOCK_ASSERTIONS
     for (NSString *key in dict) {
         NSAssert([kRNSAllowedMenuKeys containsObject:key], @"[RNScreens] Invalid key \"%@\" found in menu", key);
     }
+#endif // !NS_BLOCK_ASSERTIONS
     NSAssert(dict[@"children"], @"[RNScreens] missing key \"children\" in menu");
     NSAssert(dict[@"id"], @"[RNScreens] missing id on one of menu elements");
 }
 
 + (void)validateMenuItemKeys:(NSDictionary *)dict
 {
+#ifndef NS_BLOCK_ASSERTIONS
     for (NSString *key in dict) {
         NSAssert([kRNSAllowedMenuItemKeys containsObject:key], @"[RNScreens] Invalid key \"%@\" found in menu item", key);
     }
+#endif // !NS_BLOCK_ASSERTIONS
     NSAssert(dict[@"id"], @"[RNScreens] missing id on one of menu elements");
 }
 

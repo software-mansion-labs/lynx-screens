@@ -2,6 +2,14 @@ require 'json'
 
 package = JSON.parse(File.read(File.join(__dir__, '..', 'package.json')))
 
+# Counterpart of the RNScreens.podspec RNS_DEBUG_LOGGING opt-in: run
+# `pod install` with RNS_DEBUG_LOGGING=1 in the environment to compile the
+# debug-only diagnostics (e.g. dumpStackModel) in.
+debug_logging_enabled = ENV['RNS_DEBUG_LOGGING'] == '1'
+
+lynxscreens_cpp_flags = []
+lynxscreens_cpp_flags << '-DRNS_DEBUG_LOGGING=1' if debug_logging_enabled
+
 Pod::Spec.new do |s|
   s.name = 'LynxScreens'
   s.version = package['version']
@@ -18,6 +26,10 @@ Pod::Spec.new do |s|
   s.static_framework = true
 
   s.source_files = 'common/**/*.{h,m,mm}', 'form-sheet/**/*.{h,m,mm}', 'header/**/*.{h,m,mm}', 'helpers/**/*.{h,m,mm}', 'host/**/*.{h,m,mm}', 'screen/**/*.{h,m,mm}', 'scroll-view-marker/**/*.{h,m,mm}', 'utils/**/*.{h,m,mm}'
+
+  s.pod_target_xcconfig = {
+    'OTHER_CPLUSPLUSFLAGS' => lynxscreens_cpp_flags.join(' ')
+  }
 
   s.dependency 'Lynx'
 end
