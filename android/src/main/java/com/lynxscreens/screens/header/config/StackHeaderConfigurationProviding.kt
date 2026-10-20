@@ -3,7 +3,7 @@ package com.lynxscreens.screens.header.config
 import android.graphics.drawable.Drawable
 import com.lynxscreens.screens.common.text.TextAppearance
 import com.lynxscreens.screens.header.subview.StackHeaderSubviewProviding
-import com.lynxscreens.screens.header.toolbar.model.StackHeaderToolbarMenuConfig
+import com.lynxscreens.screens.header.toolbar.StackHeaderToolbarMenuController
 
 internal interface StackHeaderConfigurationProviding {
     val type: StackHeaderType
@@ -34,8 +34,7 @@ internal interface StackHeaderConfigurationProviding {
     val centerSubview: StackHeaderSubviewProviding?
     val trailingSubview: StackHeaderSubviewProviding?
     val backgroundSubview: StackHeaderSubviewProviding?
-    val toolbarMenu: StackHeaderToolbarMenuConfig
-    val toolbarMenuGroupDividerEnabled: Boolean
+    val toolbarMenuController: StackHeaderToolbarMenuController
 
     val titleCentered: Boolean
     val subtitleCentered: Boolean

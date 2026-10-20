@@ -1,0 +1,10 @@
+package com.lynxscreens.screens.header.toolbar
+
+internal interface StackHeaderToolbarMenuDelegate {
+    fun onMenuItemClicked(id: String)
+
+    fun onGroupSelectionChanged(
+        groupId: String,
+        selectedIds: List<String>,
+    )
+}
