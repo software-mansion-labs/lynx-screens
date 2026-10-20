@@ -28,6 +28,13 @@ class StackScreenView(
 
     internal var onLaidOut: ((width: Int, height: Int) -> Unit)? = null
 
+    // Adaptation: the preventNativeDismiss flag and the JS event live on the owning
+    // StackScreenComponent (RNS keeps both on the StackScreen view); the component
+    // wires these callbacks so the ContainerItem protocol can answer for itself.
+    internal var isPreventNativeDismissEnabledProvider: (() -> Boolean)? = null
+
+    internal var onNativeDismissPrevented: (() -> Unit)? = null
+
     override fun onLayout(
         changed: Boolean,
         l: Int,
@@ -50,6 +57,10 @@ class StackScreenView(
     override fun resolveNestedContainer(): Container? = containerItemSupport.resolveNestedContainer()
 
     override fun findContentScrollView(): ViewGroup? = containerItemSupport.findContentScrollView(this)
+
+    override fun wantsToPreventStackNativeDismiss(): ContainerItem? =
+        resolveNestedContainer()?.wantsToPreventStackNativeDismiss()
+            ?: takeIf { isPreventNativeDismissEnabledProvider?.invoke() == true }
 
     // region ScrollViewSeeking
 

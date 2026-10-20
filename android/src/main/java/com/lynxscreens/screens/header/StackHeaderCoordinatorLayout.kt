@@ -7,7 +7,6 @@ import android.os.Parcelable
 import android.util.SparseArray
 import android.view.ViewGroup.LayoutParams.MATCH_PARENT
 import android.widget.FrameLayout
-import androidx.activity.OnBackPressedDispatcherOwner
 import androidx.appcompat.view.ContextThemeWrapper
 import androidx.coordinatorlayout.widget.CoordinatorLayout
 import com.google.android.material.R
@@ -34,6 +33,7 @@ internal class StackHeaderCoordinatorLayout(
     context: Context,
     internal val stackScreen: StackScreenComponent,
     private val canNavigateBack: Boolean,
+    private val backPressHandler: StackHeaderBackPressHandler,
 ) : CoordinatorLayout(context),
     ColorSchemeProviding {
     // region Config attach / detach
@@ -139,10 +139,7 @@ internal class StackHeaderCoordinatorLayout(
     private var appBarLayout: StackHeaderAppBarLayout? = null
 
     private val onNavigationIconClick: () -> Unit = {
-        // The fragment constructs this layout with its (activity) context.
-        (getContext() as? OnBackPressedDispatcherOwner)
-            ?.onBackPressedDispatcher
-            ?.onBackPressed()
+        backPressHandler.handleHeaderBackButtonPress(stackScreen)
     }
 
     private fun processUpdate(
