@@ -4,6 +4,9 @@ plugins {
     id("org.jetbrains.kotlin.kapt")
 }
 
+// Use the `rnsDebugLogsEnabled` Gradle property to enable or disable debug logging (RNSLog.d / i / v).
+val areDebugLogsEnabled = providers.gradleProperty("rnsDebugLogsEnabled").orElse("false").get() == "true"
+
 val formSheetBackendSourceDir =
     when (val backend = providers.gradleProperty("lynxScreens.formSheetBackend").orElse("material").get()) {
         "material" -> "src/formSheetMaterial/java"
@@ -17,6 +20,11 @@ android {
 
     defaultConfig {
         minSdk = 24
+        buildConfigField("boolean", "RNS_DEBUG_LOGGING", areDebugLogsEnabled.toString())
+    }
+
+    buildFeatures {
+        buildConfig = true
     }
 
     compileOptions {

@@ -1,7 +1,6 @@
 package com.lynxscreens.screens.host
 
 import android.content.Context
-import android.util.Log
 import android.view.View
 import androidx.fragment.app.FragmentManager
 import com.lynx.tasm.behavior.LynxContext
@@ -15,6 +14,7 @@ import com.lynx.tasm.behavior.ui.UIGroup
 import com.lynxscreens.screens.common.colorscheme.ColorScheme
 import com.lynxscreens.screens.helpers.FragmentManagerHelper
 import com.lynxscreens.screens.screen.StackScreenComponent
+import com.lynxscreens.screens.utils.RNSLog
 import java.lang.ref.WeakReference
 
 @LynxElement(name = "ls-stack-host")
@@ -215,7 +215,7 @@ internal class StackHostComponent(context: LynxContext) : UIGroup<StackHostView>
             beginUpdateBatch()
             containerUpdateCoordinator.addPopOperation(stackScreen)
         } else {
-            Log.d(TAG, "Ignoring pop operation of ${stackScreen.screenKey}, already not attached or natively dismissed")
+            RNSLog.d(TAG, "Ignoring pop operation of ${stackScreen.screenKey}, already not attached or natively dismissed")
         }
     }
 

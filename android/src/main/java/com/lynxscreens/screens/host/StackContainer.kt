@@ -21,6 +21,7 @@ import com.lynxscreens.screens.screen.StackScreenComponent
 import com.lynxscreens.screens.screen.StackScreenFragment
 import com.lynxscreens.screens.screen.StackScreenFragmentDelegate
 import com.lynxscreens.screens.screen.StackScreenView
+import com.lynxscreens.screens.utils.RNSLog
 import java.lang.ref.WeakReference
 
 @SuppressLint("ViewConstructor") // Only we construct this view, it is never inflated.
@@ -80,7 +81,7 @@ internal class StackContainer(
     }
 
     override fun onAttachedToWindow() {
-        Log.d(TAG, "StackContainer [$id] attached to window")
+        RNSLog.d(TAG, "StackContainer [$id] attached to window")
         super.onAttachedToWindow()
 
         parentContainerRegistry.attach(this)
@@ -256,9 +257,9 @@ internal class StackContainer(
     }
 
     private fun dumpStackModel() {
-        Log.d(TAG, "StackContainer [$id] MODEL BEGIN")
+        RNSLog.d(TAG, "StackContainer [$id] MODEL BEGIN")
         stackModel.forEach {
-            Log.d(TAG, "${it.stackScreen.screenKey}")
+            RNSLog.d(TAG, "${it.stackScreen.screenKey}")
         }
     }
 
@@ -274,7 +275,7 @@ internal class StackContainer(
             updateBatchStateProvider = WeakReference(this),
             colorSchemeProvider = WeakReference(this),
         ).also {
-            Log.d(TAG, "Created Fragment $it for screen ${screen.screenKey}")
+            RNSLog.d(TAG, "Created Fragment $it for screen ${screen.screenKey}")
         }
 
     private fun updateTopFragment() {

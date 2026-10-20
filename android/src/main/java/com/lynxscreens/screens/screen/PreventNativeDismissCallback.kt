@@ -1,10 +1,10 @@
 package com.lynxscreens.screens.screen
 
-import android.util.Log
 import androidx.activity.OnBackPressedCallback
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.LifecycleOwner
+import com.lynxscreens.screens.utils.RNSLog
 
 internal class PreventNativeDismissCallback(
     lifecycleOwner: LifecycleOwner,
@@ -31,7 +31,7 @@ internal class PreventNativeDismissCallback(
     }
 
     override fun handleOnBackPressed() {
-        Log.i("RNScreens", "PreventNativeDismissCallback called for screen ${screen.screenKey}")
+        RNSLog.i("RNScreens", "PreventNativeDismissCallback called for screen ${screen.screenKey}")
         screen.onNativeDismissPrevented()
     }
 
