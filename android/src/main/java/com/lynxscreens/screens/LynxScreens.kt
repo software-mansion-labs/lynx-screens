@@ -1,7 +1,7 @@
 package com.lynxscreens.screens
 
-import com.lynxscreens.screens.formsheet.interfaces.FormSheetControllerFactory
-import com.lynxscreens.screens.formsheet.interfaces.default
+import com.lynxscreens.screens.core.modals.formsheet.interfaces.FormSheetControllerFactory
+import com.lynxscreens.screens.core.modals.formsheet.interfaces.default
 
 public object LynxScreens {
     private val lock = Any()
