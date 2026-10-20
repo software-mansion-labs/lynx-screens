@@ -31,6 +31,7 @@ interface BackButtonConfig {
   title: string | undefined;
   backButtonTitle: string | undefined;
   displayMode: StackHeaderBackButtonDisplayModeIOS;
+  backButtonMenuEnabled: boolean;
   trailingItemsCount: number;
 }
 
@@ -38,6 +39,7 @@ const INITIAL_CONFIG: BackButtonConfig = {
   title: undefined,
   backButtonTitle: undefined,
   displayMode: 'default',
+  backButtonMenuEnabled: true,
   trailingItemsCount: 0,
 };
 
@@ -72,12 +74,27 @@ function buildHeaderConfig(
     ios: {
       backButtonTitle: config.backButtonTitle,
       backButtonDisplayMode: config.displayMode,
+      backButtonMenuEnabled: config.backButtonMenuEnabled,
       trailingItems: Array.from(
         { length: config.trailingItemsCount },
         (_, index) => ({
           type: 'item' as const,
           id: `trailing-item-${index}`,
           title: `Item ${index + 1}`,
+          onPress: () => {
+            console.log('click');
+          },
+          menu: {
+            id: `trailing-item-menu-${index}`,
+            type: 'menu' as const,
+            children: [
+              {
+                id: `trailing-item-menu-item-${index}`,
+                type: 'menuItem' as const,
+                title: 'Menu Item',
+              },
+            ],
+          },
         }),
       ),
     },
@@ -175,6 +192,12 @@ function BackButtonConfigSection(props: {
         ]!,
     }));
 
+  const toggleMenuEnabled = () =>
+    onChange((prev) => ({
+      ...prev,
+      backButtonMenuEnabled: !prev.backButtonMenuEnabled,
+    }));
+
   const cycleTrailingItemsCount = () =>
     onChange((prev) => ({
       ...prev,
@@ -212,6 +235,10 @@ function BackButtonConfigSection(props: {
       <SettingsButton
         label={`displayMode: ${config.displayMode}`}
         onTap={cycleDisplayMode}
+      />
+      <SettingsButton
+        label={`menuEnabled: ${config.backButtonMenuEnabled}`}
+        onTap={toggleMenuEnabled}
       />
       <SettingsButton
         label={`trailingItemsCount: ${config.trailingItemsCount}`}

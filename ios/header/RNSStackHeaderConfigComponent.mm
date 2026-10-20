@@ -54,6 +54,7 @@ static void RNSAssertIsValidHeaderChild(id child)
     _largeTitleEnabled = NO;
     _backButtonTitle = nil;
     _backButtonDisplayMode = UINavigationItemBackButtonDisplayModeDefault;
+    _backButtonMenuEnabled = YES;
     _titleMenu = nil;
 }
 
@@ -301,6 +302,13 @@ LYNX_PROP_SETTER("backButtonDisplayMode", setBackButtonDisplayMode, NSString *) 
         LLogWarn(@"[RNScreens] Unsupported backButtonDisplayMode value: %@", value);
         _backButtonDisplayMode = UINavigationItemBackButtonDisplayModeDefault;
     }
+}
+
+LYNX_PROP_SETTER("backButtonMenuEnabled", setBackButtonMenuEnabled, BOOL) {
+    if (requestReset) {
+        value = YES;
+    }
+    _backButtonMenuEnabled = value;
 }
 
 LYNX_PROP_SETTER("titleMenu", setTitleMenu, NSDictionary *) {

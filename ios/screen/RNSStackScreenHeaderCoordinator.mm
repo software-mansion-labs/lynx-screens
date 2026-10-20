@@ -126,6 +126,9 @@
 
     [self applyTitleMenuForController:controller];
     [self updateNavigationBarVisibilityAnimated:YES];
+#if !TARGET_OS_TV
+    [self updateBackButtonMenuEnabled];
+#endif // !TARGET_OS_TV
 }
 
 - (void)applyConfigProperties
@@ -136,7 +139,23 @@
 
     [self applyConfigPropertiesForController:[self requireScreenController]];
     [self updateNavigationBarVisibilityAnimated:YES];
+#if !TARGET_OS_TV
+    [self updateBackButtonMenuEnabled];
+#endif // !TARGET_OS_TV
 }
+
+#if !TARGET_OS_TV
+- (void)updateBackButtonMenuEnabled
+{
+    RNSStackNavigationController *navController = [self getNavigationController];
+    if (navController == nil || navController.topViewController != _screenController) {
+        return;
+    }
+
+    BOOL enabled = _configDataProvider == nil || _configDataProvider.backButtonMenuEnabled;
+    [navController.navigationBarCoordinator setBackButtonMenuEnabled:enabled forNavigationController:navController];
+}
+#endif // !TARGET_OS_TV
 
 /**
  Rebuilds an existing item: sets all props and applies the menu config.
@@ -328,6 +347,9 @@
 #endif // !TARGET_OS_TV
 
     [self updateNavigationBarVisibilityAnimated:YES];
+#if !TARGET_OS_TV
+    [self updateBackButtonMenuEnabled];
+#endif // !TARGET_OS_TV
 }
 
 /**
