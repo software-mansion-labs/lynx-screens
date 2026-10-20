@@ -11,6 +11,7 @@ import androidx.annotation.Keep
 import androidx.transition.Slide
 import com.lynxscreens.screens.header.StackHeaderBackPressHandler
 import com.lynxscreens.screens.header.StackHeaderCoordinatorLayout
+import com.lynxscreens.screens.host.StackUpdateBatchStateProviding
 import java.lang.ref.WeakReference
 
 internal data class StackScreenRuntimeState(
@@ -18,6 +19,7 @@ internal data class StackScreenRuntimeState(
     val canNavigateBack: Boolean,
     val delegate: WeakReference<StackScreenFragmentDelegate>,
     val backPressHandler: WeakReference<StackHeaderBackPressHandler>,
+    val updateBatchStateProvider: WeakReference<StackUpdateBatchStateProviding>,
 )
 
 internal class StackScreenFragment @Keep constructor() :
@@ -27,6 +29,7 @@ internal class StackScreenFragment @Keep constructor() :
         canNavigateBack: Boolean,
         delegate: WeakReference<StackScreenFragmentDelegate>,
         backPressHandler: WeakReference<StackHeaderBackPressHandler>,
+        updateBatchStateProvider: WeakReference<StackUpdateBatchStateProviding>,
     ) : this() {
         initializeRuntimeState(
             StackScreenRuntimeState(
@@ -34,6 +37,7 @@ internal class StackScreenFragment @Keep constructor() :
                 canNavigateBack = canNavigateBack,
                 delegate = delegate,
                 backPressHandler = backPressHandler,
+                updateBatchStateProvider = updateBatchStateProvider,
             ),
         )
     }
@@ -45,6 +49,13 @@ internal class StackScreenFragment @Keep constructor() :
         get() = runtimeState.canNavigateBack
 
     private var screenLifecycleEventEmitter: StackScreenAppearanceEventsEmitter? = null
+
+    /**
+     * Retained across fragment view destruction (e.g. tab switches detaching the fragment), so that
+     * the app bar scroll offset and the built header survive reattachment. FragmentManager removes
+     * the view from its container before `onDestroyView`, so `onCreateView` can return it as-is.
+     */
+    private var headerCoordinatorLayout: StackHeaderCoordinatorLayout? = null
 
     /**
      * This holds the screen strongly for now. Beware of retain cycle.
@@ -75,11 +86,23 @@ internal class StackScreenFragment @Keep constructor() :
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?,
-    ): View =
-        StackHeaderCoordinatorLayout(requireContext(), stackScreen, canNavigateBack) { pressedScreen ->
+    ): View {
+        headerCoordinatorLayout?.let { return it }
+
+        return StackHeaderCoordinatorLayout(
+            requireContext(),
+            stackScreen,
+            canNavigateBack,
+            runtimeState.updateBatchStateProvider,
+        ) { pressedScreen ->
             runtimeState.backPressHandler.get()?.handleHeaderBackButtonPress(pressedScreen)
                 ?: Log.w(TAG, "[RNScreens] Header back button press dropped - handler is gone")
-        }
+        }.also { headerCoordinatorLayout = it }
+    }
+
+    internal fun flushPendingHeaderUpdates() {
+        headerCoordinatorLayout?.flushPendingUpdates()
+    }
 
     override fun onRuntimeViewCreated(
         view: View,
@@ -89,15 +112,12 @@ internal class StackScreenFragment @Keep constructor() :
     }
 
     override fun onRuntimeDestroyView() {
-        val coordinatorLayout = view
-        check(coordinatorLayout is StackHeaderCoordinatorLayout) {
-            "[RNScreens] Unexpected fragment view type: $view"
-        }
-        coordinatorLayout.tearDown()
         screenLifecycleEventEmitter = null
     }
 
     override fun onRuntimeDestroy() {
+        headerCoordinatorLayout?.tearDown()
+        headerCoordinatorLayout = null
         // Destroying an outer StackScreen also destroys all Fragments in its child manager. Those
         // nested screens were not independently popped and must not emit another native dismissal.
         if (generateSequence(parentFragment) { it.parentFragment }.none { it.isRemoving }) {

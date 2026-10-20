@@ -13,6 +13,7 @@ import com.lynx.tasm.behavior.LynxElement
 import com.lynx.tasm.behavior.LynxProp
 import com.lynx.tasm.behavior.LynxUIMethod
 import com.lynx.tasm.behavior.LynxUIMethodConstants
+import com.lynx.tasm.behavior.StylesDiffMap
 import com.lynx.tasm.behavior.ui.LynxBaseUI
 import com.lynx.tasm.behavior.ui.UIGroup
 import com.lynxscreens.screens.common.ShadowStateProxy
@@ -49,40 +50,45 @@ internal class StackHeaderConfigComponent(
         configObserver = observer
     }
 
-    override var invalidationFlags = StackHeaderInvalidationFlags.ALL
-
-    override fun clearInvalidationFlags(flags: StackHeaderInvalidationFlags) {
-        invalidationFlags = invalidationFlags.clearing(flags)
-    }
-
     private fun invalidate(flags: StackHeaderInvalidationFlags) {
-        invalidationFlags = invalidationFlags or flags
-    }
-
-    private fun flushUpdates() {
-        if (configObserver == null || invalidationFlags.isEmpty) {
-            return
+        when {
+            // Adaptation: RNS reports every change right away and the host's mount transaction
+            // (willMountItems/didMountItems) holds the consumer's flush. Lynx has no transaction
+            // bracket, so the changes raised by this config's own props batch are coalesced here
+            // and reported once from onPropsUpdated (see updatePropertiesInterval).
+            isInsidePropsUpdate -> pendingNotificationFlags = pendingNotificationFlags or flags
+            // Adaptation: on Lynx child mounting precedes layout application within a patch, so
+            // out-of-band subview changes (child attach/detach, subview prop batches) are reported
+            // one frame later - otherwise freshly attached subviews reach the Toolbar as 0x0 views.
+            flags.containsAny(StackHeaderInvalidationFlags.SUBVIEWS) -> scheduleInvalidation(flags)
+            else -> configObserver?.onInvalidated(flags)
         }
-
-        configObserver?.onConfigChanged(this)
     }
 
-    /**
-     * Lynx analog of flushing in RNS's didMountItems: Fabric applies layout
-     * metrics before didMountItems fires, so RNS flushes with children already
-     * sized. On Lynx child mounting precedes layout application within a batch,
-     * so out-of-band invalidations (child attach/detach, subview prop changes)
-     * defer the flush one frame - otherwise freshly attached subviews reach the
-     * Toolbar with a 0x0 view.
-     */
-    private var isFlushScheduled = false
+    private var pendingNotificationFlags = StackHeaderInvalidationFlags.NONE
 
-    private fun scheduleFlush() {
-        if (isFlushScheduled) return
-        isFlushScheduled = true
+    private fun reportPendingInvalidations() {
+        val flags = pendingNotificationFlags
+        pendingNotificationFlags = StackHeaderInvalidationFlags.NONE
+        if (!flags.isEmpty) {
+            configObserver?.onInvalidated(flags)
+        }
+    }
+
+    private var deferredNotificationFlags = StackHeaderInvalidationFlags.NONE
+    private var isDeferredNotificationScheduled = false
+
+    private fun scheduleInvalidation(flags: StackHeaderInvalidationFlags) {
+        deferredNotificationFlags = deferredNotificationFlags or flags
+        if (isDeferredNotificationScheduled) return
+        isDeferredNotificationScheduled = true
         view.post {
-            isFlushScheduled = false
-            flushUpdates()
+            isDeferredNotificationScheduled = false
+            val deferredFlags = deferredNotificationFlags
+            deferredNotificationFlags = StackHeaderInvalidationFlags.NONE
+            if (!deferredFlags.isEmpty) {
+                configObserver?.onInvalidated(deferredFlags)
+            }
         }
     }
 
@@ -220,9 +226,6 @@ internal class StackHeaderConfigComponent(
      */
     internal fun onContentScrollViewChanged() {
         invalidate(StackHeaderInvalidationFlags.LIFT_ON_SCROLL)
-        if (!isInsidePropsUpdate) {
-            flushUpdates()
-        }
     }
 
     // endregion
@@ -243,12 +246,7 @@ internal class StackHeaderConfigComponent(
         ) { result ->
             when (result) {
                 IconResolution.Unchanged -> Unit
-                is IconResolution.Resolved -> {
-                    backButtonIcon = result.drawable
-                    if (!isInsidePropsUpdate) {
-                        flushUpdates()
-                    }
-                }
+                is IconResolution.Resolved -> backButtonIcon = result.drawable
             }
         }
     }
@@ -270,12 +268,7 @@ internal class StackHeaderConfigComponent(
         ) { result ->
             when (result) {
                 IconResolution.Unchanged -> Unit
-                is IconResolution.Resolved -> {
-                    overflowIcon = result.drawable
-                    if (!isInsidePropsUpdate) {
-                        flushUpdates()
-                    }
-                }
+                is IconResolution.Resolved -> overflowIcon = result.drawable
             }
         }
     }
@@ -335,11 +328,6 @@ internal class StackHeaderConfigComponent(
 
     override fun onStackHeaderSubviewChanged() {
         invalidate(StackHeaderInvalidationFlags.SUBVIEWS)
-        // Subview prop changes arrive through the subview's own props batch,
-        // outside this config's onPropsUpdated.
-        if (!isInsidePropsUpdate) {
-            scheduleFlush()
-        }
     }
 
     internal fun addConfigSubview(headerSubview: StackHeaderSubviewComponent) {
@@ -350,10 +338,6 @@ internal class StackHeaderConfigComponent(
             StackHeaderSubviewType.TRAILING -> trailingSubview = headerSubview
         }
         headerSubview.onStackHeaderSubviewChangeListener = WeakReference(this)
-        // Child mount/unmount happens outside this config's props batch.
-        if (!isInsidePropsUpdate) {
-            scheduleFlush()
-        }
     }
 
     internal fun removeConfigSubview(headerSubview: StackHeaderSubviewComponent) {
@@ -363,9 +347,6 @@ internal class StackHeaderConfigComponent(
             StackHeaderSubviewType.LEADING -> leadingSubview = null
             StackHeaderSubviewType.CENTER -> centerSubview = null
             StackHeaderSubviewType.TRAILING -> trailingSubview = null
-        }
-        if (!isInsidePropsUpdate) {
-            scheduleFlush()
         }
     }
 
@@ -457,13 +438,18 @@ internal class StackHeaderConfigComponent(
     }
 
     /**
-     * Lynx analog of the RNS UIManagerListener transaction bracket
-     * (willMountItems/didMountItems): prop setters run synchronously right before
-     * onPropsUpdated, so the flag accumulation happens "inside the transaction"
-     * and a single flush is issued here. The guard keeps synchronously-resolving
-     * icon callbacks from flushing mid-batch.
+     * Lynx analog of the RNS mount transaction (willMountItems/didMountItems) for
+     * this config's own updates: prop setters run synchronously between
+     * updatePropertiesInterval and onPropsUpdated, so the changes they raise are
+     * coalesced "inside the transaction" and reported to the observer once. The
+     * bracket also covers synchronously-resolving icon callbacks.
      */
     private var isInsidePropsUpdate = false
+
+    override fun updatePropertiesInterval(props: StylesDiffMap?) {
+        isInsidePropsUpdate = true
+        super.updatePropertiesInterval(props)
+    }
 
     override fun onPropsUpdated() {
         super.onPropsUpdated()
@@ -471,7 +457,7 @@ internal class StackHeaderConfigComponent(
         resolveBackButtonIconIfNeeded()
         resolveOverflowIconIfNeeded()
         isInsidePropsUpdate = false
-        flushUpdates()
+        reportPendingInvalidations()
     }
 
     // Lynx analog of RNS's onDropViewInstance-driven teardown.
@@ -482,9 +468,9 @@ internal class StackHeaderConfigComponent(
 
     internal fun tearDown() {
         toolbarMenuController.tearDown()
-        invalidationFlags = StackHeaderInvalidationFlags.NONE
         configObserver = null
-        isFlushScheduled = false
+        pendingNotificationFlags = StackHeaderInvalidationFlags.NONE
+        deferredNotificationFlags = StackHeaderInvalidationFlags.NONE
     }
 
     // endregion
