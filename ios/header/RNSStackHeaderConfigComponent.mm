@@ -12,7 +12,6 @@
 #import "RNSStackNavigationController.h"
 #import "RNSStackScreenComponent.h"
 #import "RNSStackScreenController.h"
-#import "RNSStackScreenHeaderCoordinator.h"
 
 #import <Lynx/LynxComponentRegistry.h>
 #import <Lynx/LynxLog.h>
@@ -102,18 +101,7 @@ static void RNSAssertIsValidHeaderChild(id child)
 {
     if (self.view.window != nil) {
         [[self requireNavigationController] setNavigationBarFrameChangeDelegate:self];
-        RNSStackScreenHeaderCoordinator *coordinator = [self headerCoordinator];
-        coordinator.configDataProvider = self;
-        coordinator.frameChangeDelegate = self;
-        coordinator.eventsDelegate = self;
-        coordinator.imageLoader = self;
-        [coordinator rebuild];
-    } else {
-        RNSStackScreenHeaderCoordinator *coordinator = [self headerCoordinator];
-        coordinator.configDataProvider = nil;
-        coordinator.frameChangeDelegate = nil;
-        coordinator.eventsDelegate = nil;
-        coordinator.imageLoader = nil;
+        [self.headerCoordinator rebuild];
     }
 }
 
@@ -134,7 +122,7 @@ static void RNSAssertIsValidHeaderChild(id child)
         ((RNSStackHeaderItemSpacerComponent *)child).invalidationDelegate = self;
     }
 
-    [[self headerCoordinator] rebuild];
+    [self.headerCoordinator rebuild];
 }
 
 - (void)removeChild:(id)child atIndex:(NSInteger)index
@@ -148,7 +136,7 @@ static void RNSAssertIsValidHeaderChild(id child)
     }
 
     [super removeChild:child atIndex:index];
-    [[self headerCoordinator] rebuild];
+    [self.headerCoordinator rebuild];
 }
 
 #pragma mark - RNSStackHeaderItemInvalidationDelegate
@@ -157,22 +145,21 @@ static void RNSAssertIsValidHeaderChild(id child)
 {
     if (itemId == nil) {
         LLogWarn(@"[RNScreens] headerItemDidInvalidateWithId called with nil id, will run full header rebuild");
-        [[self headerCoordinator] rebuild];
+        [self.headerCoordinator rebuild];
         return;
     }
-    [[self headerCoordinator] rebuildItemWithId:itemId];
+    [self.headerCoordinator rebuildItemWithId:itemId];
 }
 
 - (void)headerItemMenuDidChangeWithId:(NSString *)itemId
 {
     if (itemId == nil) {
         LLogWarn(@"[RNScreens] headerItemMenuDidChangeWithId called with nil id, will run full header rebuild");
-        [[self headerCoordinator] rebuild];
+        [self.headerCoordinator rebuild];
         return;
     }
-    RNSStackScreenHeaderCoordinator *coordinator = [self headerCoordinator];
-    [coordinator resetTrackerForItemWithId:itemId];
-    [coordinator reapplyMenuForItemWithId:itemId];
+    [self.headerCoordinator resetTrackerForItemWithId:itemId];
+    [self.headerCoordinator reapplyMenuForItemWithId:itemId];
 }
 
 /**
@@ -182,15 +169,15 @@ static void RNSAssertIsValidHeaderChild(id child)
 {
     if (itemId == nil) {
         LLogWarn(@"[RNScreens] headerItemMenuDidUpdateFromCommandWithId called with nil id, will run full header rebuild");
-        [[self headerCoordinator] rebuild];
+        [self.headerCoordinator rebuild];
         return;
     }
-    [[self headerCoordinator] reapplyMenuForItemWithId:itemId];
+    [self.headerCoordinator reapplyMenuForItemWithId:itemId];
 }
 
 - (void)headerItemSpacerDidInvalidate
 {
-    [[self headerCoordinator] rebuild];
+    [self.headerCoordinator rebuild];
 }
 
 #pragma mark - RNSStackHeaderEventsDelegate
@@ -312,15 +299,15 @@ LYNX_PROP_SETTER("backButtonHidden", setBackButtonHidden, BOOL) {}
 - (void)propsDidUpdate
 {
     [super propsDidUpdate];
-    [[self headerCoordinator] applyConfigProperties];
+    [self.headerCoordinator applyConfigProperties];
 
     if (_titleMenuDidChange) {
         _titleMenuDidChange = NO;
         // title menu is a prop on the navigation item, not on one of the bar button items
         // thus it is not configured with matching RNSStackHeaderItemComponentView
         // but here directly
-        [[self headerCoordinator] resetTitleMenuTracker];
-        [[self headerCoordinator] reapplyTitleMenu];
+        [self.headerCoordinator resetTitleMenuTracker];
+        [self.headerCoordinator reapplyTitleMenu];
     }
 }
 
@@ -364,11 +351,11 @@ LYNX_UI_METHOD(setMenuItemOptions) {
             (oldItemData.itemType == RNSMenuItemTypeAutomatic &&
              [RNSStackHeaderMenuFinder singleSelectionRootForElementWithId:menuItemId inMenu:locator.rootMenu] != nil);
         if (isToggle) {
-            [[self headerCoordinator] setToggleState:updateOptions.toggleState
-                                    forMenuElementId:menuItemId
-                                       trackerItemId:locator.trackerItemId
-                                            rootMenu:locator.rootMenu
-                                          parentMenu:locator.searchResult.parentMenu];
+            [self.headerCoordinator setToggleState:updateOptions.toggleState
+                                  forMenuElementId:menuItemId
+                                     trackerItemId:locator.trackerItemId
+                                          rootMenu:locator.rootMenu
+                                        parentMenu:locator.searchResult.parentMenu];
         }
     }
 
@@ -387,7 +374,7 @@ LYNX_UI_METHOD(setMenuItemOptions) {
                                             replacingChildWithId:menuItemId
                                                      withElement:newItemData];
             }
-            [[self headerCoordinator] reapplyTitleMenu];
+            [self.headerCoordinator reapplyTitleMenu];
             break;
         case RNSMenuElementPositionOverflow:
             // TODO: handle overflow menu
@@ -440,7 +427,7 @@ LYNX_UI_METHOD(setMenuOptions) {
                                             replacingChildWithId:menuElementId
                                                      withElement:newMenuItem];
             }
-            [[self headerCoordinator] reapplyTitleMenu];
+            [self.headerCoordinator reapplyTitleMenu];
             break;
         case RNSMenuElementPositionOverflow:
             // TODO: handle overflow menu
@@ -543,17 +530,6 @@ LYNX_UI_METHOD(setMenuOptions) {
 }
 
 #pragma mark - Private
-
-- (nullable RNSStackScreenHeaderCoordinator *)headerCoordinator
-{
-    if (self.parent == nil) {
-        return nil;
-    }
-    NSAssert([self.parent isKindOfClass:RNSStackScreenComponent.class],
-             @"[RNScreens] Header Config should be a direct child of RNSStackScreenComponent");
-    RNSStackScreenComponent *screen = (RNSStackScreenComponent *)self.parent;
-    return screen.controller.headerCoordinator;
-}
 
 - (nullable RNSStackScreenComponent *)stackScreen
 {

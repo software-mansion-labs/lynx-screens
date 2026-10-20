@@ -14,6 +14,7 @@
     UIScrollView *_Nullable _contentScrollView;
     RNSStackScreenController *_Nonnull _controller;
     RNSStackScreenEventEmitter *_eventEmitter;
+    RNSStackHeaderConfigComponent *_Nullable _headerConfig;
 
     // Flags
     BOOL _hasUpdatedActivityMode;
@@ -102,10 +103,25 @@ LYNX_PROP_SETTER("screenKey", setScreenKey, NSString *) {
 
 #pragma mark - Children Lifecycle
 
+- (void)insertChild:(id)child atIndex:(NSInteger)index
+{
+    if ([child isKindOfClass:RNSStackHeaderConfigComponent.class]) {
+        _headerConfig = (RNSStackHeaderConfigComponent *)child;
+        _headerConfig.headerCoordinator = _controller.headerCoordinator;
+        _controller.headerCoordinator.configDataProvider = _headerConfig;
+        _controller.headerCoordinator.frameChangeDelegate = _headerConfig;
+        _controller.headerCoordinator.eventsDelegate = _headerConfig;
+        _controller.headerCoordinator.imageLoader = _headerConfig;
+    }
+    [super insertChild:child atIndex:index];
+}
+
 - (void)removeChild:(id)child atIndex:(NSInteger)index
 {
     if ([child isKindOfClass:RNSStackHeaderConfigComponent.class]) {
         [_controller.headerCoordinator clearHeaderConfiguration];
+        _headerConfig.headerCoordinator = nil;
+        _headerConfig = nil;
     }
     [super removeChild:child atIndex:index];
 }
