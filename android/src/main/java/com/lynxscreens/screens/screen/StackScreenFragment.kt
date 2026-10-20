@@ -9,6 +9,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.annotation.Keep
 import androidx.transition.Slide
+import com.lynxscreens.screens.common.colorscheme.ColorSchemeProviding
 import com.lynxscreens.screens.header.StackHeaderBackPressHandler
 import com.lynxscreens.screens.header.StackHeaderCoordinatorLayout
 import com.lynxscreens.screens.host.StackUpdateBatchStateProviding
@@ -20,6 +21,7 @@ internal data class StackScreenRuntimeState(
     val delegate: WeakReference<StackScreenFragmentDelegate>,
     val backPressHandler: WeakReference<StackHeaderBackPressHandler>,
     val updateBatchStateProvider: WeakReference<StackUpdateBatchStateProviding>,
+    val colorSchemeProvider: WeakReference<ColorSchemeProviding>,
 )
 
 internal class StackScreenFragment @Keep constructor() :
@@ -30,6 +32,7 @@ internal class StackScreenFragment @Keep constructor() :
         delegate: WeakReference<StackScreenFragmentDelegate>,
         backPressHandler: WeakReference<StackHeaderBackPressHandler>,
         updateBatchStateProvider: WeakReference<StackUpdateBatchStateProviding>,
+        colorSchemeProvider: WeakReference<ColorSchemeProviding>,
     ) : this() {
         initializeRuntimeState(
             StackScreenRuntimeState(
@@ -38,6 +41,7 @@ internal class StackScreenFragment @Keep constructor() :
                 delegate = delegate,
                 backPressHandler = backPressHandler,
                 updateBatchStateProvider = updateBatchStateProvider,
+                colorSchemeProvider = colorSchemeProvider,
             ),
         )
     }
@@ -94,6 +98,7 @@ internal class StackScreenFragment @Keep constructor() :
             stackScreen,
             canNavigateBack,
             runtimeState.updateBatchStateProvider,
+            runtimeState.colorSchemeProvider,
         ) { pressedScreen ->
             runtimeState.backPressHandler.get()?.handleHeaderBackButtonPress(pressedScreen)
                 ?: Log.w(TAG, "[RNScreens] Header back button press dropped - handler is gone")
