@@ -7,6 +7,7 @@ export { default as TestStackBackButtonAndroid } from './TestStackBackButtonAndr
 export { default as TestStackOverflowIconAndroid } from './TestStackOverflowIconAndroid';
 export { default as TestStackHeaderTitleAppearanceAndroid } from './TestStackHeaderTitleAppearanceAndroid';
 export { default as TestStackHeaderContentInsetsAndroid } from './TestStackHeaderContentInsetsAndroid';
+export { default as TestStackHeaderBackgroundAndroid } from './TestStackHeaderBackgroundAndroid';
 export { default as TestStackLiftOnScrollAndroid } from './TestStackLiftOnScrollAndroid';
 export { default as TestStackSimpleNav } from './TestStackSimpleNav';
 export { default as TestStackToolbarMenuCommandsAndroid } from './TestStackToolbarMenuCommandsAndroid';
