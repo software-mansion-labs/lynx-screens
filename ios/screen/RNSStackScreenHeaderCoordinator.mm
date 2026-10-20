@@ -12,6 +12,24 @@
 
 #import <Lynx/LynxLog.h>
 
+// Adaptation: RNS keeps this mapping in the rnscreens::conversion namespace
+// (RNSConversions-Stack); Lynx has no conversion unit, so it lives here.
+#if RNS_IPHONE_OS_VERSION_AVAILABLE(27_0) && !TARGET_OS_TV && !TARGET_OS_VISION
+API_AVAILABLE(ios(27.0))
+static UIBarButtonItemVisibilityPriority UIBarButtonItemVisibilityPriorityFromRNSHeaderItemVisibilityPriority(
+    RNSHeaderItemVisibilityPriority visibilityPriority)
+{
+    switch (visibilityPriority) {
+        case RNSHeaderItemVisibilityPriorityLow:
+            return UIBarButtonItemVisibilityPriorityLow;
+        case RNSHeaderItemVisibilityPriorityStandard:
+            return UIBarButtonItemVisibilityPriorityStandard;
+        case RNSHeaderItemVisibilityPriorityHigh:
+            return UIBarButtonItemVisibilityPriorityHigh;
+    }
+}
+#endif // RNS_IPHONE_OS_VERSION_AVAILABLE(27_0) && !TARGET_OS_TV && !TARGET_OS_VISION
+
 @implementation RNSStackScreenHeaderCoordinator {
     __weak RNSStackScreenController *_Nullable _screenController;
 
@@ -559,6 +577,15 @@
         barButtonItem.hidesSharedBackground = item.hidesSharedBackground;
     }
 #endif // RNS_IPHONE_OS_VERSION_AVAILABLE(26_0)
+
+// tvOS and visionOS are excluded on purpose: `visibilityPriority` exists there, but the only
+// supported value is `standard`, which is already the default.
+#if RNS_IPHONE_OS_VERSION_AVAILABLE(27_0) && !TARGET_OS_TV && !TARGET_OS_VISION
+    if (@available(iOS 27.0, *)) {
+        barButtonItem.visibilityPriority =
+            UIBarButtonItemVisibilityPriorityFromRNSHeaderItemVisibilityPriority(item.visibilityPriority);
+    }
+#endif // RNS_IPHONE_OS_VERSION_AVAILABLE(27_0) && !TARGET_OS_TV && !TARGET_OS_VISION
 
     if (item.menu != nil && item.itemId != nil) {
         RNSStackHeaderMenuToggleStateTracker *tracker = [_trackerRegistry trackerForItemId:item.itemId];

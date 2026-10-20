@@ -47,6 +47,7 @@ export interface NativeProps {
   itemId?: string | undefined;
   identifier?: string | undefined;
   hidesSharedBackground?: boolean | undefined;
+  visibilityPriority?: 'low' | 'standard' | 'high' | undefined;
   title?: string | undefined;
   icon?: StackHeaderIconIOSAttr | undefined;
   menu?: StackHeaderMenuAttr | undefined;
