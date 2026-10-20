@@ -45,6 +45,7 @@ export interface NativeProps {
     | 'largeSubtitle'
     | undefined;
   itemId?: string | undefined;
+  identifier?: string | undefined;
   title?: string | undefined;
   icon?: StackHeaderIconIOSAttr | undefined;
   menu?: StackHeaderMenuAttr | undefined;
