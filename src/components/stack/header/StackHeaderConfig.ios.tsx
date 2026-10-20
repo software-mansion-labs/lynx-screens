@@ -12,6 +12,7 @@ import type {
   StackHeaderConfigRef,
 } from './StackHeaderConfig.types.js';
 import type {
+  StackHeaderAppearanceIOS,
   StackHeaderInlineCustomItemIOS,
   StackHeaderInlineItemIOS,
   StackHeaderSpacerItemIOS,
@@ -20,6 +21,7 @@ import type {
   StackHeaderMenuOptionsIOS,
 } from './StackHeaderConfig.ios.types.js';
 import type { StackHeaderMenuIOS } from './ios/StackHeaderMenu.ios.types.js';
+import type { HeaderAppearance } from '../../../native_specs/stack/StackHeaderConfigNativeComponent.js';
 import {
   findMenuElementByIdInMenus,
   parseMenuElementToAttr,
@@ -103,6 +105,8 @@ export const StackHeaderConfigIOS = (props: PlatformInnerProps) => {
     backButtonTitle,
     backButtonDisplayMode,
     backButtonMenuEnabled,
+    standardAppearance,
+    scrollEdgeAppearance,
   } = ios ?? {};
 
   const allMenus = useMemo(
@@ -179,6 +183,8 @@ export const StackHeaderConfigIOS = (props: PlatformInnerProps) => {
       largeSubtitle={largeSubtitle}
       largeTitleEnabled={!!largeTitleEnabled}
       prompt={prompt}
+      standardAppearance={mapAppearanceToNativeProp(standardAppearance)}
+      scrollEdgeAppearance={mapAppearanceToNativeProp(scrollEdgeAppearance)}
       titleMenu={parsedTitleMenu}
       bindOnMenuItemPress={handleMenuItemPress}
       bindOnMenuSelectionChange={handleSelectionChange}
@@ -253,4 +259,27 @@ function parseMenuElementOptionsToNativeIOS(
       ];
     }),
   );
+}
+
+// Adaptation: RNS processes the colors here (processColor); on Lynx the CSS
+// color strings are passed through and parsed natively.
+function mapAppearanceToNativeProp(
+  appearance?: StackHeaderAppearanceIOS,
+): HeaderAppearance | undefined {
+  if (!appearance) return undefined;
+
+  const { titleFontWeight, largeTitleFontWeight, subtitleFontWeight } =
+    appearance;
+
+  return {
+    ...appearance,
+    titleFontWeight:
+      titleFontWeight !== undefined ? String(titleFontWeight) : undefined,
+    largeTitleFontWeight:
+      largeTitleFontWeight !== undefined
+        ? String(largeTitleFontWeight)
+        : undefined,
+    subtitleFontWeight:
+      subtitleFontWeight !== undefined ? String(subtitleFontWeight) : undefined,
+  };
 }

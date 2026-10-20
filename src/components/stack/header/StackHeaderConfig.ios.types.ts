@@ -1,4 +1,5 @@
 import type { ReactElement } from '@lynx-js/react';
+import type { CSSProperties } from '@lynx-js/types';
 import type { PlatformIconIOS } from '../../shared/types.js';
 import type { StackHeaderMenuIOS } from './ios/StackHeaderMenu.ios.types.js';
 
@@ -164,6 +165,119 @@ export type StackHeaderBackButtonDisplayModeIOS =
   | 'generic'
   | 'minimal';
 
+export interface StackHeaderAppearanceIOS {
+  /**
+   * @summary Specifies the font family used for the title of the header.
+   *
+   * @platform ios
+   */
+  titleFontFamily?: CSSProperties['fontFamily'] | undefined;
+  /**
+   * @summary Specifies the font size used for the title of the header.
+   *
+   * @platform ios
+   */
+  titleFontSize?: number | undefined;
+  /**
+   * @summary Specifies the font weight used for the title of the header.
+   *
+   * @platform ios
+   */
+  titleFontWeight?: CSSProperties['fontWeight'] | undefined;
+  /**
+   * @summary Specifies the font style used for the title of the header.
+   *
+   * @platform ios
+   */
+  titleFontStyle?: CSSProperties['fontStyle'] | undefined;
+  /**
+   * @summary Specifies the font color used for the title of the header.
+   *
+   * @platform ios
+   */
+  titleFontColor?: string | undefined;
+  /**
+   * @summary Specifies the font family used for the large title of the header.
+   *
+   * @platform ios
+   */
+  largeTitleFontFamily?: CSSProperties['fontFamily'] | undefined;
+  /**
+   * @summary Specifies the font size used for the large title of the header.
+   *
+   * @platform ios
+   */
+  largeTitleFontSize?: number | undefined;
+  /**
+   * @summary Specifies the font weight used for the large title of the header.
+   *
+   * @platform ios
+   */
+  largeTitleFontWeight?: CSSProperties['fontWeight'] | undefined;
+  /**
+   * @summary Specifies the font style used for the large title of the header.
+   *
+   * @platform ios
+   */
+  largeTitleFontStyle?: CSSProperties['fontStyle'] | undefined;
+  /**
+   * @summary Specifies the font color used for the large title of the header.
+   *
+   * @platform ios
+   */
+  largeTitleFontColor?: string | undefined;
+  /**
+   * @summary Specifies the font family used for the subtitle of the header.
+   *
+   * @description Applies to both the regular and the large subtitle.
+   *
+   * @platform ios
+   *
+   * @supported iOS 26 and higher
+   */
+  subtitleFontFamily?: CSSProperties['fontFamily'] | undefined;
+  /**
+   * @summary Specifies the font size used for the subtitle of the header.
+   *
+   * @description Applies to both the regular and the large subtitle.
+   *
+   * @platform ios
+   *
+   * @supported iOS 26 and higher
+   */
+  subtitleFontSize?: number | undefined;
+  /**
+   * @summary Specifies the font weight used for the subtitle of the header.
+   *
+   * @description Applies to both the regular and the large subtitle.
+   *
+   * @platform ios
+   *
+   * @supported iOS 26 and higher
+   */
+  subtitleFontWeight?: CSSProperties['fontWeight'] | undefined;
+  /**
+   * @summary Specifies the font style used for the subtitle of the header.
+   *
+   * @description Applies to both the regular and the large subtitle.
+   *
+   * @platform ios
+   *
+   * @supported iOS 26 and higher
+   */
+  subtitleFontStyle?: CSSProperties['fontStyle'] | undefined;
+  /**
+   * @summary Specifies the font color used for the subtitle of the header.
+   *
+   * @description Applies to both the regular and the large subtitle.
+   *
+   * @platform ios
+   *
+   * @supported iOS 26 and higher
+   */
+  subtitleFontColor?: string | undefined;
+}
+
 export interface StackHeaderConfigPropsIOS {
   /**
    * @summary Title displayed next to the back button on this screen.
@@ -242,6 +356,24 @@ export interface StackHeaderConfigPropsIOS {
    * @platform iOS
    */
   prompt?: string | undefined;
+  /**
+   * @summary Appearance of the header when the edge of scrollable content
+   * is not aligned with the edge of the header.
+   *
+   * @platform ios
+   */
+  standardAppearance?: StackHeaderAppearanceIOS | undefined;
+  /**
+   * @summary Appearance of the header when the edge of scrollable content
+   * is aligned with the edge of the header.
+   *
+   * @description If unset, derives the configuration from `standardAppearance`,
+   * otherwise becomes a standalone definition. In both cases it keeps transparent
+   * background by default (iOS <18).
+   *
+   * @platform ios
+   */
+  scrollEdgeAppearance?: StackHeaderAppearanceIOS | undefined;
 }
 
 export interface StackHeaderConfigCommandsIOS {
