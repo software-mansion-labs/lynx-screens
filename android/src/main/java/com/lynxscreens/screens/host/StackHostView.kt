@@ -1,11 +1,11 @@
 package com.lynxscreens.screens.host
 
 import android.annotation.SuppressLint
-import android.util.Log
 import android.view.View
 import android.view.ViewGroup
 import com.lynx.tasm.behavior.LynxContext
 import com.lynxscreens.screens.common.colorscheme.ColorScheme
+import com.lynxscreens.screens.utils.RNSLog
 
 @SuppressLint("ViewConstructor") // should never be restored
 internal class StackHostView(
@@ -58,7 +58,7 @@ internal class StackHostView(
     }
 
     override fun onAttachedToWindow() {
-        Log.d(TAG, "StackHost [$id] attached to window")
+        RNSLog.d(TAG, "StackHost [$id] attached to window")
         super.onAttachedToWindow()
     }
 
