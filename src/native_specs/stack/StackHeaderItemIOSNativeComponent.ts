@@ -46,6 +46,7 @@ export interface NativeProps {
     | undefined;
   itemId?: string | undefined;
   identifier?: string | undefined;
+  hidesSharedBackground?: boolean | undefined;
   title?: string | undefined;
   icon?: StackHeaderIconIOSAttr | undefined;
   menu?: StackHeaderMenuAttr | undefined;

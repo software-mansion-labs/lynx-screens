@@ -80,6 +80,24 @@ export interface SupportsMenuIOS {
   menu?: StackHeaderMenuIOS | undefined;
 }
 
+export interface SupportsSharedBackgroundIOS {
+  /**
+   * @summary Whether the liquid glass background for this item should be hidden.
+   *
+   * @description
+   * On iOS 26, adjacent bar button items are grouped inside a shared liquid
+   * glass background. Setting this to `true` removes the shared background
+   * from this item.
+   *
+   * @default false
+   *
+   * @platform iOS
+   *
+   * @supported iOS 26 and higher
+   */
+  hidesSharedBackground?: boolean | undefined;
+}
+
 export interface SupportsIdentifierIOS {
   /**
    * @summary Stable identifier used to match the item across different screens
@@ -102,7 +120,8 @@ export interface SupportsIdentifierIOS {
 export interface StackHeaderInlineItemIOS
   extends StackHeaderBaseItemIOS,
     SupportsMenuIOS,
-    SupportsIdentifierIOS {
+    SupportsIdentifierIOS,
+    SupportsSharedBackgroundIOS {
   type: 'item';
   /**
    * @summary Callback invoked when the header item is pressed.
@@ -119,7 +138,8 @@ export interface StackHeaderInlineItemIOS
 
 export interface StackHeaderInlineCustomItemIOS
   extends SupportsMenuIOS,
-    SupportsIdentifierIOS {
+    SupportsIdentifierIOS,
+    SupportsSharedBackgroundIOS {
   id: string;
   type: 'item';
   render: () => ReactElement;

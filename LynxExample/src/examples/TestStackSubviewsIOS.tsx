@@ -90,6 +90,7 @@ interface Config {
   largeSubtitle: LargeSubtitleOption;
   leadingItemsCount: number;
   trailingItemsCount: number;
+  hidesSharedBackground: boolean;
   title: TitleOption;
   subtitle: TitleOption;
   hitSlop: HitSlopValue;
@@ -124,6 +125,7 @@ const DEFAULT_CONFIG: Config = {
   largeSubtitle: 'none',
   leadingItemsCount: 2,
   trailingItemsCount: 2,
+  hidesSharedBackground: false,
   title: 'short',
   subtitle: 'short',
   hitSlop: '0',
@@ -141,6 +143,7 @@ function buildHeaderConfig(config: Config): StackHeaderConfigProps | undefined {
   }).map((_, i) => ({
     type: 'item',
     id: `leading-${i}`,
+    hidesSharedBackground: config.hidesSharedBackground,
     render: () => <ResizingItem hitSlop={config.hitSlop} />,
   }));
   if (leadingItems.length > 1) {
@@ -157,6 +160,7 @@ function buildHeaderConfig(config: Config): StackHeaderConfigProps | undefined {
   > = Array.from({ length: config.trailingItemsCount }).map((_, i) => ({
     type: 'item',
     id: `trailing-${i}`,
+    hidesSharedBackground: config.hidesSharedBackground,
     render: () => <ResizingItem hitSlop={config.hitSlop} />,
   }));
   if (trailingItems.length > 1) {
@@ -278,6 +282,11 @@ function ConfigScreen() {
           label="prompt"
           value={config.promptEnabled}
           onValueChange={(v) => updateConfig('promptEnabled', v)}
+        />
+        <SettingsSwitch
+          label="hidesSharedBackground"
+          value={config.hidesSharedBackground}
+          onValueChange={(v) => updateConfig('hidesSharedBackground', v)}
         />
         <SettingsSwitch
           label="large header enabled"
