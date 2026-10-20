@@ -99,6 +99,10 @@ internal class StackHeaderConfigComponent(
     override var subtitle: String by invalidatingProperty("", StackHeaderInvalidationFlags.TITLE)
         internal set
 
+    // Requires header rebuild due to bug in Material implementation
+    override var maxLines: Int by invalidatingProperty(1, StackHeaderInvalidationFlags.STRUCTURE)
+        internal set
+
     override var hidden: Boolean by invalidatingProperty(false, StackHeaderInvalidationFlags.STRUCTURE)
         internal set
 
@@ -577,6 +581,11 @@ internal class StackHeaderConfigComponent(
     @LynxProp(name = "subtitle")
     fun setSubtitle(value: String?) {
         subtitle = value ?: ""
+    }
+
+    @LynxProp(name = "maxLines", defaultInt = 1)
+    fun setMaxLines(value: Int) {
+        maxLines = value.coerceAtLeast(1)
     }
 
     @LynxProp(name = "titleCentered")

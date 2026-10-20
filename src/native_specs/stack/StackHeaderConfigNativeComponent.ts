@@ -83,6 +83,7 @@ export interface NativeProps {
   collapsedSubtitleFontStyle?: string | undefined;
   title?: string | undefined;
   subtitle?: string | undefined;
+  maxLines?: number | undefined;
   hidden?: boolean | undefined;
   transparent?: boolean | undefined;
   backButtonHidden?: boolean | undefined;
