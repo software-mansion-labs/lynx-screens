@@ -160,6 +160,9 @@ internal class StackHeaderConfigComponent(
     override var scrolledBackgroundColor: Int? by invalidatingProperty(null, StackHeaderInvalidationFlags.BACKGROUND_COLORS)
         internal set
 
+    override var statusBarScrimColor: Int? by invalidatingProperty(null, StackHeaderInvalidationFlags.BACKGROUND_COLORS)
+        internal set
+
     override var toolbarMenu: StackHeaderToolbarMenuConfig
         by invalidatingProperty(StackHeaderToolbarMenuConfig(emptyList(), emptyList()), StackHeaderInvalidationFlags.TOOLBAR_MENU)
         internal set
@@ -924,6 +927,11 @@ internal class StackHeaderConfigComponent(
     @LynxProp(name = "scrolledBackgroundColor")
     fun setScrolledBackgroundColor(value: String?) {
         scrolledBackgroundColor = value?.let { runCatching { Color.parseColor(it) }.getOrNull() }
+    }
+
+    @LynxProp(name = "statusBarScrimColor")
+    fun setStatusBarScrimColor(value: String?) {
+        statusBarScrimColor = value?.let { runCatching { Color.parseColor(it) }.getOrNull() }
     }
 
     @LynxProp(name = "toolbarMenuGroupDividerEnabled")
