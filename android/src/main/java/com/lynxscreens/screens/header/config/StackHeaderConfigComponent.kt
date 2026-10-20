@@ -16,6 +16,7 @@ import com.lynx.tasm.behavior.LynxUIMethodConstants
 import com.lynx.tasm.behavior.ui.LynxBaseUI
 import com.lynx.tasm.behavior.ui.UIGroup
 import com.lynxscreens.screens.common.ShadowStateProxy
+import com.lynxscreens.screens.common.text.ReactTextAppearance
 import com.lynxscreens.screens.header.subview.OnStackHeaderSubviewChangeListener
 import com.lynxscreens.screens.header.subview.StackHeaderSubviewComponent
 import com.lynxscreens.screens.header.subview.StackHeaderSubviewType
@@ -89,152 +90,106 @@ internal class StackHeaderConfigComponent(
 
     // region Properties
 
-    override var type: StackHeaderType by Delegates.observable(StackHeaderType.SMALL) { _, old, new ->
-        if (old != new) invalidate(StackHeaderInvalidationFlags.STRUCTURE)
-    }
+    override var type: StackHeaderType by invalidatingProperty(StackHeaderType.SMALL, StackHeaderInvalidationFlags.STRUCTURE)
         internal set
 
-    override var title: String by Delegates.observable("") { _, old, new ->
-        if (old != new) invalidate(StackHeaderInvalidationFlags.TITLE)
-    }
+    override var title: String by invalidatingProperty("", StackHeaderInvalidationFlags.TITLE)
         internal set
 
-    override var subtitle: String by Delegates.observable("") { _, old, new ->
-        if (old != new) invalidate(StackHeaderInvalidationFlags.TITLE)
-    }
+    override var subtitle: String by invalidatingProperty("", StackHeaderInvalidationFlags.TITLE)
         internal set
 
-    override var hidden: Boolean by Delegates.observable(false) { _, old, new ->
-        if (old != new) invalidate(StackHeaderInvalidationFlags.STRUCTURE)
-    }
+    override var hidden: Boolean by invalidatingProperty(false, StackHeaderInvalidationFlags.STRUCTURE)
         internal set
 
-    override var transparent: Boolean by Delegates.observable(false) { _, old, new ->
-        if (old != new) invalidate(StackHeaderInvalidationFlags.STRUCTURE)
-    }
+    override var transparent: Boolean by invalidatingProperty(false, StackHeaderInvalidationFlags.STRUCTURE)
         internal set
 
-    override var backButtonHidden: Boolean by Delegates.observable(false) { _, old, new ->
-        if (old != new) invalidate(StackHeaderInvalidationFlags.BACK_BUTTON)
-    }
+    override var backButtonHidden: Boolean by invalidatingProperty(false, StackHeaderInvalidationFlags.BACK_BUTTON)
         internal set
 
-    override var backButtonTintColorNormal: Int? by Delegates.observable(null) { _, old, new ->
-        if (old != new) invalidate(StackHeaderInvalidationFlags.BACK_BUTTON)
-    }
+    override var backButtonTintColorNormal: Int? by invalidatingProperty(null, StackHeaderInvalidationFlags.BACK_BUTTON)
         internal set
 
-    override var backButtonTintColorPressed: Int? by Delegates.observable(null) { _, old, new ->
-        if (old != new) invalidate(StackHeaderInvalidationFlags.BACK_BUTTON)
-    }
+    override var backButtonTintColorPressed: Int? by invalidatingProperty(null, StackHeaderInvalidationFlags.BACK_BUTTON)
         internal set
 
-    override var backButtonTintColorFocused: Int? by Delegates.observable(null) { _, old, new ->
-        if (old != new) invalidate(StackHeaderInvalidationFlags.BACK_BUTTON)
-    }
+    override var backButtonTintColorFocused: Int? by invalidatingProperty(null, StackHeaderInvalidationFlags.BACK_BUTTON)
         internal set
 
-    override var backButtonIcon: Drawable? by Delegates.observable(null) { _, old, new ->
-        if (old !== new) invalidate(StackHeaderInvalidationFlags.BACK_BUTTON)
-    }
+    override var backButtonIcon: Drawable? by invalidatingProperty(null, StackHeaderInvalidationFlags.BACK_BUTTON)
         internal set
 
-    override var overflowIconTintColorNormal: Int? by Delegates.observable(null) { _, old, new ->
-        if (old != new) invalidate(StackHeaderInvalidationFlags.OVERFLOW_ICON)
-    }
+    override var overflowIconTintColorNormal: Int? by invalidatingProperty(null, StackHeaderInvalidationFlags.OVERFLOW_ICON)
         internal set
 
-    override var overflowIconTintColorPressed: Int? by Delegates.observable(null) { _, old, new ->
-        if (old != new) invalidate(StackHeaderInvalidationFlags.OVERFLOW_ICON)
-    }
+    override var overflowIconTintColorPressed: Int? by invalidatingProperty(null, StackHeaderInvalidationFlags.OVERFLOW_ICON)
         internal set
 
-    override var overflowIconTintColorFocused: Int? by Delegates.observable(null) { _, old, new ->
-        if (old != new) invalidate(StackHeaderInvalidationFlags.OVERFLOW_ICON)
-    }
+    override var overflowIconTintColorFocused: Int? by invalidatingProperty(null, StackHeaderInvalidationFlags.OVERFLOW_ICON)
         internal set
 
-    override var overflowIcon: Drawable? by Delegates.observable(null) { _, old, new ->
-        if (old !== new) invalidate(StackHeaderInvalidationFlags.OVERFLOW_ICON)
-    }
+    override var overflowIcon: Drawable? by invalidatingProperty(null, StackHeaderInvalidationFlags.OVERFLOW_ICON)
         internal set
 
-    override var scrollFlagScroll: Boolean by Delegates.observable(false) { _, old, new ->
-        if (old != new) invalidate(StackHeaderInvalidationFlags.SCROLL_FLAGS)
-    }
+    override var scrollFlagScroll: Boolean by invalidatingProperty(false, StackHeaderInvalidationFlags.SCROLL_FLAGS)
         internal set
 
-    override var scrollFlagEnterAlways: Boolean by Delegates.observable(false) { _, old, new ->
-        if (old != new) invalidate(StackHeaderInvalidationFlags.SCROLL_FLAGS)
-    }
+    override var scrollFlagEnterAlways: Boolean by invalidatingProperty(false, StackHeaderInvalidationFlags.SCROLL_FLAGS)
         internal set
 
-    override var scrollFlagEnterAlwaysCollapsed: Boolean by Delegates.observable(false) { _, old, new ->
-        if (old != new) invalidate(StackHeaderInvalidationFlags.SCROLL_FLAGS)
-    }
+    override var scrollFlagEnterAlwaysCollapsed: Boolean by invalidatingProperty(false, StackHeaderInvalidationFlags.SCROLL_FLAGS)
         internal set
 
-    override var scrollFlagExitUntilCollapsed: Boolean by Delegates.observable(false) { _, old, new ->
-        if (old != new) invalidate(StackHeaderInvalidationFlags.SCROLL_FLAGS)
-    }
+    override var scrollFlagExitUntilCollapsed: Boolean by invalidatingProperty(false, StackHeaderInvalidationFlags.SCROLL_FLAGS)
         internal set
 
-    override var scrollFlagSnap: Boolean by Delegates.observable(false) { _, old, new ->
-        if (old != new) invalidate(StackHeaderInvalidationFlags.SCROLL_FLAGS)
-    }
+    override var scrollFlagSnap: Boolean by invalidatingProperty(false, StackHeaderInvalidationFlags.SCROLL_FLAGS)
         internal set
 
-    override var liftOnScroll: Boolean by Delegates.observable(true) { _, old, new ->
-        if (old != new) invalidate(StackHeaderInvalidationFlags.LIFT_ON_SCROLL)
-    }
+    override var liftOnScroll: Boolean by invalidatingProperty(true, StackHeaderInvalidationFlags.LIFT_ON_SCROLL)
         internal set
 
     override var toolbarMenu: StackHeaderToolbarMenuConfig
-        by Delegates.observable(StackHeaderToolbarMenuConfig(emptyList(), emptyList())) { _, old, new ->
-            if (old != new) invalidate(StackHeaderInvalidationFlags.TOOLBAR_MENU)
-        }
+        by invalidatingProperty(StackHeaderToolbarMenuConfig(emptyList(), emptyList()), StackHeaderInvalidationFlags.TOOLBAR_MENU)
         internal set
 
-    override var toolbarMenuGroupDividerEnabled: Boolean by Delegates.observable(false) { _, old, new ->
-        if (old != new) invalidate(StackHeaderInvalidationFlags.TOOLBAR_MENU)
-    }
+    override var toolbarMenuGroupDividerEnabled: Boolean by invalidatingProperty(false, StackHeaderInvalidationFlags.TOOLBAR_MENU)
         internal set
 
-    override var titleCentered: Boolean by Delegates.observable(false) { _, old, new ->
-        if (old != new) invalidate(StackHeaderInvalidationFlags.TITLE_POSITIONING)
-    }
+    override var titleCentered: Boolean by invalidatingProperty(false, StackHeaderInvalidationFlags.TITLE_POSITIONING)
         internal set
 
-    override var subtitleCentered: Boolean by Delegates.observable(false) { _, old, new ->
-        if (old != new) invalidate(StackHeaderInvalidationFlags.TITLE_POSITIONING)
-    }
+    override var subtitleCentered: Boolean by invalidatingProperty(false, StackHeaderInvalidationFlags.TITLE_POSITIONING)
         internal set
 
-    override var expandedTitleHorizontalGravity: Int by Delegates.observable(Gravity.START) { _, old, new ->
-        if (old != new) invalidate(StackHeaderInvalidationFlags.TITLE_POSITIONING)
-    }
+    override var expandedTitleHorizontalGravity: Int by invalidatingProperty(Gravity.START, StackHeaderInvalidationFlags.TITLE_POSITIONING)
         internal set
 
-    override var expandedTitleVerticalGravity: Int by Delegates.observable(Gravity.BOTTOM) { _, old, new ->
-        if (old != new) invalidate(StackHeaderInvalidationFlags.TITLE_POSITIONING)
-    }
+    override var expandedTitleVerticalGravity: Int by invalidatingProperty(Gravity.BOTTOM, StackHeaderInvalidationFlags.TITLE_POSITIONING)
         internal set
 
-    override var collapsedTitleHorizontalGravity: Int by Delegates.observable(Gravity.START) { _, old, new ->
-        if (old != new) invalidate(StackHeaderInvalidationFlags.TITLE_POSITIONING)
-    }
+    override var collapsedTitleHorizontalGravity: Int by invalidatingProperty(Gravity.START, StackHeaderInvalidationFlags.TITLE_POSITIONING)
         internal set
 
-    override var collapsedTitleVerticalGravity: Int by Delegates.observable(Gravity.CENTER_VERTICAL) { _, old, new ->
-        if (old != new) invalidate(StackHeaderInvalidationFlags.TITLE_POSITIONING)
-    }
+    override var collapsedTitleVerticalGravity: Int by invalidatingProperty(
+        Gravity.CENTER_VERTICAL,
+        StackHeaderInvalidationFlags.TITLE_POSITIONING,
+    )
         internal set
 
     override var collapsedTitleGravityMode: StackHeaderCollapsedTitleGravityMode
-        by Delegates.observable(StackHeaderCollapsedTitleGravityMode.AVAILABLE_SPACE) { _, old, new ->
-            if (old != new) invalidate(StackHeaderInvalidationFlags.STRUCTURE)
-        }
+        by invalidatingProperty(StackHeaderCollapsedTitleGravityMode.AVAILABLE_SPACE, StackHeaderInvalidationFlags.STRUCTURE)
         internal set
+
+    override val titleAppearance = ReactTextAppearance(lynxContext, ::invalidateTextAppearance)
+    override val subtitleAppearance = ReactTextAppearance(lynxContext, ::invalidateTextAppearance)
+    override val expandedTitleAppearance = ReactTextAppearance(lynxContext, ::invalidateTextAppearance)
+    override val collapsedTitleAppearance = ReactTextAppearance(lynxContext, ::invalidateTextAppearance)
+    override val expandedSubtitleAppearance = ReactTextAppearance(lynxContext, ::invalidateTextAppearance)
+    override val collapsedSubtitleAppearance = ReactTextAppearance(lynxContext, ::invalidateTextAppearance)
+
+    private fun invalidateTextAppearance() = invalidate(StackHeaderInvalidationFlags.TITLE_APPEARANCE)
 
     override val isRTL: Boolean
         get() = view.layoutDirection == LayoutDirection.RTL
@@ -373,24 +328,16 @@ internal class StackHeaderConfigComponent(
 
     // region Subviews
 
-    override var backgroundSubview: StackHeaderSubviewComponent? by Delegates.observable(null) { _, old, new ->
-        if (old !== new) invalidate(StackHeaderInvalidationFlags.SUBVIEWS)
-    }
+    override var backgroundSubview: StackHeaderSubviewComponent? by invalidatingProperty(null, StackHeaderInvalidationFlags.SUBVIEWS)
         private set
 
-    override var leadingSubview: StackHeaderSubviewComponent? by Delegates.observable(null) { _, old, new ->
-        if (old !== new) invalidate(StackHeaderInvalidationFlags.SUBVIEWS)
-    }
+    override var leadingSubview: StackHeaderSubviewComponent? by invalidatingProperty(null, StackHeaderInvalidationFlags.SUBVIEWS)
         private set
 
-    override var centerSubview: StackHeaderSubviewComponent? by Delegates.observable(null) { _, old, new ->
-        if (old !== new) invalidate(StackHeaderInvalidationFlags.SUBVIEWS)
-    }
+    override var centerSubview: StackHeaderSubviewComponent? by invalidatingProperty(null, StackHeaderInvalidationFlags.SUBVIEWS)
         private set
 
-    override var trailingSubview: StackHeaderSubviewComponent? by Delegates.observable(null) { _, old, new ->
-        if (old !== new) invalidate(StackHeaderInvalidationFlags.SUBVIEWS)
-    }
+    override var trailingSubview: StackHeaderSubviewComponent? by invalidatingProperty(null, StackHeaderInvalidationFlags.SUBVIEWS)
         private set
 
     override fun onStackHeaderSubviewChanged() {
@@ -676,6 +623,162 @@ internal class StackHeaderConfigComponent(
             }
     }
 
+    // region Text appearance
+    // Font size arrives as a float defaulting to -1 (unset); non-positive means "use default".
+    // Colors arrive as CSS color strings (RNS gets processed color Ints from Fabric).
+
+    @LynxProp(name = "titleColor")
+    fun setTitleColor(value: String?) {
+        titleAppearance.color = value?.let { runCatching { Color.parseColor(it) }.getOrNull() }
+    }
+
+    @LynxProp(name = "titleFontFamily")
+    fun setTitleFontFamily(value: String?) {
+        titleAppearance.fontFamily = value
+    }
+
+    @LynxProp(name = "titleFontSize", defaultFloat = -1f)
+    fun setTitleFontSize(value: Float) {
+        titleAppearance.fontSize = value.takeIf { it > 0f }
+    }
+
+    @LynxProp(name = "titleFontWeight")
+    fun setTitleFontWeight(value: String?) {
+        titleAppearance.fontWeight = value
+    }
+
+    @LynxProp(name = "titleFontStyle")
+    fun setTitleFontStyle(value: String?) {
+        titleAppearance.fontStyle = value
+    }
+
+    @LynxProp(name = "subtitleColor")
+    fun setSubtitleColor(value: String?) {
+        subtitleAppearance.color = value?.let { runCatching { Color.parseColor(it) }.getOrNull() }
+    }
+
+    @LynxProp(name = "subtitleFontFamily")
+    fun setSubtitleFontFamily(value: String?) {
+        subtitleAppearance.fontFamily = value
+    }
+
+    @LynxProp(name = "subtitleFontSize", defaultFloat = -1f)
+    fun setSubtitleFontSize(value: Float) {
+        subtitleAppearance.fontSize = value.takeIf { it > 0f }
+    }
+
+    @LynxProp(name = "subtitleFontWeight")
+    fun setSubtitleFontWeight(value: String?) {
+        subtitleAppearance.fontWeight = value
+    }
+
+    @LynxProp(name = "subtitleFontStyle")
+    fun setSubtitleFontStyle(value: String?) {
+        subtitleAppearance.fontStyle = value
+    }
+
+    @LynxProp(name = "expandedTitleColor")
+    fun setExpandedTitleColor(value: String?) {
+        expandedTitleAppearance.color = value?.let { runCatching { Color.parseColor(it) }.getOrNull() }
+    }
+
+    @LynxProp(name = "expandedTitleFontFamily")
+    fun setExpandedTitleFontFamily(value: String?) {
+        expandedTitleAppearance.fontFamily = value
+    }
+
+    @LynxProp(name = "expandedTitleFontSize", defaultFloat = -1f)
+    fun setExpandedTitleFontSize(value: Float) {
+        expandedTitleAppearance.fontSize = value.takeIf { it > 0f }
+    }
+
+    @LynxProp(name = "expandedTitleFontWeight")
+    fun setExpandedTitleFontWeight(value: String?) {
+        expandedTitleAppearance.fontWeight = value
+    }
+
+    @LynxProp(name = "expandedTitleFontStyle")
+    fun setExpandedTitleFontStyle(value: String?) {
+        expandedTitleAppearance.fontStyle = value
+    }
+
+    @LynxProp(name = "collapsedTitleColor")
+    fun setCollapsedTitleColor(value: String?) {
+        collapsedTitleAppearance.color = value?.let { runCatching { Color.parseColor(it) }.getOrNull() }
+    }
+
+    @LynxProp(name = "collapsedTitleFontFamily")
+    fun setCollapsedTitleFontFamily(value: String?) {
+        collapsedTitleAppearance.fontFamily = value
+    }
+
+    @LynxProp(name = "collapsedTitleFontSize", defaultFloat = -1f)
+    fun setCollapsedTitleFontSize(value: Float) {
+        collapsedTitleAppearance.fontSize = value.takeIf { it > 0f }
+    }
+
+    @LynxProp(name = "collapsedTitleFontWeight")
+    fun setCollapsedTitleFontWeight(value: String?) {
+        collapsedTitleAppearance.fontWeight = value
+    }
+
+    @LynxProp(name = "collapsedTitleFontStyle")
+    fun setCollapsedTitleFontStyle(value: String?) {
+        collapsedTitleAppearance.fontStyle = value
+    }
+
+    @LynxProp(name = "expandedSubtitleColor")
+    fun setExpandedSubtitleColor(value: String?) {
+        expandedSubtitleAppearance.color = value?.let { runCatching { Color.parseColor(it) }.getOrNull() }
+    }
+
+    @LynxProp(name = "expandedSubtitleFontFamily")
+    fun setExpandedSubtitleFontFamily(value: String?) {
+        expandedSubtitleAppearance.fontFamily = value
+    }
+
+    @LynxProp(name = "expandedSubtitleFontSize", defaultFloat = -1f)
+    fun setExpandedSubtitleFontSize(value: Float) {
+        expandedSubtitleAppearance.fontSize = value.takeIf { it > 0f }
+    }
+
+    @LynxProp(name = "expandedSubtitleFontWeight")
+    fun setExpandedSubtitleFontWeight(value: String?) {
+        expandedSubtitleAppearance.fontWeight = value
+    }
+
+    @LynxProp(name = "expandedSubtitleFontStyle")
+    fun setExpandedSubtitleFontStyle(value: String?) {
+        expandedSubtitleAppearance.fontStyle = value
+    }
+
+    @LynxProp(name = "collapsedSubtitleColor")
+    fun setCollapsedSubtitleColor(value: String?) {
+        collapsedSubtitleAppearance.color = value?.let { runCatching { Color.parseColor(it) }.getOrNull() }
+    }
+
+    @LynxProp(name = "collapsedSubtitleFontFamily")
+    fun setCollapsedSubtitleFontFamily(value: String?) {
+        collapsedSubtitleAppearance.fontFamily = value
+    }
+
+    @LynxProp(name = "collapsedSubtitleFontSize", defaultFloat = -1f)
+    fun setCollapsedSubtitleFontSize(value: Float) {
+        collapsedSubtitleAppearance.fontSize = value.takeIf { it > 0f }
+    }
+
+    @LynxProp(name = "collapsedSubtitleFontWeight")
+    fun setCollapsedSubtitleFontWeight(value: String?) {
+        collapsedSubtitleAppearance.fontWeight = value
+    }
+
+    @LynxProp(name = "collapsedSubtitleFontStyle")
+    fun setCollapsedSubtitleFontStyle(value: String?) {
+        collapsedSubtitleAppearance.fontStyle = value
+    }
+
+    // endregion
+
     @LynxProp(name = "hidden")
     fun setHidden(value: Boolean?) {
         hidden = value == true
@@ -851,6 +954,17 @@ internal class StackHeaderConfigComponent(
                 "[RNScreens] Invalid StackHeaderConfig title vertical gravity: $value.",
             )
         }
+
+    // endregion
+
+    // region Helpers
+
+    private fun <T> invalidatingProperty(
+        initialValue: T,
+        flag: StackHeaderInvalidationFlags,
+    ) = Delegates.observable(initialValue) { _, old, new ->
+        if (old != new) invalidate(flag)
+    }
 
     // endregion
 
