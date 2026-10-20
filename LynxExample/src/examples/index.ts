@@ -35,3 +35,4 @@ export { default as TestStackHeaderSelectiveUpdatesIOS } from './TestStackHeader
 export { default as TestPreventNativeDismissSingleStack } from './TestPreventNativeDismissSingleStack';
 export { default as TestFormSheet } from './TestFormSheet';
 export { default as TestFormSheetImplicitAnimationIOS } from './TestFormSheetImplicitAnimationIOS';
+export { default as TestFormSheetKeyboard } from './TestFormSheetKeyboard';
