@@ -1,3 +1,4 @@
+import type { Ref } from '@lynx-js/react';
 import type {
   StackHeaderConfigCommandsAndroid,
   StackHeaderConfigPropsAndroid,
@@ -60,6 +61,7 @@ export interface StackHeaderConfigPropsBase {
 export interface StackHeaderConfigProps extends StackHeaderConfigPropsBase {
   android?: StackHeaderConfigPropsAndroid | undefined;
   ios?: StackHeaderConfigPropsIOS | undefined;
+  ref?: Ref<StackHeaderConfigRef> | undefined;
 }
 
 export interface StackHeaderConfigRef {

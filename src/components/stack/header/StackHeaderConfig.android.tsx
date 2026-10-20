@@ -1,9 +1,6 @@
-import { useImperativeHandle, useRef, type Ref } from '@lynx-js/react';
+import { useImperativeHandle, useRef } from '@lynx-js/react';
 import type { BaseEventOrig, EventHandler, NodesRef } from '@lynx-js/types';
-import type {
-  StackHeaderConfigProps,
-  StackHeaderConfigRef,
-} from './StackHeaderConfig.types.js';
+import type { StackHeaderConfigProps } from './StackHeaderConfig.types.js';
 import type {
   StackHeaderConfigPropsAndroid,
   StackHeaderToolbarMenuBaseAndroid,
@@ -20,8 +17,8 @@ import type { NativeProps as StackHeaderConfigNativeProps } from '../../../nativ
 import { StackHeaderSubview } from './android/StackHeaderSubview.android.js';
 import { parseAndroidIconToNativeProps } from '../../shared/index.js';
 
-type PlatformInnerProps = StackHeaderConfigProps & {
-  forwardedRef: Ref<StackHeaderConfigRef>;
+type PlatformInnerProps = Omit<StackHeaderConfigProps, 'ref'> & {
+  forwardedRef: StackHeaderConfigProps['ref'];
 };
 
 export const StackHeaderConfigAndroid = (props: PlatformInnerProps) => {
@@ -94,7 +91,9 @@ export const StackHeaderConfigAndroid = (props: PlatformInnerProps) => {
       toolbarMenu={parsedToolbarMenu}
       toolbarMenuGroupDividerEnabled={!!toolbarMenuGroupDividerEnabled}
       bindOnToolbarMenuItemPress={handleToolbarMenuItemPress}
-      bindOnToolbarMenuGroupSelectionChange={handleToolbarMenuGroupSelectionChange}
+      bindOnToolbarMenuGroupSelectionChange={
+        handleToolbarMenuGroupSelectionChange
+      }
       {...backButtonIconProps}
       {...overflowIconProps}
       {...scrollFlagProps}
@@ -213,7 +212,7 @@ function resolveScrollFlags(
   };
 }
 
-function useHeaderConfigRef(forwardedRef: Ref<StackHeaderConfigRef>) {
+function useHeaderConfigRef(forwardedRef: StackHeaderConfigProps['ref']) {
   const ref = useRef<NodesRef>(null);
 
   useImperativeHandle(forwardedRef, () => ({
