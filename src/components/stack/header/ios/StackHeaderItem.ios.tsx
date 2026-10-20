@@ -13,6 +13,7 @@ export const StackHeaderItem = ({
   icon,
   render,
   menu,
+  menuRepresentation,
   onPress,
 }: StackHeaderItemProps) => {
   const handlePress: EventHandler<BaseEventOrig<Record<string, never>>> =
@@ -35,6 +36,10 @@ export const StackHeaderItem = ({
       title={title}
       icon={icon}
       menu={menu && (parseMenuElementToAttr(menu) as StackHeaderMenuAttr)}
+      menuRepresentation={
+        menuRepresentation &&
+        (parseMenuElementToAttr(menuRepresentation) as StackHeaderMenuAttr)
+      }
       // We need to tell iOS that we want the handler to be attached only when we actually require it
       // because doing so makes the menu appear on long press instead of tap
       respondsToOnPress={!!onPress}
