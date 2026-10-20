@@ -6,6 +6,7 @@ import { parseMenuElementToAttr, type StackHeaderMenuAttr } from '../utils.js';
 export const StackHeaderItem = ({
   placement,
   itemId,
+  identifier,
   title,
   icon,
   render,
@@ -26,6 +27,7 @@ export const StackHeaderItem = ({
       }}
       placement={placement}
       itemId={itemId}
+      identifier={identifier}
       title={title}
       icon={icon}
       menu={menu && (parseMenuElementToAttr(menu) as StackHeaderMenuAttr)}

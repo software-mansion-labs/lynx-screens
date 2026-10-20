@@ -15,6 +15,7 @@
     RNSHeaderItemPlacement _placement;
     BOOL _didSetHeaderItemPlacement;
     NSString *_Nullable _itemId;
+    NSString *_Nullable _identifier;
     NSString *_Nullable _title;
     RNSStackHeaderIconData *_Nullable _icon;
     RNSStackHeaderMenuData *_Nullable _menu;
@@ -35,6 +36,7 @@
 - (void)resetProps
 {
     _itemId = nil;
+    _identifier = nil;
     [self setTitleProp:nil];
     [self setIconProp:nil];
     [self setMenuProp:nil];
@@ -116,6 +118,11 @@
 - (nullable NSString *)itemId
 {
     return _itemId;
+}
+
+- (nullable NSString *)identifier
+{
+    return _identifier;
 }
 
 - (nullable NSString *)title
@@ -222,6 +229,16 @@ LYNX_PROP_SETTER("itemId", setItemId, NSString *) {
         value = nil;
     }
     _itemId = value;
+}
+
+LYNX_PROP_SETTER("identifier", setIdentifier, NSString *) {
+    if (requestReset || value.length == 0) {
+        value = nil;
+    }
+    if (_identifier != value && ![_identifier isEqualToString:value]) {
+        _identifier = value;
+        _needsUpdate = YES;
+    }
 }
 
 LYNX_PROP_SETTER("title", setTitle, NSString *) {
