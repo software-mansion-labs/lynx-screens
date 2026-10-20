@@ -15,7 +15,6 @@ import com.lynxscreens.screens.common.container.Container
 import com.lynxscreens.screens.common.container.ContainerItem
 import com.lynxscreens.screens.common.container.ParentContainerItemRegistry
 import com.lynxscreens.screens.ext.isMeasured
-import com.lynxscreens.screens.helpers.FragmentManagerHelper
 import com.lynxscreens.screens.helpers.ViewIdGenerator
 import com.lynxscreens.screens.header.StackHeaderBackPressHandler
 import com.lynxscreens.screens.screen.StackScreenComponent
@@ -85,7 +84,7 @@ internal class StackContainer(
         super.onAttachedToWindow()
 
         parentContainerRegistry.attach(this)
-        setupFragmentManger()
+        setupFragmentManager()
 
         // StackContainer only provides container-level color scheme configuration for its screens
         // but doesn't use any color scheme-dependent views, so we don't need the callback.
@@ -120,11 +119,11 @@ internal class StackContainer(
 
     override fun onFragmentConfigurationChanged(config: Configuration) = onConfigurationChanged(config)
 
-    internal fun setupFragmentManger() {
+    internal fun setupFragmentManager() {
         fragmentManager =
-            checkNotNull(FragmentManagerHelper.findFragmentManagerForView(this)) {
-                "[RNScreens] Nullish fragment manager - can't run container operations"
-            }.also {
+            checkNotNull(delegate.get()) {
+                "[RNScreens] StackContainer has no delegate to resolve the fragment manager from"
+            }.resolveFragmentManager().also {
                 it.addOnBackStackChangedListener(this)
             }
     }

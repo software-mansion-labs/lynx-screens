@@ -3,6 +3,7 @@ package com.lynxscreens.screens.host
 import android.content.Context
 import android.util.Log
 import android.view.View
+import androidx.fragment.app.FragmentManager
 import com.lynx.tasm.behavior.LynxContext
 import com.lynx.tasm.behavior.LynxElement
 import com.lynx.tasm.behavior.LynxProp
@@ -12,6 +13,7 @@ import com.lynx.tasm.behavior.ui.LynxBaseUI
 import com.lynx.tasm.behavior.ui.LynxUI
 import com.lynx.tasm.behavior.ui.UIGroup
 import com.lynxscreens.screens.common.colorscheme.ColorScheme
+import com.lynxscreens.screens.helpers.FragmentManagerHelper
 import com.lynxscreens.screens.screen.StackScreenComponent
 import java.lang.ref.WeakReference
 
@@ -236,6 +238,13 @@ internal class StackHostComponent(context: LynxContext) : UIGroup<StackHostView>
             stackScreen.isNativelyDismissed = true
         }
     }
+
+    // Adaptation: the delegate is the host's Lynx UI, so the walk starts from its view
+    // (RNS's StackHost is the view itself).
+    override fun resolveFragmentManager(): FragmentManager =
+        checkNotNull(FragmentManagerHelper.findFragmentManagerForView(view)) {
+            "[RNScreens] Nullish fragment manager - can't run container operations"
+        }
 
     override fun onPatchFinish() {
         containerUpdateCoordinator.enqueuePendingOperations(container, renderedScreens)
