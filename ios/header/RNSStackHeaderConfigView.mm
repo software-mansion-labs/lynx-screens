@@ -7,8 +7,9 @@
 {
     [super didMoveToWindow];
 
-    // Forwarded for both directions - the component detaches itself from the
-    // header coordinator when the view leaves the window.
+    // Forwarded so the component rebuilds the header once the view is in a
+    // window (the coordinator wiring itself happens when the screen mounts
+    // the config).
     [self.component viewDidMoveToWindow];
 }
 
