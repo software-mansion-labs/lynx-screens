@@ -111,6 +111,7 @@ export interface NativeProps {
   hasBackgroundSubview?: boolean | undefined;
   backButtonTitle?: string | undefined;
   backButtonDisplayMode?: 'default' | 'generic' | 'minimal' | undefined;
+  backButtonMenuEnabled?: boolean | undefined;
   largeTitle?: string | undefined;
   largeSubtitle?: string | undefined;
   largeTitleEnabled?: boolean | undefined;
