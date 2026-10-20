@@ -1,8 +1,6 @@
 package com.lynxscreens.screens.formsheet.presentation
 
 import android.app.Activity
-import android.content.Context
-import android.content.ContextWrapper
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.util.Log
@@ -10,8 +8,11 @@ import android.view.View
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import kotlin.math.roundToInt
 
+/**
+ * @param activityProvider returns the activity whose decor view hosts the dimming of the bottom-most sheet.
+ */
 internal class FormSheetDimmingManager(
-    private val context: Context,
+    private val activityProvider: () -> Activity?,
 ) {
     // TODO: @t0maboro - consider exposing as a prop
     internal val maxAlpha: Float = MAX_DIMMING_ALPHA_FRACTION
@@ -92,16 +93,7 @@ internal class FormSheetDimmingManager(
     }
 
     // Adaptation: LynxContext is a ContextWrapper, so regular unwrapping replaces ReactContext.currentActivity.
-    private fun resolveActivityDecorView(): View? {
-        var current: Context? = context
-        while (current is ContextWrapper) {
-            if (current is Activity) {
-                return current.window?.decorView
-            }
-            current = current.baseContext
-        }
-        return null
-    }
+    private fun resolveActivityDecorView(): View? = activityProvider()?.window?.decorView
 
     companion object {
         const val TAG = "FormSheetDimmingManager"
