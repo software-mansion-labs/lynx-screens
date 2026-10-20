@@ -99,6 +99,7 @@ export const StackHeaderConfigIOS = (props: PlatformInnerProps) => {
     largeTitle,
     largeSubtitle,
     largeTitleEnabled,
+    prompt,
     backButtonTitle,
     backButtonDisplayMode,
     backButtonMenuEnabled,
@@ -177,6 +178,7 @@ export const StackHeaderConfigIOS = (props: PlatformInnerProps) => {
       largeTitle={largeTitle}
       largeSubtitle={largeSubtitle}
       largeTitleEnabled={!!largeTitleEnabled}
+      prompt={prompt}
       titleMenu={parsedTitleMenu}
       bindOnMenuItemPress={handleMenuItemPress}
       bindOnMenuSelectionChange={handleSelectionChange}

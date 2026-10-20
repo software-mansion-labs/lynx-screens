@@ -115,6 +115,7 @@ export interface NativeProps {
   largeTitle?: string | undefined;
   largeSubtitle?: string | undefined;
   largeTitleEnabled?: boolean | undefined;
+  prompt?: string | undefined;
   titleMenu?: StackHeaderMenuAttr | undefined;
   toolbarMenu?:
     | {
