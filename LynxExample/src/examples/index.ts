@@ -22,6 +22,7 @@ export { default as TestStackToolbarMenuA11yAndroid } from './TestStackToolbarMe
 export { default as TestStackToolbarMenuBatchCommandsAndroid } from './TestStackToolbarMenuBatchCommandsAndroid';
 export { default as TestStackSubviewsAndroid } from './TestStackSubviewsAndroid';
 export { default as TestStackSubviewsIOS } from './TestStackSubviewsIOS';
+export { default as TestStackBackButtonIOS } from './TestStackBackButtonIOS';
 export { default as TestStackHeaderMenuIOS } from './TestStackHeaderMenuIOS';
 export { default as TestStackHeaderIconIOS } from './TestStackHeaderIconIOS';
 export { default as TestStackHeaderItemIdentifierIOS } from './TestStackHeaderItemIdentifierIOS';

@@ -116,7 +116,7 @@
 
     NSUInteger pushIndex = 0;
     for (RNSPushOperation *op in _pendingPushOperations) {
-        UIViewController *controller = static_cast<UIViewController *>(op.stackScreen.controller);
+        RNSStackScreenController *controller = op.stackScreen.controller;
         BOOL isFinalOperation = pushIndex == _pendingPushOperations.count - 1;
         // The root screen appears immediately when the stack is first mounted.
         BOOL animated = isFinalOperation && self.viewControllers.count > 0;

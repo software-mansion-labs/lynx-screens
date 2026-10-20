@@ -52,6 +52,8 @@ static void RNSAssertIsValidHeaderChild(id child)
     _largeTitle = nil;
     _largeSubtitle = nil;
     _largeTitleEnabled = NO;
+    _backButtonTitle = nil;
+    _backButtonDisplayMode = UINavigationItemBackButtonDisplayModeDefault;
     _titleMenu = nil;
 }
 
@@ -277,6 +279,28 @@ LYNX_PROP_SETTER("largeTitleEnabled", setLargeTitleEnabled, BOOL) {
         value = NO;
     }
     _largeTitleEnabled = value;
+}
+
+LYNX_PROP_SETTER("backButtonTitle", setBackButtonTitle, NSString *) {
+    if (requestReset || value.length == 0) {
+        value = nil;
+    }
+    _backButtonTitle = value;
+}
+
+// Adaptation: RNS converts the codegen enum in RNSConversions-Stack; on Lynx
+// the string value is mapped here.
+LYNX_PROP_SETTER("backButtonDisplayMode", setBackButtonDisplayMode, NSString *) {
+    if (requestReset || value == nil || [value isEqualToString:@"default"]) {
+        _backButtonDisplayMode = UINavigationItemBackButtonDisplayModeDefault;
+    } else if ([value isEqualToString:@"generic"]) {
+        _backButtonDisplayMode = UINavigationItemBackButtonDisplayModeGeneric;
+    } else if ([value isEqualToString:@"minimal"]) {
+        _backButtonDisplayMode = UINavigationItemBackButtonDisplayModeMinimal;
+    } else {
+        LLogWarn(@"[RNScreens] Unsupported backButtonDisplayMode value: %@", value);
+        _backButtonDisplayMode = UINavigationItemBackButtonDisplayModeDefault;
+    }
 }
 
 LYNX_PROP_SETTER("titleMenu", setTitleMenu, NSDictionary *) {
