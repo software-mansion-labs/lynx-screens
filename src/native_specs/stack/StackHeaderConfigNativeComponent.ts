@@ -136,6 +136,13 @@ export interface NativeProps {
   largeSubtitle?: string | undefined;
   largeTitleEnabled?: boolean | undefined;
   prompt?: string | undefined;
+  minimizationBehavior?:
+    | 'automatic'
+    | 'never'
+    | 'onScrollDown'
+    | 'onScrollUp'
+    | undefined;
+  restorationBehavior?: 'automatic' | 'atScrollEdge' | undefined;
   standardAppearance?: HeaderAppearance | undefined;
   scrollEdgeAppearance?: HeaderAppearance | undefined;
   titleMenu?: StackHeaderMenuAttr | undefined;
