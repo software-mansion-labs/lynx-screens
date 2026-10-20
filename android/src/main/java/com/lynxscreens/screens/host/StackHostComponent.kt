@@ -174,8 +174,18 @@ internal class StackHostComponent(context: LynxContext) : UIGroup<StackHostView>
         renderedScreens.clear()
     }
 
+    // Adaptation: Lynx has no counterpart of RNS's willMountItems (the UI operations of a patch
+    // are consumed synchronously and only the end is observable, through PatchFinishListener), so
+    // the container's update batch opens with the first navigation operation recorded for the
+    // patch and closes in onPatchFinish. Header-only patches never open one: the header config
+    // coalesces its own props batch (see StackHeaderConfigComponent).
+    private fun beginUpdateBatch() {
+        container.beginUpdateBatch()
+    }
+
     private fun addPushOperationIfNeeded(stackScreen: StackScreenComponent) {
         if (stackScreen.activityMode == StackScreenComponent.ActivityMode.ATTACHED) {
+            beginUpdateBatch()
             containerUpdateCoordinator.addPushOperation(stackScreen)
         }
     }
@@ -183,6 +193,7 @@ internal class StackHostComponent(context: LynxContext) : UIGroup<StackHostView>
     private fun addPopOperationIfNeeded(stackScreen: StackScreenComponent) {
         if (stackScreen.activityMode == StackScreenComponent.ActivityMode.ATTACHED && !stackScreen.isNativelyDismissed) {
             // This shouldn't happen in typical scenarios but it can happen with fast-refresh.
+            beginUpdateBatch()
             containerUpdateCoordinator.addPopOperation(stackScreen)
         } else {
             Log.d(TAG, "Ignoring pop operation of ${stackScreen.screenKey}, already not attached or natively dismissed")
@@ -192,6 +203,7 @@ internal class StackHostComponent(context: LynxContext) : UIGroup<StackHostView>
     internal fun stackScreenChangedActivityMode(stackScreen: StackScreenComponent) {
         when (stackScreen.activityMode) {
             StackScreenComponent.ActivityMode.DETACHED -> {
+                beginUpdateBatch()
                 containerUpdateCoordinator.addPopOperation(stackScreen)
             }
             StackScreenComponent.ActivityMode.ATTACHED -> {
@@ -209,7 +221,8 @@ internal class StackHostComponent(context: LynxContext) : UIGroup<StackHostView>
     }
 
     override fun onPatchFinish() {
-        containerUpdateCoordinator.executePendingOperationsIfNeeded(container, renderedScreens)
+        containerUpdateCoordinator.enqueuePendingOperations(container, renderedScreens)
+        container.endUpdateBatch()
     }
 
     companion object {
