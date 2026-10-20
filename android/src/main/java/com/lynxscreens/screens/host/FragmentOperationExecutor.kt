@@ -2,7 +2,7 @@ package com.lynxscreens.screens.host
 
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentTransaction
-import com.lynxscreens.screens.helpers.createTransactionWithReordering
+import com.lynxscreens.screens.ext.createTransactionWithReordering
 
 internal class FragmentOperationExecutor {
     internal fun executeOperations(
