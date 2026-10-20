@@ -2,12 +2,14 @@ package com.lynxscreens.screens.screen
 
 import android.content.res.Configuration
 import android.os.Bundle
+import android.util.Log
 import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.annotation.Keep
 import androidx.transition.Slide
+import com.lynxscreens.screens.header.StackHeaderBackPressHandler
 import com.lynxscreens.screens.header.StackHeaderCoordinatorLayout
 import java.lang.ref.WeakReference
 
@@ -15,6 +17,7 @@ internal data class StackScreenRuntimeState(
     val stackScreen: StackScreenComponent,
     val canNavigateBack: Boolean,
     val delegate: WeakReference<StackScreenFragmentDelegate>,
+    val backPressHandler: WeakReference<StackHeaderBackPressHandler>,
 )
 
 internal class StackScreenFragment @Keep constructor() :
@@ -23,12 +26,14 @@ internal class StackScreenFragment @Keep constructor() :
         stackScreen: StackScreenComponent,
         canNavigateBack: Boolean,
         delegate: WeakReference<StackScreenFragmentDelegate>,
+        backPressHandler: WeakReference<StackHeaderBackPressHandler>,
     ) : this() {
         initializeRuntimeState(
             StackScreenRuntimeState(
                 stackScreen = stackScreen,
                 canNavigateBack = canNavigateBack,
                 delegate = delegate,
+                backPressHandler = backPressHandler,
             ),
         )
     }
@@ -70,7 +75,11 @@ internal class StackScreenFragment @Keep constructor() :
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?,
-    ): View = StackHeaderCoordinatorLayout(requireContext(), stackScreen, canNavigateBack)
+    ): View =
+        StackHeaderCoordinatorLayout(requireContext(), stackScreen, canNavigateBack) { pressedScreen ->
+            runtimeState.backPressHandler.get()?.handleHeaderBackButtonPress(pressedScreen)
+                ?: Log.w(TAG, "[RNScreens] Header back button press dropped - handler is gone")
+        }
 
     override fun onRuntimeViewCreated(
         view: View,
@@ -142,5 +151,9 @@ internal class StackScreenFragment @Keep constructor() :
     private fun teardownPreventNativeDismissCallback() {
         requireNativeDismissBackPressedCallback.remove()
         preventNativeDismissBackPressedCallback = null
+    }
+
+    companion object {
+        private const val TAG = "StackScreenFragment"
     }
 }

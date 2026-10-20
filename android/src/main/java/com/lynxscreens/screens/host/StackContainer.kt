@@ -12,13 +12,16 @@ import com.lynxscreens.screens.common.colorscheme.ColorSchemeCoordinator
 import com.lynxscreens.screens.common.colorscheme.ColorSchemeListener
 import com.lynxscreens.screens.common.colorscheme.ColorSchemeProviding
 import com.lynxscreens.screens.common.container.Container
+import com.lynxscreens.screens.common.container.ContainerItem
 import com.lynxscreens.screens.common.container.ParentContainerItemRegistry
 import com.lynxscreens.screens.ext.isMeasured
 import com.lynxscreens.screens.helpers.FragmentManagerHelper
 import com.lynxscreens.screens.helpers.ViewIdGenerator
+import com.lynxscreens.screens.header.StackHeaderBackPressHandler
 import com.lynxscreens.screens.screen.StackScreenComponent
 import com.lynxscreens.screens.screen.StackScreenFragment
 import com.lynxscreens.screens.screen.StackScreenFragmentDelegate
+import com.lynxscreens.screens.screen.StackScreenView
 import java.lang.ref.WeakReference
 
 @SuppressLint("ViewConstructor") // Only we construct this view, it is never inflated.
@@ -29,6 +32,7 @@ internal class StackContainer(
     Container,
     FragmentManager.OnBackStackChangedListener,
     ColorSchemeProviding,
+    StackHeaderBackPressHandler,
     StackScreenFragmentDelegate {
     private var fragmentManager: FragmentManager? = null
 
@@ -236,7 +240,12 @@ internal class StackContainer(
         screen: StackScreenComponent,
         canNavigateBack: Boolean,
     ): StackScreenFragment =
-        StackScreenFragment(screen, canNavigateBack, WeakReference(this)).also {
+        StackScreenFragment(
+            screen,
+            canNavigateBack,
+            WeakReference(this),
+            backPressHandler = WeakReference(this),
+        ).also {
             Log.d(TAG, "Created Fragment $it for screen ${screen.screenKey}")
         }
 
@@ -319,6 +328,65 @@ internal class StackContainer(
             ?.stackScreen
             ?.view
             ?.findContentScrollView()
+
+    // Asked when this container's whole subtree is about to be dismissed (the screen
+    // hosting this container is popped) - every item gets a vote, back-to-front, so
+    // the deepest preventing screen wins.
+    // Adaptation: the ContainerItem is the screen's native view on Lynx.
+    override fun wantsToPreventStackNativeDismiss(): ContainerItem? =
+        stackModel
+            .asReversed()
+            .firstNotNullOfOrNull { it.stackScreen.view?.wantsToPreventStackNativeDismiss() }
+
+    // endregion
+
+    // region Header back button
+
+    override fun handleHeaderBackButtonPress(pressedScreen: StackScreenComponent) {
+        val fragmentManager = fragmentManager
+        if (fragmentManager == null) {
+            Log.w(TAG, "[RNScreens] Ignoring header back button press - container is detached")
+            return
+        }
+
+        val topScreen = stackModel.lastOrNull()?.stackScreen
+        if (topScreen !== pressedScreen || stackModel.size <= 1) {
+            Log.w(
+                TAG,
+                "[RNScreens] Ignoring header back button press for non-top screen ${pressedScreen.screenKey}",
+            )
+            return
+        }
+
+        // This pop dismisses only the top screen (together with its subtree), therefore
+        // only the top item is asked - screens below the top get no vote at this level.
+        val vetoingItem = topScreen.view?.wantsToPreventStackNativeDismiss()
+        if (vetoingItem != null) {
+            // Only a stack screen can veto - its view forwards to the owning component (RNS calls
+            // StackScreen.onNativeDismissPrevented directly; Tabs screens have no own flag).
+            val vetoingView = vetoingItem as? StackScreenView
+            if (vetoingView != null) {
+                vetoingView.onNativeDismissPrevented?.invoke()
+            } else {
+                Log.w(
+                    TAG,
+                    "[RNScreens] Unexpected vetoing item type: ${vetoingItem.javaClass.simpleName}",
+                )
+            }
+            return
+        }
+
+        // Mirrors FragmentManager's internal OnBackPressedCallback, which also runs
+        // popBackStackImmediate. The synchronous pop makes the top-screen guard above
+        // reliable against double taps: onBackStackChangeCommitted -> onNativeFragmentPop
+        // updates stackModel before this call returns.
+        fragmentManager.popBackStackImmediate(
+            // key MUST BE present, otherwise the navigation action will be delegated to child primary navigation
+            // fragment.
+            checkNotNull(pressedScreen.screenKey) { "[RNScreens] Screen key is required" },
+            FragmentManager.POP_BACK_STACK_INCLUSIVE,
+        )
+    }
 
     // endregion
 

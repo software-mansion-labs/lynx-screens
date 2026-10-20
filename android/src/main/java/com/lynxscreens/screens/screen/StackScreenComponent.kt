@@ -134,6 +134,8 @@ internal class StackScreenComponent(context: LynxContext) : UIGroup<StackScreenV
         StackScreenView(context as LynxContext).also { view ->
             view.onLaidOut = { width, height -> updateStateIfNeeded(width = width, height = height) }
             view.onContentScrollViewChanged = { headerConfig?.onContentScrollViewChanged() }
+            view.isPreventNativeDismissEnabledProvider = { isPreventNativeDismissEnabled }
+            view.onNativeDismissPrevented = { onNativeDismissPrevented() }
         }
 
     @LynxProp(name = "activityMode")
