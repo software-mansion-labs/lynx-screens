@@ -109,6 +109,8 @@ export interface NativeProps {
   scrolledBackgroundColor?: string | undefined;
   statusBarScrimColor?: string | undefined;
   hasBackgroundSubview?: boolean | undefined;
+  backButtonTitle?: string | undefined;
+  backButtonDisplayMode?: 'default' | 'generic' | 'minimal' | undefined;
   largeTitle?: string | undefined;
   largeSubtitle?: string | undefined;
   largeTitleEnabled?: boolean | undefined;

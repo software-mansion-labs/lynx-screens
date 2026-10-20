@@ -99,6 +99,8 @@ export const StackHeaderConfigIOS = (props: PlatformInnerProps) => {
     largeTitle,
     largeSubtitle,
     largeTitleEnabled,
+    backButtonTitle,
+    backButtonDisplayMode,
   } = ios ?? {};
 
   const allMenus = useMemo(
@@ -168,6 +170,8 @@ export const StackHeaderConfigIOS = (props: PlatformInnerProps) => {
         top: 0,
       }}
       {...baseProps}
+      backButtonTitle={backButtonTitle}
+      backButtonDisplayMode={backButtonDisplayMode}
       largeTitle={largeTitle}
       largeSubtitle={largeSubtitle}
       largeTitleEnabled={!!largeTitleEnabled}
