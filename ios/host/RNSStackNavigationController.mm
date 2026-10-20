@@ -104,10 +104,10 @@
     BOOL hasPendingPushes = _pendingPushOperations.count > 0;
 
     NSUInteger popIndex = 0;
-    for (RNSPopOperation *op in _pendingPopOperations) {
-        UIViewController *controller = static_cast<UIViewController *>(op.stackScreen.controller);
+    for ([[maybe_unused]] RNSPopOperation *op in _pendingPopOperations) {
         NSAssert([self.viewControllers count] > 1, @"[RNScreens] Attempt to pop last screen from the stack");
-        NSAssert(self.topViewController == controller, @"[RNScreens] Attempt to pop non-top screen");
+        NSAssert(self.topViewController == static_cast<UIViewController *>(op.stackScreen.controller),
+                 @"[RNScreens] Attempt to pop non-top screen");
         BOOL isFinalOperation =
             !hasPendingPushes && popIndex == _pendingPopOperations.count - 1;
         [self popViewControllerAnimated:isFinalOperation];
@@ -144,10 +144,12 @@
 
 - (void)dumpStackModel
 {
+#ifdef RNS_DEBUG_LOGGING
     LLogInfo(@"[RNScreens] StackContainer [%ld] MODEL BEGIN", (long)self.view.tag);
     for (UIViewController *viewController in self.viewControllers) {
         LLogInfo(@"[RNScreens] %@", static_cast<RNSStackScreenController *>(viewController).screenComponent.screenKey);
     }
+#endif // RNS_DEBUG_LOGGING
 }
 
 @end
