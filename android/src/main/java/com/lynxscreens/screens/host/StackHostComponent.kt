@@ -5,11 +5,13 @@ import android.util.Log
 import android.view.View
 import com.lynx.tasm.behavior.LynxContext
 import com.lynx.tasm.behavior.LynxElement
+import com.lynx.tasm.behavior.LynxProp
 import com.lynx.tasm.behavior.PatchFinishListener
 import com.lynx.tasm.behavior.event.EventTarget
 import com.lynx.tasm.behavior.ui.LynxBaseUI
 import com.lynx.tasm.behavior.ui.LynxUI
 import com.lynx.tasm.behavior.ui.UIGroup
+import com.lynxscreens.screens.common.colorscheme.ColorScheme
 import com.lynxscreens.screens.screen.StackScreenComponent
 import java.lang.ref.WeakReference
 
@@ -25,6 +27,18 @@ internal class StackHostComponent(context: LynxContext) : UIGroup<StackHostView>
         container = StackContainer(lynxContext, WeakReference(this))
 
         return StackHostView(lynxContext, container)
+    }
+
+    // Unlike Fabric (codegen WithDefault), Lynx delivers null for an absent prop - the setter
+    // falls back to the RNS default (inherit).
+    @LynxProp(name = "colorScheme")
+    fun setColorScheme(value: String?) {
+        when (value) {
+            null, "inherit" -> view.colorScheme = ColorScheme.INHERIT
+            "light" -> view.colorScheme = ColorScheme.LIGHT
+            "dark" -> view.colorScheme = ColorScheme.DARK
+            else -> throw IllegalArgumentException("[RNScreens] Invalid color scheme: $value.")
+        }
     }
 
     /**

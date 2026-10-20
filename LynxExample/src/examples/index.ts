@@ -11,6 +11,7 @@ export { default as TestStackHeaderBackgroundAndroid } from './TestStackHeaderBa
 export { default as TestStackHeaderStatusBarScrimAndroid } from './TestStackHeaderStatusBarScrimAndroid';
 export { default as TestStackLiftOnScrollAndroid } from './TestStackLiftOnScrollAndroid';
 export { default as TestStackSimpleNav } from './TestStackSimpleNav';
+export { default as TestStackColorScheme } from './TestStackColorScheme';
 export { default as TestStackToolbarMenuCommandsAndroid } from './TestStackToolbarMenuCommandsAndroid';
 export { default as TestStackToolbarMenuShowAsActionAndroid } from './TestStackToolbarMenuShowAsActionAndroid';
 export { default as TestStackToolbarMenuIconAndroid } from './TestStackToolbarMenuIconAndroid';

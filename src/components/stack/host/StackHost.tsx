@@ -1,6 +1,10 @@
 import type { StackHostProps } from './StackHost.types.js';
 
-export const StackHost = ({ children }: StackHostProps) => {
+// Adaptation: RNS forwards the remaining props with a rest spread. ReactLynx
+// compiles a spread placed on an intrinsic element differently and the inline
+// `style` below was lost (the host laid out with zero height), so the props
+// are forwarded explicitly instead.
+export const StackHost = ({ children, colorScheme }: StackHostProps) => {
   return (
     <ls-stack-host
       style={{
@@ -9,6 +13,7 @@ export const StackHost = ({ children }: StackHostProps) => {
         width: '100%',
         height: '100%',
       }}
+      colorScheme={colorScheme}
     >
       {children}
     </ls-stack-host>

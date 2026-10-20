@@ -2,6 +2,7 @@ import React from 'react';
 import type {
   StackHeaderConfigProps,
   StackHeaderConfigRef,
+  StackHostProps,
   StackScreenProps,
 } from 'lynx-screens';
 
@@ -39,7 +40,7 @@ export type StackRoute = Omit<StackRouteConfig, 'Component'> & {
 
 /// StackContainer props
 
-export type StackContainerProps = {
+export type StackContainerProps = Omit<StackHostProps, 'children'> & {
   routeConfigs: StackRouteConfig[];
 };
 

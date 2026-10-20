@@ -19,7 +19,8 @@ import { Stack } from 'lynx-screens';
 import { useParentNavigationEffect } from '../hooks/useParentNavigationEffect';
 import { useComponentsByName } from '../hooks/useComponentsByName';
 
-export function StackContainer({ routeConfigs }: StackContainerProps) {
+export function StackContainer(props: StackContainerProps) {
+  const { routeConfigs, ...restProps } = props;
   useSanitizeRouteConfigs(routeConfigs);
 
   const componentsByName = useComponentsByName(routeConfigs);
@@ -56,7 +57,7 @@ export function StackContainer({ routeConfigs }: StackContainerProps) {
   );
 
   return (
-    <Stack.Host>
+    <Stack.Host {...restProps}>
       {stackNavState.stack.map(
         ({ options: { headerConfig, headerConfigRef, ...options } = {}, activityMode, routeKey, name }) => {
           const stackNavigationContext: StackNavigationContextPayload = {

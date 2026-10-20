@@ -1,6 +1,8 @@
 // RNS resolves RN assets via Image.resolveAssetSource; on Lynx images are
 // referenced by plain URI strings (bundler-emitted URLs, remote URLs or
 // android_asset paths).
+export type ColorScheme = 'light' | 'dark';
+
 export type PlatformIconShared = {
   type: 'imageSource';
   uri: string;
