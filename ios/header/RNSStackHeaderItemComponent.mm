@@ -42,6 +42,7 @@
     [self setTitleProp:nil];
     [self setIconProp:nil];
     [self setMenuProp:nil];
+    [self setMenuRepresentationProp:nil];
     _placement = RNSHeaderItemPlacementTrailing;
     _didSetHeaderItemPlacement = NO;
     _respondsToOnPress = NO;
@@ -69,14 +70,31 @@
     _menu = menuProp;
 }
 
+- (void)setMenuRepresentationProp:(RNSStackHeaderMenuData *)menuRepresentationProp
+{
+    _menuRepresentationProp = menuRepresentationProp;
+    _menuRepresentation = menuRepresentationProp;
+}
+
 - (void)updateMenuElementWithId:(NSString *)elementId
                     withElement:(id<RNSStackHeaderMenuElement>)newElement
                      parentMenu:(nullable RNSStackHeaderMenuData *)parentMenu
+           inMenuRepresentation:(BOOL)inMenuRepresentation
 {
-    if (parentMenu == nil) {
-        _menu = (RNSStackHeaderMenuData *)newElement;
+    if (inMenuRepresentation) {
+        if (parentMenu == nil) {
+            _menuRepresentation = (RNSStackHeaderMenuData *)newElement;
+        } else {
+            _menuRepresentation = [RNSStackHeaderMenuCoordinator menu:_menuRepresentation
+                                                 replacingChildWithId:elementId
+                                                          withElement:newElement];
+        }
     } else {
-        _menu = [RNSStackHeaderMenuCoordinator menu:_menu replacingChildWithId:elementId withElement:newElement];
+        if (parentMenu == nil) {
+            _menu = (RNSStackHeaderMenuData *)newElement;
+        } else {
+            _menu = [RNSStackHeaderMenuCoordinator menu:_menu replacingChildWithId:elementId withElement:newElement];
+        }
     }
     [_invalidationDelegate headerItemMenuDidUpdateFromCommandWithId:_itemId];
 }
@@ -318,6 +336,16 @@ LYNX_PROP_SETTER("menu", setMenu, NSDictionary *) {
     // Adaptation: Lynx delivers the prop as a plain NSDictionary - no
     // folly::dynamic conversion is needed.
     [self setMenuProp:[RNSStackHeaderMenuMapper menuFromDictionary:value]];
+    _menuDidChange = YES;
+}
+
+LYNX_PROP_SETTER("menuRepresentation", setMenuRepresentation, NSDictionary *) {
+    if (requestReset) {
+        value = nil;
+    }
+    [self setMenuRepresentationProp:[RNSStackHeaderMenuMapper menuFromDictionary:value]];
+    // menu representation is applied together with the menu & shares its toggle state tracker,
+    // so it follows the same invalidation path
     _menuDidChange = YES;
 }
 
