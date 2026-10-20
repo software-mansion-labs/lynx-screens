@@ -37,6 +37,26 @@ type StackHeaderToolbarMenuElementAttr = {
   children?: StackHeaderToolbarMenuElementAttr[] | undefined;
 };
 
+export type HeaderAppearance = {
+  titleFontFamily?: string | undefined;
+  titleFontSize?: number | undefined;
+  titleFontWeight?: string | undefined;
+  titleFontStyle?: string | undefined;
+  titleFontColor?: string | undefined;
+
+  largeTitleFontFamily?: string | undefined;
+  largeTitleFontSize?: number | undefined;
+  largeTitleFontWeight?: string | undefined;
+  largeTitleFontStyle?: string | undefined;
+  largeTitleFontColor?: string | undefined;
+
+  subtitleFontFamily?: string | undefined;
+  subtitleFontSize?: number | undefined;
+  subtitleFontWeight?: string | undefined;
+  subtitleFontStyle?: string | undefined;
+  subtitleFontColor?: string | undefined;
+};
+
 export interface NativeProps {
   ref?: Ref<Lynx.NodesRef> | undefined;
   className?: string | undefined;
@@ -116,6 +136,8 @@ export interface NativeProps {
   largeSubtitle?: string | undefined;
   largeTitleEnabled?: boolean | undefined;
   prompt?: string | undefined;
+  standardAppearance?: HeaderAppearance | undefined;
+  scrollEdgeAppearance?: HeaderAppearance | undefined;
   titleMenu?: StackHeaderMenuAttr | undefined;
   toolbarMenu?:
     | {

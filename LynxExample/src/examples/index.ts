@@ -6,6 +6,7 @@ export { default as TestPreventNativeDismissNestedStack } from './TestPreventNat
 export { default as TestStackBackButtonAndroid } from './TestStackBackButtonAndroid';
 export { default as TestStackOverflowIconAndroid } from './TestStackOverflowIconAndroid';
 export { default as TestStackHeaderTitleAppearanceAndroid } from './TestStackHeaderTitleAppearanceAndroid';
+export { default as TestStackHeaderTitleAppearanceIOS } from './TestStackHeaderTitleAppearanceIOS';
 export { default as TestStackHeaderContentInsetsAndroid } from './TestStackHeaderContentInsetsAndroid';
 export { default as TestStackHeaderBackgroundAndroid } from './TestStackHeaderBackgroundAndroid';
 export { default as TestStackHeaderStatusBarScrimAndroid } from './TestStackHeaderStatusBarScrimAndroid';

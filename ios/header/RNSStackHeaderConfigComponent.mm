@@ -1,6 +1,7 @@
 #import "RNSStackHeaderConfigComponent.h"
 #import "RNSImageLoadingHelper.h"
 #import "RNSShadowStateProxy.h"
+#import "RNSStackHeaderAppearanceMapper.h"
 #import "RNSStackHeaderConfigEventEmitter.h"
 #import "RNSStackHeaderItemComponent.h"
 #import "RNSStackHeaderItemSpacerComponent.h"
@@ -57,6 +58,8 @@ static void RNSAssertIsValidHeaderChild(id child)
     _backButtonDisplayMode = UINavigationItemBackButtonDisplayModeDefault;
     _backButtonMenuEnabled = YES;
     _titleMenu = nil;
+    _standardAppearance = nil;
+    _scrollEdgeAppearance = nil;
 }
 
 - (UIView *)createView
@@ -329,6 +332,22 @@ LYNX_PROP_SETTER("titleMenu", setTitleMenu, NSDictionary *) {
     // fires when the attr value changed, so the flag is set unconditionally.
     _titleMenu = [RNSStackHeaderMenuMapper menuFromDictionary:value];
     _titleMenuDidChange = YES;
+}
+
+// Adaptation: Lynx delivers the appearance props as plain NSDictionaries (RNS
+// converts the folly::dynamic objects first).
+LYNX_PROP_SETTER("standardAppearance", setStandardAppearance, NSDictionary *) {
+    if (requestReset) {
+        value = nil;
+    }
+    _standardAppearance = [RNSStackHeaderAppearanceMapper appearanceFromDictionary:value];
+}
+
+LYNX_PROP_SETTER("scrollEdgeAppearance", setScrollEdgeAppearance, NSDictionary *) {
+    if (requestReset) {
+        value = nil;
+    }
+    _scrollEdgeAppearance = [RNSStackHeaderAppearanceMapper scrollEdgeAppearanceFromDictionary:value];
 }
 
 // Base props consumed only by the Android implementation for now (RNS iOS
