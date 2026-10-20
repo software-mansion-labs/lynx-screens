@@ -8,6 +8,7 @@ import {
 import type {
   StackHeaderConfigProps,
   StackHeaderConfigRef,
+  StackHeaderMenuIOS,
   StackHeaderMenuItemOptionsIOS,
   StackHeaderMenuOptionsIOS,
 } from 'lynx-screens';
@@ -33,12 +34,21 @@ const ACTION_IDS = [
   'radio-1-1',
   'radio-1-2',
   'radio-1-3',
+  'repr-radio-0-1',
+  'repr-radio-0-2',
+  'repr-radio-0-3',
   'title-action-1',
   'title-action-2',
 ] as const;
 type ActionId = (typeof ACTION_IDS)[number];
 
-const MENU_IDS = ['menu-1', 'submenu-1', 'subsubmenu-1', 'title-menu'] as const;
+const MENU_IDS = [
+  'menu-1',
+  'submenu-1',
+  'subsubmenu-1',
+  'repr-menu-0',
+  'title-menu',
+] as const;
 type MenuId = (typeof MENU_IDS)[number];
 
 const TITLE_OPTIONS = [
@@ -130,10 +140,43 @@ function PressableWithFeedback({
   );
 }
 
+function buildMenuRepresentation(
+  index: number,
+  showClicked: (text: string) => void,
+): StackHeaderMenuIOS {
+  return {
+    type: 'menu',
+    id: `repr-menu-${index}`,
+    title: `Repr ${index}`,
+    singleSelection: true,
+    onSelectionChange: (selection) =>
+      showClicked(`Repr ${index} selected "${selection}"`),
+    children: [
+      {
+        id: `repr-radio-${index}-1`,
+        type: 'menuItem',
+        title: `Repr ${index} Radio 1`,
+        initialToggleState: true,
+      },
+      {
+        id: `repr-radio-${index}-2`,
+        type: 'menuItem',
+        title: `Repr ${index} Radio 2`,
+      },
+      {
+        id: `repr-radio-${index}-3`,
+        type: 'menuItem',
+        title: `Repr ${index} Radio 3`,
+      },
+    ],
+  };
+}
+
 function buildHeaderConfig(
   trailingItemsCount: number,
   showClicked: (text: string) => void,
   keepsMenuPresented: boolean,
+  representationEnabled: boolean,
 ): StackHeaderConfigProps {
   const trailingItems: NonNullable<
     NonNullable<StackHeaderConfigProps['ios']>['trailingItems']
@@ -144,6 +187,9 @@ function buildHeaderConfig(
     // every second item is custom
     ...(i % 2 === 0 && {
       render: () => <PressableWithFeedback width={30} height={30} />,
+    }),
+    ...(representationEnabled && {
+      menuRepresentation: buildMenuRepresentation(i, showClicked),
     }),
     menu: {
       type: 'menu',
@@ -251,6 +297,7 @@ function ConfigScreen() {
     DEFAULT_TRAILING_ITEMS_COUNT,
   );
   const [keepsMenuPresented, setKeepsMenuPresented] = useState(false);
+  const [representationEnabled, setRepresentationEnabled] = useState(false);
   const [lastClicked, setLastClicked] = useState<string | null>(null);
 
   const showClicked = useCallback(
@@ -262,8 +309,14 @@ function ConfigScreen() {
 
   const { setRouteOptions, routeKey } = navigation;
   const headerConfig = useMemo(
-    () => buildHeaderConfig(trailingItemsCount, showClicked, keepsMenuPresented),
-    [trailingItemsCount, showClicked, keepsMenuPresented],
+    () =>
+      buildHeaderConfig(
+        trailingItemsCount,
+        showClicked,
+        keepsMenuPresented,
+        representationEnabled,
+      ),
+    [trailingItemsCount, showClicked, keepsMenuPresented, representationEnabled],
   );
 
   useLayoutEffect(() => {
@@ -326,6 +379,10 @@ function ConfigScreen() {
         <SettingsButton
           label={`keepsMenuPresented: ${keepsMenuPresented}`}
           onTap={() => setKeepsMenuPresented((prev) => !prev)}
+        />
+        <SettingsButton
+          label={`menuRepresentation: ${representationEnabled}`}
+          onTap={() => setRepresentationEnabled((prev) => !prev)}
         />
 
         <Heading label="setMenuItemOptions (Menu 1)" />

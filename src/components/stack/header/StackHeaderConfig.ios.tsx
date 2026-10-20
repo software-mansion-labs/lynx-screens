@@ -114,10 +114,16 @@ export const StackHeaderConfigIOS = (props: PlatformInnerProps) => {
       [
         ...(leadingItems ?? [])
           .filter((it) => it && it.type === 'item')
-          .map((it) => (it as StackHeaderInlineItemIOS).menu),
+          .flatMap((it) => [
+            (it as StackHeaderInlineItemIOS).menu,
+            (it as StackHeaderInlineItemIOS).menuRepresentation,
+          ]),
         ...(trailingItems ?? [])
           .filter((it) => it && it.type === 'item')
-          .map((it) => (it as StackHeaderInlineItemIOS).menu),
+          .flatMap((it) => [
+            (it as StackHeaderInlineItemIOS).menu,
+            (it as StackHeaderInlineItemIOS).menuRepresentation,
+          ]),
         titleMenu,
       ].filter((it): it is StackHeaderMenuIOS => !!it),
     [leadingItems, trailingItems, titleMenu],

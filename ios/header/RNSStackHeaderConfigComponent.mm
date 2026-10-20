@@ -425,7 +425,8 @@ LYNX_UI_METHOD(setMenuItemOptions) {
             [static_cast<RNSStackHeaderItemComponent *>(locator.headerItem)
                 updateMenuElementWithId:menuItemId
                             withElement:newItemData
-                             parentMenu:locator.searchResult.parentMenu];
+                             parentMenu:locator.searchResult.parentMenu
+                   inMenuRepresentation:locator.inMenuRepresentation];
             break;
         case RNSMenuElementPositionTitle:
             if (locator.searchResult.parentMenu != nil) {
@@ -476,7 +477,8 @@ LYNX_UI_METHOD(setMenuOptions) {
             [static_cast<RNSStackHeaderItemComponent *>(locator.headerItem)
                 updateMenuElementWithId:menuElementId
                             withElement:newMenuItem
-                             parentMenu:locator.searchResult.parentMenu];
+                             parentMenu:locator.searchResult.parentMenu
+                   inMenuRepresentation:locator.inMenuRepresentation];
             break;
         case RNSMenuElementPositionTitle:
             if (locator.searchResult.parentMenu == nil) {
