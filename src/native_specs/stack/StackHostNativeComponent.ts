@@ -3,8 +3,11 @@ import type * as Lynx from '@lynx-js/types';
 
 type StackHostColorScheme = 'inherit' | 'light' | 'dark';
 
+type StackHostDirection = 'inherit' | 'ltr' | 'rtl';
+
 export interface NativeProps {
   // General
+  direction?: StackHostDirection | undefined;
   colorScheme?: StackHostColorScheme | undefined;
 
   className?: string | undefined;

@@ -4,7 +4,11 @@ import type { StackHostProps } from './StackHost.types.js';
 // compiles a spread placed on an intrinsic element differently and the inline
 // `style` below was lost (the host laid out with zero height), so the props
 // are forwarded explicitly instead.
-export const StackHost = ({ children, colorScheme }: StackHostProps) => {
+export const StackHost = ({
+  children,
+  colorScheme,
+  direction,
+}: StackHostProps) => {
   return (
     <ls-stack-host
       style={{
@@ -14,6 +18,7 @@ export const StackHost = ({ children, colorScheme }: StackHostProps) => {
         height: '100%',
       }}
       colorScheme={colorScheme}
+      direction={direction}
     >
       {children}
     </ls-stack-host>

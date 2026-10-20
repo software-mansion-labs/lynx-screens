@@ -3,6 +3,8 @@
 // android_asset paths).
 export type ColorScheme = 'light' | 'dark';
 
+export type Direction = 'ltr' | 'rtl';
+
 export type PlatformIconShared = {
   type: 'imageSource';
   uri: string;

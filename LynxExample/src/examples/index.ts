@@ -9,6 +9,7 @@ export { default as TestStackHeaderTitleAppearanceAndroid } from './TestStackHea
 export { default as TestStackHeaderTitleAppearanceIOS } from './TestStackHeaderTitleAppearanceIOS';
 export { default as TestStackHeaderContentInsetsAndroid } from './TestStackHeaderContentInsetsAndroid';
 export { default as TestStackHeaderHiddenRestoreAndroid } from './TestStackHeaderHiddenRestoreAndroid';
+export { default as TestStackLayoutDirectionAndroid } from './TestStackLayoutDirectionAndroid';
 export { default as TestStackHeaderBackgroundAndroid } from './TestStackHeaderBackgroundAndroid';
 export { default as TestStackHeaderStatusBarScrimAndroid } from './TestStackHeaderStatusBarScrimAndroid';
 export { default as TestStackLiftOnScrollAndroid } from './TestStackLiftOnScrollAndroid';

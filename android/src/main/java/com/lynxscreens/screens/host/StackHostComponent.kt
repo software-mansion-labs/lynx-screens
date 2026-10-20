@@ -29,6 +29,23 @@ internal class StackHostComponent(context: LynxContext) : UIGroup<StackHostView>
         return StackHostView(lynxContext, container)
     }
 
+    // Adaptation: RNS maps `direction` to RN's `style.direction`, which sets the native View's
+    // layoutDirection. Lynx's CSS `direction` only drives the Lynx layout (LynxBaseUI.mLynxDirection)
+    // and never touches the Android View property, so the prop is forwarded natively and applied
+    // here; the native subtree (app bar, subviews, menu, back button, transitions) inherits it.
+    // Unlike Fabric (codegen WithDefault), Lynx delivers null for an absent prop - the setter
+    // falls back to the RNS default (inherit).
+    @LynxProp(name = "direction")
+    fun setDirection(value: String?) {
+        view.layoutDirection =
+            when (value) {
+                null, "inherit" -> View.LAYOUT_DIRECTION_INHERIT
+                "ltr" -> View.LAYOUT_DIRECTION_LTR
+                "rtl" -> View.LAYOUT_DIRECTION_RTL
+                else -> throw IllegalArgumentException("[RNScreens] Invalid direction: $value.")
+            }
+    }
+
     // Unlike Fabric (codegen WithDefault), Lynx delivers null for an absent prop - the setter
     // falls back to the RNS default (inherit).
     @LynxProp(name = "colorScheme")
