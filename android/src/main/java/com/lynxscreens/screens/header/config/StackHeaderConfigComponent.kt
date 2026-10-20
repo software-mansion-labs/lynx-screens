@@ -186,6 +186,14 @@ internal class StackHeaderConfigComponent(
         by invalidatingProperty(StackHeaderCollapsedTitleGravityMode.AVAILABLE_SPACE, StackHeaderInvalidationFlags.STRUCTURE)
         internal set
 
+    override var contentInsetStart: Float?
+        by invalidatingProperty(null, StackHeaderInvalidationFlags.CONTENT_INSETS)
+        internal set
+
+    override var contentInsetEnd: Float?
+        by invalidatingProperty(null, StackHeaderInvalidationFlags.CONTENT_INSETS)
+        internal set
+
     override val titleAppearance = ReactTextAppearance(lynxContext, ::invalidateTextAppearance)
     override val subtitleAppearance = ReactTextAppearance(lynxContext, ::invalidateTextAppearance)
     override val expandedTitleAppearance = ReactTextAppearance(lynxContext, ::invalidateTextAppearance)
@@ -631,6 +639,21 @@ internal class StackHeaderConfigComponent(
                 )
             }
     }
+
+    // region Header spacing
+    // Spacing arrives as a float defaulting to -1 (unset); 0 is a valid, applied value.
+
+    @LynxProp(name = "contentInsetStart", defaultFloat = -1f)
+    fun setContentInsetStart(value: Float) {
+        contentInsetStart = value.takeIf { it >= 0f }
+    }
+
+    @LynxProp(name = "contentInsetEnd", defaultFloat = -1f)
+    fun setContentInsetEnd(value: Float) {
+        contentInsetEnd = value.takeIf { it >= 0f }
+    }
+
+    // endregion
 
     // region Text appearance
     // Font size arrives as a float defaulting to -1 (unset); non-positive means "use default".

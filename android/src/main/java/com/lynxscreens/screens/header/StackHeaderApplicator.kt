@@ -32,8 +32,10 @@ import com.lynxscreens.screens.header.appbar.StackHeaderAppBarLayout
 import com.lynxscreens.screens.header.config.StackHeaderConfigurationProviding
 import com.lynxscreens.screens.header.config.StackHeaderType
 import com.lynxscreens.screens.header.subview.StackHeaderSubviewView
+import com.lynxscreens.screens.utils.dpToPx
 import com.lynxscreens.screens.utils.resolveDrawableAttr
 import com.lynxscreens.screens.utils.spToPx
+import kotlin.math.roundToInt
 
 /**
  * Builds and applies the Material app bar — type, subviews, title, back button,
@@ -327,6 +329,20 @@ internal class StackHeaderApplicator(
         setColor(appearance.color ?: defaults.color)
         setTypeface(appearance.resolveTypeface(defaults.typeface))
         setTextSizePx(appearance.fontSize?.let { view.spToPx(it) } ?: defaults.textSizePx)
+    }
+
+    internal fun applyContentInsets(
+        appBar: StackHeaderAppBarLayout,
+        config: StackHeaderConfigurationProviding,
+    ) {
+        val toolbar = appBar.toolbar
+
+        toolbar.setContentInsetsRelative(
+            config.contentInsetStart?.let { toolbar.dpToPx(it).roundToInt() } ?: appBar.defaultContentInsetStart,
+            config.contentInsetEnd?.let { toolbar.dpToPx(it).roundToInt() } ?: appBar.defaultContentInsetEnd,
+        )
+
+        toolbar.requestLayout()
     }
 
     internal fun applyBackButton(

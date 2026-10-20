@@ -6,6 +6,7 @@ import type {
   StackHeaderTitleVerticalGravityAndroid,
   StackHeaderCollapsedTitleGravityModeAndroid,
   StackHeaderBackgroundSubviewCollapseModeAndroid,
+  StackHeaderToolbarMenuElementAndroid,
 } from 'lynx-screens';
 import { ScrollViewMarker } from 'lynx-screens';
 import {
@@ -31,6 +32,8 @@ type SubviewSize = 'none' | 'sm' | 'md' | 'lg' | 'xl';
 type TextOption = 'undefined' | 'short' | 'long';
 type ScrollFlagValue = 'undefined' | 'true' | 'false';
 type MaxLinesValue = '1' | '2' | '3';
+type MenuItemsValue = '0' | '1' | '2';
+type DpValue = 'default' | '0' | '8' | '16' | '32';
 
 interface Config {
   enabled: boolean;
@@ -47,6 +50,9 @@ interface Config {
   collapsedTitleHorizontalGravity: StackHeaderTitleHorizontalGravityAndroid;
   collapsedTitleVerticalGravity: StackHeaderTitleVerticalGravityAndroid;
   collapsedTitleGravityMode: StackHeaderCollapsedTitleGravityModeAndroid;
+  contentInsetStart: DpValue;
+  contentInsetEnd: DpValue;
+  menuItems: MenuItemsValue;
   leadingSize: SubviewSize;
   centerSize: SubviewSize;
   trailingSize: SubviewSize;
@@ -74,6 +80,9 @@ const DEFAULT_CONFIG: Config = {
   collapsedTitleHorizontalGravity: 'start',
   collapsedTitleVerticalGravity: 'center',
   collapsedTitleGravityMode: 'availableSpace',
+  contentInsetStart: 'default',
+  contentInsetEnd: 'default',
+  menuItems: '0',
   leadingSize: 'none',
   centerSize: 'none',
   trailingSize: 'none',
@@ -109,6 +118,8 @@ const GRAVITY_MODE_OPTIONS: StackHeaderCollapsedTitleGravityModeAndroid[] = [
   'availableSpace',
   'entireSpace',
 ];
+const MENU_ITEMS_OPTIONS: MenuItemsValue[] = ['0', '1', '2'];
+const DP_OPTIONS: DpValue[] = ['default', '0', '8', '16', '32'];
 
 function resolveScrollFlag(value: ScrollFlagValue): boolean | undefined {
   switch (value) {
@@ -119,6 +130,21 @@ function resolveScrollFlag(value: ScrollFlagValue): boolean | undefined {
     default:
       return undefined;
   }
+}
+
+function resolveDp(value: DpValue): number | undefined {
+  return value === 'default' ? undefined : Number(value);
+}
+
+function buildMenuItems(
+  count: MenuItemsValue,
+): StackHeaderToolbarMenuElementAndroid[] {
+  return Array.from({ length: Number(count) }, (_, i) => ({
+    type: 'menuItem',
+    id: `menu-item-${i}`,
+    title: `M${i}`,
+    showAsAction: 'always',
+  }));
 }
 
 function resolveText(
@@ -261,6 +287,12 @@ function buildHeaderConfig(config: Config): StackHeaderConfigProps | undefined {
       collapsedTitleVerticalGravity: config.collapsedTitleVerticalGravity,
       collapsedTitleGravityMode: config.collapsedTitleGravityMode,
       maxLines: Number(config.maxLines),
+      toolbarMenu:
+        config.menuItems === '0'
+          ? undefined
+          : { children: buildMenuItems(config.menuItems) },
+      contentInsetStart: resolveDp(config.contentInsetStart),
+      contentInsetEnd: resolveDp(config.contentInsetEnd),
       scrollFlagScroll: resolveScrollFlag(config.scrollFlagScroll),
       scrollFlagEnterAlways: resolveScrollFlag(config.scrollFlagEnterAlways),
       scrollFlagEnterAlwaysCollapsed: resolveScrollFlag(
@@ -427,6 +459,32 @@ function ConfigScreen() {
               />
             </>
           )}
+
+          <Heading label="Content Insets" />
+          <view style={{ display: 'flex', flexDirection: 'row' }}>
+            <view style={{ flex: 1 }}>
+              <SettingsPicker<DpValue>
+                label="inset start"
+                value={config.contentInsetStart}
+                onValueChange={(v) => updateConfig('contentInsetStart', v)}
+                items={DP_OPTIONS}
+              />
+            </view>
+            <view style={{ flex: 1 }}>
+              <SettingsPicker<DpValue>
+                label="inset end"
+                value={config.contentInsetEnd}
+                onValueChange={(v) => updateConfig('contentInsetEnd', v)}
+                items={DP_OPTIONS}
+              />
+            </view>
+          </view>
+          <SettingsPicker<MenuItemsValue>
+            label="menu items"
+            value={config.menuItems}
+            onValueChange={(v) => updateConfig('menuItems', v)}
+            items={MENU_ITEMS_OPTIONS}
+          />
 
           <Heading label="Toolbar Subviews" />
           <SettingsPicker<SubviewSize>
