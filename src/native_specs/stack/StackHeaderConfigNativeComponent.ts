@@ -51,6 +51,8 @@ export interface NativeProps {
   collapsedTitleHorizontalGravity?: 'start' | 'center' | 'end' | undefined;
   collapsedTitleVerticalGravity?: 'top' | 'center' | 'bottom' | undefined;
   collapsedTitleGravityMode?: 'entireSpace' | 'availableSpace' | undefined;
+  contentInsetStart?: number | undefined;
+  contentInsetEnd?: number | undefined;
   titleColor?: string | undefined;
   titleFontFamily?: string | undefined;
   titleFontSize?: number | undefined;
