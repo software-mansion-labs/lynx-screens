@@ -16,6 +16,7 @@ import type {
   StackHeaderTypeAndroid,
 } from './StackHeaderConfig.android.types.js';
 import type { PlatformIconAndroid } from '../../shared/types.js';
+import type { NativeProps as StackHeaderConfigNativeProps } from '../../../native_specs/stack/StackHeaderConfigNativeComponent.js';
 import { StackHeaderSubview } from './android/StackHeaderSubview.android.js';
 import { parseAndroidIconToNativeProps } from '../../shared/index.js';
 
@@ -36,6 +37,7 @@ export const StackHeaderConfigAndroid = (props: PlatformInnerProps) => {
     centerSubview,
     trailingSubview,
     backButtonIcon,
+    overflowIcon,
     scrollFlagScroll,
     scrollFlagEnterAlways,
     scrollFlagEnterAlwaysCollapsed,
@@ -68,6 +70,7 @@ export const StackHeaderConfigAndroid = (props: PlatformInnerProps) => {
   };
 
   const backButtonIconProps = parseBackButtonIconToNativeProps(backButtonIcon);
+  const overflowIconProps = parseOverflowIconToNativeProps(overflowIcon);
   const scrollFlagProps = resolveScrollFlags(filteredAndroidProps.type, {
     scrollFlagScroll,
     scrollFlagEnterAlways,
@@ -93,6 +96,7 @@ export const StackHeaderConfigAndroid = (props: PlatformInnerProps) => {
       bindOnToolbarMenuItemPress={handleToolbarMenuItemPress}
       bindOnToolbarMenuGroupSelectionChange={handleToolbarMenuGroupSelectionChange}
       {...backButtonIconProps}
+      {...overflowIconProps}
       {...scrollFlagProps}
       hasBackgroundSubview={backgroundSubview != null}
     >
@@ -129,27 +133,30 @@ export const StackHeaderConfigAndroid = (props: PlatformInnerProps) => {
 
 function parseBackButtonIconToNativeProps(
   icon: PlatformIconAndroid | undefined,
-): {
-  backButtonImageIconUri?: string | undefined;
-  backButtonDrawableIconResourceName?: string | undefined;
-} {
-  if (!icon) {
-    return {};
-  }
+): Pick<
+  StackHeaderConfigNativeProps,
+  'backButtonImageIconUri' | 'backButtonDrawableIconResourceName'
+> {
+  const parsed = parseAndroidIconToNativeProps(icon);
 
-  if (icon.type === 'imageSource') {
-    return {
-      backButtonImageIconUri: icon.uri,
-    };
-  } else if (icon.type === 'drawableResource') {
-    return {
-      backButtonDrawableIconResourceName: icon.name,
-    };
-  } else {
-    throw new Error(
-      '[RNScreens] Incorrect icon format for Android. You must provide `imageSource` or `drawableResource`.',
-    );
-  }
+  return {
+    backButtonImageIconUri: parsed.imageIconUri,
+    backButtonDrawableIconResourceName: parsed.drawableIconResourceName,
+  };
+}
+
+function parseOverflowIconToNativeProps(
+  icon: StackHeaderConfigPropsAndroid['overflowIcon'],
+): Pick<
+  StackHeaderConfigNativeProps,
+  'overflowIconImageIconUri' | 'overflowIconDrawableIconResourceName'
+> {
+  const parsed = parseAndroidIconToNativeProps(icon);
+
+  return {
+    overflowIconImageIconUri: parsed.imageIconUri,
+    overflowIconDrawableIconResourceName: parsed.drawableIconResourceName,
+  };
 }
 
 type ScrollFlagFields = {

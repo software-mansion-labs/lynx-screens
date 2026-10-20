@@ -133,6 +133,26 @@ internal class StackHeaderConfigComponent(
     }
         internal set
 
+    override var overflowIconTintColorNormal: Int? by Delegates.observable(null) { _, old, new ->
+        if (old != new) invalidate(StackHeaderInvalidationFlags.OVERFLOW_ICON)
+    }
+        internal set
+
+    override var overflowIconTintColorPressed: Int? by Delegates.observable(null) { _, old, new ->
+        if (old != new) invalidate(StackHeaderInvalidationFlags.OVERFLOW_ICON)
+    }
+        internal set
+
+    override var overflowIconTintColorFocused: Int? by Delegates.observable(null) { _, old, new ->
+        if (old != new) invalidate(StackHeaderInvalidationFlags.OVERFLOW_ICON)
+    }
+        internal set
+
+    override var overflowIcon: Drawable? by Delegates.observable(null) { _, old, new ->
+        if (old !== new) invalidate(StackHeaderInvalidationFlags.OVERFLOW_ICON)
+    }
+        internal set
+
     override var scrollFlagScroll: Boolean by Delegates.observable(false) { _, old, new ->
         if (old != new) invalidate(StackHeaderInvalidationFlags.SCROLL_FLAGS)
     }
@@ -215,6 +235,34 @@ internal class StackHeaderConfigComponent(
                 IconResolution.Unchanged -> Unit
                 is IconResolution.Resolved -> {
                     backButtonIcon = result.drawable
+                    if (!isInsidePropsUpdate) {
+                        flushUpdates()
+                    }
+                }
+            }
+        }
+    }
+
+    // endregion
+
+    // region Overflow menu icon resolution
+
+    // Staging fields for overflow menu icon resolution — mirrors the back button icon.
+    // Resolution happens in resolveOverflowIconIfNeeded(), called from onPropsUpdated.
+    internal var overflowIconDrawableIconResourceName: String? = null
+    internal var overflowIconImageIconUri: String? = null
+    private val overflowIconResolver = PropIconResolver()
+
+    internal fun resolveOverflowIconIfNeeded() {
+        overflowIconResolver.resolve(
+            lynxContext,
+            overflowIconDrawableIconResourceName,
+            overflowIconImageIconUri,
+        ) { result ->
+            when (result) {
+                IconResolution.Unchanged -> Unit
+                is IconResolution.Resolved -> {
+                    overflowIcon = result.drawable
                     if (!isInsidePropsUpdate) {
                         flushUpdates()
                     }
@@ -496,6 +544,7 @@ internal class StackHeaderConfigComponent(
         super.onPropsUpdated()
         isInsidePropsUpdate = true
         resolveBackButtonIconIfNeeded()
+        resolveOverflowIconIfNeeded()
         resolveToolbarMenuItemIconsIfNeeded()
         isInsidePropsUpdate = false
         flushUpdates()
@@ -576,6 +625,31 @@ internal class StackHeaderConfigComponent(
     @LynxProp(name = "backButtonImageIconUri")
     fun setBackButtonImageIconUri(value: String?) {
         backButtonImageIconUri = value
+    }
+
+    @LynxProp(name = "overflowIconTintColorNormal")
+    fun setOverflowIconTintColorNormal(value: String?) {
+        overflowIconTintColorNormal = value?.let { runCatching { Color.parseColor(it) }.getOrNull() }
+    }
+
+    @LynxProp(name = "overflowIconTintColorPressed")
+    fun setOverflowIconTintColorPressed(value: String?) {
+        overflowIconTintColorPressed = value?.let { runCatching { Color.parseColor(it) }.getOrNull() }
+    }
+
+    @LynxProp(name = "overflowIconTintColorFocused")
+    fun setOverflowIconTintColorFocused(value: String?) {
+        overflowIconTintColorFocused = value?.let { runCatching { Color.parseColor(it) }.getOrNull() }
+    }
+
+    @LynxProp(name = "overflowIconDrawableIconResourceName")
+    fun setOverflowIconDrawableIconResourceName(value: String?) {
+        overflowIconDrawableIconResourceName = value
+    }
+
+    @LynxProp(name = "overflowIconImageIconUri")
+    fun setOverflowIconImageIconUri(value: String?) {
+        overflowIconImageIconUri = value
     }
 
     @LynxProp(name = "scrollFlagScroll")

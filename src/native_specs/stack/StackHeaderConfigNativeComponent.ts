@@ -54,6 +54,11 @@ export interface NativeProps {
   backButtonTintColorFocused?: string | undefined;
   backButtonDrawableIconResourceName?: string | undefined;
   backButtonImageIconUri?: string | undefined;
+  overflowIconTintColorNormal?: string | undefined;
+  overflowIconTintColorPressed?: string | undefined;
+  overflowIconTintColorFocused?: string | undefined;
+  overflowIconDrawableIconResourceName?: string | undefined;
+  overflowIconImageIconUri?: string | undefined;
   scrollFlagScroll?: boolean | undefined;
   scrollFlagEnterAlways?: boolean | undefined;
   scrollFlagEnterAlwaysCollapsed?: boolean | undefined;
