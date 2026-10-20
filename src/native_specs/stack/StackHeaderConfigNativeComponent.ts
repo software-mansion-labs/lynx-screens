@@ -107,6 +107,7 @@ export interface NativeProps {
   liftOnScroll?: boolean | undefined;
   backgroundColor?: string | undefined;
   scrolledBackgroundColor?: string | undefined;
+  statusBarScrimColor?: string | undefined;
   hasBackgroundSubview?: boolean | undefined;
   largeTitle?: string | undefined;
   largeSubtitle?: string | undefined;
