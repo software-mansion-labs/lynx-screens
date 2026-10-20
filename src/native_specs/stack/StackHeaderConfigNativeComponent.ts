@@ -105,6 +105,8 @@ export interface NativeProps {
   scrollFlagExitUntilCollapsed?: boolean | undefined;
   scrollFlagSnap?: boolean | undefined;
   liftOnScroll?: boolean | undefined;
+  backgroundColor?: string | undefined;
+  scrolledBackgroundColor?: string | undefined;
   hasBackgroundSubview?: boolean | undefined;
   largeTitle?: string | undefined;
   largeSubtitle?: string | undefined;

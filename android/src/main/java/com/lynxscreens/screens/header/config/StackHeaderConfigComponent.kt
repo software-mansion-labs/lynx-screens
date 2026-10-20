@@ -154,6 +154,12 @@ internal class StackHeaderConfigComponent(
     override var liftOnScroll: Boolean by invalidatingProperty(true, StackHeaderInvalidationFlags.LIFT_ON_SCROLL)
         internal set
 
+    override var backgroundColor: Int? by invalidatingProperty(null, StackHeaderInvalidationFlags.BACKGROUND_COLORS)
+        internal set
+
+    override var scrolledBackgroundColor: Int? by invalidatingProperty(null, StackHeaderInvalidationFlags.BACKGROUND_COLORS)
+        internal set
+
     override var toolbarMenu: StackHeaderToolbarMenuConfig
         by invalidatingProperty(StackHeaderToolbarMenuConfig(emptyList(), emptyList()), StackHeaderInvalidationFlags.TOOLBAR_MENU)
         internal set
@@ -907,6 +913,17 @@ internal class StackHeaderConfigComponent(
     fun setLiftOnScroll(value: Boolean?) {
         // Unlike Fabric, Lynx delivers null for an absent prop - fall back to the default (true).
         liftOnScroll = value != false
+    }
+
+    // Colors arrive as CSS color strings (RNS gets processed color Ints from Fabric).
+    @LynxProp(name = "backgroundColor")
+    fun setBackgroundColor(value: String?) {
+        backgroundColor = value?.let { runCatching { Color.parseColor(it) }.getOrNull() }
+    }
+
+    @LynxProp(name = "scrolledBackgroundColor")
+    fun setScrolledBackgroundColor(value: String?) {
+        scrolledBackgroundColor = value?.let { runCatching { Color.parseColor(it) }.getOrNull() }
     }
 
     @LynxProp(name = "toolbarMenuGroupDividerEnabled")
