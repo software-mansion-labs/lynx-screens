@@ -5,6 +5,7 @@ import android.graphics.Color
 import android.graphics.drawable.Drawable
 import android.util.LayoutDirection
 import android.util.Log
+import android.view.Gravity
 import com.lynx.react.bridge.Callback
 import com.lynx.react.bridge.ReadableMap
 import com.lynx.tasm.behavior.LynxContext
@@ -94,6 +95,11 @@ internal class StackHeaderConfigComponent(
         internal set
 
     override var title: String by Delegates.observable("") { _, old, new ->
+        if (old != new) invalidate(StackHeaderInvalidationFlags.TITLE)
+    }
+        internal set
+
+    override var subtitle: String by Delegates.observable("") { _, old, new ->
         if (old != new) invalidate(StackHeaderInvalidationFlags.TITLE)
     }
         internal set
@@ -192,6 +198,42 @@ internal class StackHeaderConfigComponent(
     override var toolbarMenuGroupDividerEnabled: Boolean by Delegates.observable(false) { _, old, new ->
         if (old != new) invalidate(StackHeaderInvalidationFlags.TOOLBAR_MENU)
     }
+        internal set
+
+    override var titleCentered: Boolean by Delegates.observable(false) { _, old, new ->
+        if (old != new) invalidate(StackHeaderInvalidationFlags.TITLE_POSITIONING)
+    }
+        internal set
+
+    override var subtitleCentered: Boolean by Delegates.observable(false) { _, old, new ->
+        if (old != new) invalidate(StackHeaderInvalidationFlags.TITLE_POSITIONING)
+    }
+        internal set
+
+    override var expandedTitleHorizontalGravity: Int by Delegates.observable(Gravity.START) { _, old, new ->
+        if (old != new) invalidate(StackHeaderInvalidationFlags.TITLE_POSITIONING)
+    }
+        internal set
+
+    override var expandedTitleVerticalGravity: Int by Delegates.observable(Gravity.BOTTOM) { _, old, new ->
+        if (old != new) invalidate(StackHeaderInvalidationFlags.TITLE_POSITIONING)
+    }
+        internal set
+
+    override var collapsedTitleHorizontalGravity: Int by Delegates.observable(Gravity.START) { _, old, new ->
+        if (old != new) invalidate(StackHeaderInvalidationFlags.TITLE_POSITIONING)
+    }
+        internal set
+
+    override var collapsedTitleVerticalGravity: Int by Delegates.observable(Gravity.CENTER_VERTICAL) { _, old, new ->
+        if (old != new) invalidate(StackHeaderInvalidationFlags.TITLE_POSITIONING)
+    }
+        internal set
+
+    override var collapsedTitleGravityMode: StackHeaderCollapsedTitleGravityMode
+        by Delegates.observable(StackHeaderCollapsedTitleGravityMode.AVAILABLE_SPACE) { _, old, new ->
+            if (old != new) invalidate(StackHeaderInvalidationFlags.STRUCTURE)
+        }
         internal set
 
     override val isRTL: Boolean
@@ -585,6 +627,55 @@ internal class StackHeaderConfigComponent(
         title = value ?: ""
     }
 
+    @LynxProp(name = "subtitle")
+    fun setSubtitle(value: String?) {
+        subtitle = value ?: ""
+    }
+
+    @LynxProp(name = "titleCentered")
+    fun setTitleCentered(value: Boolean?) {
+        titleCentered = value == true
+    }
+
+    @LynxProp(name = "subtitleCentered")
+    fun setSubtitleCentered(value: Boolean?) {
+        subtitleCentered = value == true
+    }
+
+    // Unlike Fabric (codegen WithDefault), Lynx delivers null for an absent prop - the setters
+    // fall back to the RNS defaults.
+    @LynxProp(name = "expandedTitleHorizontalGravity")
+    fun setExpandedTitleHorizontalGravity(value: String?) {
+        expandedTitleHorizontalGravity = parseHorizontalGravity(value, Gravity.START)
+    }
+
+    @LynxProp(name = "expandedTitleVerticalGravity")
+    fun setExpandedTitleVerticalGravity(value: String?) {
+        expandedTitleVerticalGravity = parseVerticalGravity(value, Gravity.BOTTOM)
+    }
+
+    @LynxProp(name = "collapsedTitleHorizontalGravity")
+    fun setCollapsedTitleHorizontalGravity(value: String?) {
+        collapsedTitleHorizontalGravity = parseHorizontalGravity(value, Gravity.START)
+    }
+
+    @LynxProp(name = "collapsedTitleVerticalGravity")
+    fun setCollapsedTitleVerticalGravity(value: String?) {
+        collapsedTitleVerticalGravity = parseVerticalGravity(value, Gravity.CENTER_VERTICAL)
+    }
+
+    @LynxProp(name = "collapsedTitleGravityMode")
+    fun setCollapsedTitleGravityMode(value: String?) {
+        collapsedTitleGravityMode =
+            when (value) {
+                "entireSpace" -> StackHeaderCollapsedTitleGravityMode.ENTIRE_SPACE
+                "availableSpace", null -> StackHeaderCollapsedTitleGravityMode.AVAILABLE_SPACE
+                else -> throw IllegalArgumentException(
+                    "[RNScreens] Invalid StackHeaderConfig collapsedTitleGravityMode: $value.",
+                )
+            }
+    }
+
     @LynxProp(name = "hidden")
     fun setHidden(value: Boolean?) {
         hidden = value == true
@@ -732,6 +823,34 @@ internal class StackHeaderConfigComponent(
         dispatchMenuElementUpdates(parsed)
         callback.invoke(LynxUIMethodConstants.SUCCESS)
     }
+
+    private fun parseHorizontalGravity(
+        value: String?,
+        default: Int,
+    ): Int =
+        when (value) {
+            null -> default
+            "start" -> Gravity.START
+            "center" -> Gravity.CENTER_HORIZONTAL
+            "end" -> Gravity.END
+            else -> throw IllegalArgumentException(
+                "[RNScreens] Invalid StackHeaderConfig title horizontal gravity: $value.",
+            )
+        }
+
+    private fun parseVerticalGravity(
+        value: String?,
+        default: Int,
+    ): Int =
+        when (value) {
+            null -> default
+            "top" -> Gravity.TOP
+            "center" -> Gravity.CENTER_VERTICAL
+            "bottom" -> Gravity.BOTTOM
+            else -> throw IllegalArgumentException(
+                "[RNScreens] Invalid StackHeaderConfig title vertical gravity: $value.",
+            )
+        }
 
     // endregion
 
