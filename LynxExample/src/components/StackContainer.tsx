@@ -19,8 +19,10 @@ import { Stack } from 'lynx-screens';
 import { useParentNavigationEffect } from '../hooks/useParentNavigationEffect';
 import { useComponentsByName } from '../hooks/useComponentsByName';
 
-export function StackContainer(props: StackContainerProps) {
-  const { routeConfigs, ...restProps } = props;
+export function StackContainer<
+  const TRouteConfigs extends readonly StackRouteConfig[],
+>(props: StackContainerProps<TRouteConfigs>) {
+  const { routeConfigs, initialRouteNames, ...restProps } = props;
   useSanitizeRouteConfigs(routeConfigs);
 
   const componentsByName = useComponentsByName(routeConfigs);
@@ -30,7 +32,7 @@ export function StackContainer(props: StackContainerProps) {
     React.Dispatch<NavigationAction>,
   ] = React.useReducer(
     navigationStateReducerWithLogging,
-    routeConfigs,
+    { routeConfigs, initialRouteNames },
     determineInitialNavigationState,
   );
 
@@ -103,7 +105,7 @@ export function StackContainer(props: StackContainerProps) {
 }
 
 function useSanitizeRouteConfigs(
-  routeConfigs?: StackRouteConfig[] | undefined | null,
+  routeConfigs?: readonly StackRouteConfig[] | undefined | null,
 ) {
   if (!routeConfigs || routeConfigs.length === 0) {
     throw new Error('[Stack] There must be at least one route configured');
