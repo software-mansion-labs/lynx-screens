@@ -43,6 +43,7 @@
     _placement = RNSHeaderItemPlacementTrailing;
     _didSetHeaderItemPlacement = NO;
     _respondsToOnPress = NO;
+    _hidesSharedBackground = NO;
     _needsUpdate = NO;
     _menuDidChange = NO;
 }
@@ -237,6 +238,16 @@ LYNX_PROP_SETTER("identifier", setIdentifier, NSString *) {
     }
     if (_identifier != value && ![_identifier isEqualToString:value]) {
         _identifier = value;
+        _needsUpdate = YES;
+    }
+}
+
+LYNX_PROP_SETTER("hidesSharedBackground", setHidesSharedBackground, BOOL) {
+    if (requestReset) {
+        value = NO;
+    }
+    if (_hidesSharedBackground != value) {
+        _hidesSharedBackground = value;
         _needsUpdate = YES;
     }
 }
