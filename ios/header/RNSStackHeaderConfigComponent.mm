@@ -54,6 +54,12 @@ static void RNSAssertIsValidHeaderChild(id child)
     _largeSubtitle = nil;
     _largeTitleEnabled = NO;
     _prompt = nil;
+#if RNS_IPHONE_OS_VERSION_AVAILABLE(27_0)
+    if (@available(iOS 27.0, *)) {
+        _minimizationBehavior = UIBarMinimizationBehaviorAutomatic;
+        _restorationBehavior = UIBarMinimizationRestorationBehaviorAutomatic;
+    }
+#endif // Check for iOS >= 27
     _backButtonTitle = nil;
     _backButtonDisplayMode = UINavigationItemBackButtonDisplayModeDefault;
     _backButtonMenuEnabled = YES;
@@ -291,6 +297,54 @@ LYNX_PROP_SETTER("prompt", setPrompt, NSString *) {
         value = nil;
     }
     _prompt = value;
+}
+
+// Adaptation: RNS converts the codegen enums in RNSConversions-Stack; on Lynx
+// the string values are mapped here.
+LYNX_PROP_SETTER("minimizationBehavior", setMinimizationBehavior, NSString *) {
+    if (requestReset || value == nil) {
+        value = @"automatic";
+    }
+#if RNS_IPHONE_OS_VERSION_AVAILABLE(27_0)
+    if (@available(iOS 27.0, *)) {
+        if ([value isEqualToString:@"automatic"]) {
+            _minimizationBehavior = UIBarMinimizationBehaviorAutomatic;
+        } else if ([value isEqualToString:@"never"]) {
+            _minimizationBehavior = UIBarMinimizationBehaviorNever;
+        } else if ([value isEqualToString:@"onScrollDown"]) {
+            _minimizationBehavior = UIBarMinimizationBehaviorOnScrollDown;
+        } else if ([value isEqualToString:@"onScrollUp"]) {
+            _minimizationBehavior = UIBarMinimizationBehaviorOnScrollUp;
+        } else {
+            LLogWarn(@"[RNScreens] Unsupported minimizationBehavior value: %@", value);
+            _minimizationBehavior = UIBarMinimizationBehaviorAutomatic;
+        }
+    } else
+#endif // Check for iOS >= 27
+        if (![value isEqualToString:@"automatic"]) {
+            LLogWarn(@"[RNScreens] minimizationBehavior is supported for iOS >= 27");
+        }
+}
+
+LYNX_PROP_SETTER("restorationBehavior", setRestorationBehavior, NSString *) {
+    if (requestReset || value == nil) {
+        value = @"automatic";
+    }
+#if RNS_IPHONE_OS_VERSION_AVAILABLE(27_0)
+    if (@available(iOS 27.0, *)) {
+        if ([value isEqualToString:@"automatic"]) {
+            _restorationBehavior = UIBarMinimizationRestorationBehaviorAutomatic;
+        } else if ([value isEqualToString:@"atScrollEdge"]) {
+            _restorationBehavior = UIBarMinimizationRestorationBehaviorAtScrollEdge;
+        } else {
+            LLogWarn(@"[RNScreens] Unsupported restorationBehavior value: %@", value);
+            _restorationBehavior = UIBarMinimizationRestorationBehaviorAutomatic;
+        }
+    } else
+#endif // Check for iOS >= 27
+        if (![value isEqualToString:@"automatic"]) {
+            LLogWarn(@"[RNScreens] restorationBehavior is supported for iOS >= 27");
+        }
 }
 
 LYNX_PROP_SETTER("backButtonTitle", setBackButtonTitle, NSString *) {
