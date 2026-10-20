@@ -170,6 +170,18 @@ export interface SupportsIdentifierIOS {
   identifier?: string | undefined;
 }
 
+/**
+ * @summary Visual variant (style) of a header item.
+ *
+ * @description
+ * - `plain`: the default look of a bar button item.
+ * - `prominent`: the item is emphasized with a tinted background.
+ *   On iOS below 26 it falls back to bold text (the `done` style).
+ *
+ * @platform iOS
+ */
+export type StackHeaderItemVariantIOS = 'plain' | 'prominent';
+
 export interface StackHeaderInlineItemIOS
   extends StackHeaderBaseItemIOS,
     SupportsMenuIOS,
@@ -177,6 +189,14 @@ export interface StackHeaderInlineItemIOS
     SupportsSharedBackgroundIOS,
     SupportsVisibilityPriorityIOS {
   type: 'item';
+  /**
+   * @summary Visual variant (style) of the item.
+   *
+   * @default 'plain'
+   *
+   * @platform iOS
+   */
+  variant?: StackHeaderItemVariantIOS | undefined;
   /**
    * @summary Whether the item is disabled.
    *

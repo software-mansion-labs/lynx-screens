@@ -52,6 +52,7 @@ export interface NativeProps {
   icon?: StackHeaderIconIOSAttr | undefined;
   menu?: StackHeaderMenuAttr | undefined;
   menuRepresentation?: StackHeaderMenuAttr | undefined;
+  variant?: 'plain' | 'prominent' | undefined;
   disabled?: boolean | undefined;
   respondsToOnPress?: boolean | undefined;
   bindOnHeaderItemPress?:
