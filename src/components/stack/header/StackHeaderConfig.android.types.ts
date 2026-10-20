@@ -1,3 +1,4 @@
+import type { CSSProperties } from '@lynx-js/types';
 import type { ReactElement } from '@lynx-js/react';
 import type { StackHeaderSubviewCollapseModeAndroid } from './android/StackHeaderSubview.android.types.js';
 import type { PlatformIconAndroid } from '../../shared/types.js';
@@ -876,4 +877,295 @@ export interface StackHeaderConfigPropsAndroid {
   collapsedTitleGravityMode?:
     | StackHeaderCollapsedTitleGravityModeAndroid
     | undefined;
+  /**
+   * @summary Color of the title text. Applies to `small` header only.
+   *
+   * @remarks
+   * If value is not provided, falls back to Material's default.
+   *
+   * @platform android
+   */
+  titleColor?: string | undefined;
+  /**
+   * @summary Font family of the title text. Applies to `small` header only.
+   *
+   * @remarks
+   * If value is not provided, falls back to Material's default.
+   *
+   * @platform android
+   */
+  titleFontFamily?: string | undefined;
+  /**
+   * @summary Font size (SP) of the title text. Applies to `small` header only.
+   *
+   * @remarks
+   * If value is not provided, falls back to Material's default.
+   *
+   * @platform android
+   */
+  titleFontSize?: number | undefined;
+  /**
+   * @summary Font weight of the title text. Applies to `small` header only.
+   *
+   * @remarks
+   * If value is not provided, falls back to Material's default.
+   *
+   * @platform android
+   */
+  titleFontWeight?: CSSProperties['fontWeight'] | undefined;
+  /**
+   * @summary Font style of the title text. Applies to `small` header only.
+   *
+   * @remarks
+   * If value is not provided, falls back to Material's default.
+   *
+   * @platform android
+   */
+  titleFontStyle?: Exclude<CSSProperties['fontStyle'], 'oblique'> | undefined;
+  /**
+   * @summary Color of the subtitle text. Applies to `small` header only.
+   *
+   * @remarks
+   * If value is not provided, falls back to Material's default.
+   *
+   * @platform android
+   */
+  subtitleColor?: string | undefined;
+  /**
+   * @summary Font family of the subtitle text. Applies to `small` header only.
+   *
+   * @remarks
+   * If value is not provided, falls back to Material's default.
+   *
+   * @platform android
+   */
+  subtitleFontFamily?: string | undefined;
+  /**
+   * @summary Font size (SP) of the subtitle text. Applies to `small`
+   * header only.
+   *
+   * @remarks
+   * If value is not provided, falls back to Material's default.
+   *
+   * @platform android
+   */
+  subtitleFontSize?: number | undefined;
+  /**
+   * @summary Font weight of the subtitle text. Applies to `small` header only.
+   *
+   * @remarks
+   * If value is not provided, falls back to Material's default.
+   *
+   * @platform android
+   */
+  subtitleFontWeight?: CSSProperties['fontWeight'] | undefined;
+  /**
+   * @summary Font style of the subtitle text. Applies to `small` header only.
+   *
+   * @remarks
+   * If value is not provided, falls back to Material's default.
+   *
+   * @platform android
+   */
+  subtitleFontStyle?: Exclude<CSSProperties['fontStyle'], 'oblique'> | undefined;
+  /**
+   * @summary Color of the expanded title text. Applies to `medium` and
+   * `large` headers only.
+   *
+   * @remarks
+   * If value is not provided, falls back to Material's default.
+   *
+   * @platform android
+   */
+  expandedTitleColor?: string | undefined;
+  /**
+   * @summary Font family of the expanded title text. Applies to `medium`
+   * and `large` headers only.
+   *
+   * @remarks
+   * If value is not provided, falls back to Material's default.
+   *
+   * @platform android
+   */
+  expandedTitleFontFamily?: string | undefined;
+  /**
+   * @summary Font size (SP) of the expanded title text. Applies to
+   * `medium` and `large` headers only.
+   *
+   * @remarks
+   * If value is not provided, falls back to Material's default.
+   *
+   * @platform android
+   */
+  expandedTitleFontSize?: number | undefined;
+  /**
+   * @summary Font weight of the expanded title text. Applies to `medium`
+   * and `large` headers only.
+   *
+   * @remarks
+   * If value is not provided, falls back to Material's default.
+   *
+   * @platform android
+   */
+  expandedTitleFontWeight?: CSSProperties['fontWeight'] | undefined;
+  /**
+   * @summary Font style of the expanded title text. Applies to `medium`
+   * and `large` headers only.
+   *
+   * @remarks
+   * If value is not provided, falls back to Material's default.
+   *
+   * @platform android
+   */
+  expandedTitleFontStyle?: Exclude<CSSProperties['fontStyle'], 'oblique'> | undefined;
+  /**
+   * @summary Color of the collapsed title text. Applies to `medium` and
+   * `large` headers only.
+   *
+   * @remarks
+   * If value is not provided, falls back to Material's default.
+   *
+   * @platform android
+   */
+  collapsedTitleColor?: string | undefined;
+  /**
+   * @summary Font family of the collapsed title text. Applies to `medium`
+   * and `large` headers only.
+   *
+   * @remarks
+   * If value is not provided, falls back to Material's default.
+   *
+   * @platform android
+   */
+  collapsedTitleFontFamily?: string | undefined;
+  /**
+   * @summary Font size (SP) of the collapsed title text. Applies to
+   * `medium` and `large` headers only.
+   *
+   * @remarks
+   * If value is not provided, falls back to Material's default.
+   *
+   * @platform android
+   */
+  collapsedTitleFontSize?: number | undefined;
+  /**
+   * @summary Font weight of the collapsed title text. Applies to `medium`
+   * and `large` headers only.
+   *
+   * @remarks
+   * If value is not provided, falls back to Material's default.
+   *
+   * @platform android
+   */
+  collapsedTitleFontWeight?: CSSProperties['fontWeight'] | undefined;
+  /**
+   * @summary Font style of the collapsed title text. Applies to `medium`
+   * and `large` headers only.
+   *
+   * @remarks
+   * If value is not provided, falls back to Material's default.
+   *
+   * @platform android
+   */
+  collapsedTitleFontStyle?: Exclude<CSSProperties['fontStyle'], 'oblique'> | undefined;
+  /**
+   * @summary Color of the expanded subtitle text. Applies to `medium`
+   * and `large` headers only.
+   *
+   * @remarks
+   * If value is not provided, falls back to Material's default.
+   *
+   * @platform android
+   */
+  expandedSubtitleColor?: string | undefined;
+  /**
+   * @summary Font family of the expanded subtitle text. Applies to
+   * `medium` and `large` headers only.
+   *
+   * @remarks
+   * If value is not provided, falls back to Material's default.
+   *
+   * @platform android
+   */
+  expandedSubtitleFontFamily?: string | undefined;
+  /**
+   * @summary Font size (SP) of the expanded subtitle text. Applies to
+   * `medium` and `large` headers only.
+   *
+   * @remarks
+   * If value is not provided, falls back to Material's default.
+   *
+   * @platform android
+   */
+  expandedSubtitleFontSize?: number | undefined;
+  /**
+   * @summary Font weight of the expanded subtitle text. Applies to
+   * `medium` and `large` headers only.
+   *
+   * @remarks
+   * If value is not provided, falls back to Material's default.
+   *
+   * @platform android
+   */
+  expandedSubtitleFontWeight?: CSSProperties['fontWeight'] | undefined;
+  /**
+   * @summary Font style of the expanded subtitle text. Applies to
+   * `medium` and `large` headers only.
+   *
+   * @remarks
+   * If value is not provided, falls back to Material's default.
+   *
+   * @platform android
+   */
+  expandedSubtitleFontStyle?: Exclude<CSSProperties['fontStyle'], 'oblique'> | undefined;
+  /**
+   * @summary Color of the collapsed subtitle text. Applies to `medium`
+   * and `large` headers only.
+   *
+   * @remarks
+   * If value is not provided, falls back to Material's default.
+   *
+   * @platform android
+   */
+  collapsedSubtitleColor?: string | undefined;
+  /**
+   * @summary Font family of the collapsed subtitle text. Applies to
+   * `medium` and `large` headers only.
+   *
+   * @remarks
+   * If value is not provided, falls back to Material's default.
+   *
+   * @platform android
+   */
+  collapsedSubtitleFontFamily?: string | undefined;
+  /**
+   * @summary Font size (SP) of the collapsed subtitle text. Applies to
+   * `medium` and `large` headers only.
+   *
+   * @remarks
+   * If value is not provided, falls back to Material's default.
+   *
+   * @platform android
+   */
+  collapsedSubtitleFontSize?: number | undefined;
+  /**
+   * @summary Font weight of the collapsed subtitle text. Applies to
+   * `medium` and `large` headers only.
+   *
+   * @remarks
+   * If value is not provided, falls back to Material's default.
+   *
+   * @platform android
+   */
+  collapsedSubtitleFontWeight?: CSSProperties['fontWeight'] | undefined;
+  /**
+   * @summary Font style of the collapsed subtitle text. Applies to
+   * `medium` and `large` headers only.
+   *
+   * @remarks
+   * If value is not provided, falls back to Material's default.
+   *
+   * @platform android
+   */
+  collapsedSubtitleFontStyle?: Exclude<CSSProperties['fontStyle'], 'oblique'> | undefined;
 }
