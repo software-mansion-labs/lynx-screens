@@ -61,9 +61,9 @@ fi
 
 repo_root=$(git -C "$(dirname "${BASH_SOURCE[0]}")" rev-parse --show-toplevel) || exit 2
 rns_repo=${rns_repo:-"$repo_root/../react-native-screens"}
-rns_android='android/src/main/java/com/swmansion/rnscreens/modals/formsheet/native'
-lynx_android_main='android/src/main/java/com/lynxscreens/screens/formsheet'
-lynx_android_material='android/src/formSheetMaterial/java/com/lynxscreens/screens/formsheet'
+rns_android='android/src/main/java/com/swmansion/rnscreens/core/modals/formsheet'
+lynx_android_main='android/src/main/java/com/lynxscreens/screens/core/modals/formsheet'
+lynx_android_material='android/src/formSheetMaterial/java/com/lynxscreens/screens/core/modals/formsheet'
 
 required_dirs=()
 if [[ $platform != android ]]; then
