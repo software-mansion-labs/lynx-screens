@@ -15,6 +15,7 @@ export const StackScreen = ({
   onNativeDismiss,
   onNativeDismissPrevented,
   // Configuration
+  gestureEnabled,
   preventNativeDismiss,
 }: StackScreenProps) => {
   const onDismissWrapper = React.useCallback(
@@ -50,6 +51,7 @@ export const StackScreen = ({
       bindOnDismiss={onDismissWrapper}
       bindOnNativeDismissPrevented={onNativeDismissPrevented}
       // Configuration
+      gestureEnabled={gestureEnabled}
       preventNativeDismiss={preventNativeDismiss}
     >
       {children}

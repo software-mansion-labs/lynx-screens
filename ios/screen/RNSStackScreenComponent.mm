@@ -43,6 +43,7 @@
     // container state
     _screenKey = nil;
     _activityMode = RNSStackScreenActivityModeDetached;
+    _gestureEnabled = YES;
 }
 
 - (void)setupController
@@ -73,6 +74,10 @@
 }
 
 #pragma mark - Props
+
+LYNX_PROP_SETTER("gestureEnabled", setGestureEnabled, BOOL) {
+    self.gestureEnabled = requestReset ? YES : value;
+}
 
 LYNX_PROP_SETTER("activityMode", setActivityMode, NSString *) {
     auto prevActivityMode = self.activityMode;
