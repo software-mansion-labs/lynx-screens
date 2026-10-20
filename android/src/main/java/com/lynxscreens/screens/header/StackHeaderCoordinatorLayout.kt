@@ -4,7 +4,6 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.content.res.Configuration
 import android.os.Parcelable
-import android.util.Log
 import android.util.SparseArray
 import android.view.ViewGroup.LayoutParams.MATCH_PARENT
 import android.widget.FrameLayout
@@ -13,7 +12,6 @@ import androidx.appcompat.view.ContextThemeWrapper
 import androidx.coordinatorlayout.widget.CoordinatorLayout
 import com.google.android.material.R
 import com.google.android.material.appbar.AppBarLayout
-import com.google.android.material.appbar.MaterialToolbar
 import com.lynxscreens.screens.common.colorscheme.ColorSchemeCoordinator
 import com.lynxscreens.screens.common.colorscheme.ColorSchemeListener
 import com.lynxscreens.screens.common.colorscheme.ColorSchemeProviding
@@ -24,9 +22,6 @@ import com.lynxscreens.screens.header.config.StackHeaderConfigurationObserver
 import com.lynxscreens.screens.header.config.StackHeaderConfigurationProviding
 import com.lynxscreens.screens.header.config.StackHeaderDelegate
 import com.lynxscreens.screens.header.config.StackHeaderInvalidationFlags
-import com.lynxscreens.screens.header.toolbar.StackHeaderToolbarMenuApplicator
-import com.lynxscreens.screens.header.toolbar.StackHeaderToolbarMenuSelectionController
-import com.lynxscreens.screens.header.toolbar.update.StackHeaderToolbarMenuElementUpdate
 import com.lynxscreens.screens.screen.StackScreenComponent
 
 /**
@@ -58,7 +53,10 @@ internal class StackHeaderCoordinatorLayout(
         delegate: StackHeaderDelegate?,
     ) {
         // Disconnect old config to prevent spurious updates from a detached config.
-        currentProvider?.setConfigurationObserver(null)
+        currentProvider?.let {
+            it.setConfigurationObserver(null)
+            it.toolbarMenuController.detach()
+        }
 
         currentProvider = provider
         currentDelegate = delegate
@@ -78,34 +76,6 @@ internal class StackHeaderCoordinatorLayout(
     private val configObserver =
         object : StackHeaderConfigurationObserver {
             override fun onConfigChanged(config: StackHeaderConfigurationProviding) = processUpdate(config)
-
-            override fun onMenuElementsUpdated(updates: List<StackHeaderToolbarMenuElementUpdate>) {
-                val toolbar = appBarLayout?.toolbar
-                if (toolbar == null) {
-                    Log.w(
-                        TAG,
-                        "[RNScreens] Dropping ${updates.size} resolved toolbar menu update(s): " +
-                            "the header toolbar is not currently attached (header hidden or detached).",
-                    )
-                    return
-                }
-                // Apply every element first, collecting the groups whose selection changed,
-                // then emit a single coalesced event per affected group.
-                val affectedGroups = LinkedHashSet<String>()
-                for (update in updates) {
-                    StackHeaderToolbarMenuApplicator.updateToolbarMenuElement(
-                        toolbar,
-                        selectionController.forwardIdMap,
-                        update.id,
-                        update.options,
-                    )
-                    val checked = update.options.checked
-                    if (checked != null) {
-                        selectionController.applyGroupItemStateChange(toolbar, update.id, checked)?.let(affectedGroups::add)
-                    }
-                }
-                affectedGroups.forEach { groupId -> emitGroupSelection(toolbar, groupId) }
-            }
         }
 
     // endregion
@@ -165,8 +135,6 @@ internal class StackHeaderCoordinatorLayout(
         )
 
     private val applicator = StackHeaderApplicator(wrappedContext)
-
-    private val selectionController = StackHeaderToolbarMenuSelectionController()
 
     private var appBarLayout: StackHeaderAppBarLayout? = null
 
@@ -251,41 +219,7 @@ internal class StackHeaderCoordinatorLayout(
             }
 
             if (needsRebuild || effectiveFlags.containsAny(StackHeaderInvalidationFlags.TOOLBAR_MENU)) {
-                val (forwardIdMap, reverseIdMap) =
-                    StackHeaderToolbarMenuApplicator.generateToolbarMenuItemMappings(
-                        provider.toolbarMenu,
-                    )
-                val forwardGroupIdMap =
-                    StackHeaderToolbarMenuApplicator.generateToolbarMenuGroupMappings(
-                        provider.toolbarMenu,
-                    )
-                val groupMetadata =
-                    StackHeaderToolbarMenuApplicator.computeGroupMetadata(
-                        provider.toolbarMenu,
-                    )
-
-                StackHeaderToolbarMenuApplicator.validateRadioInitialSelection(provider.toolbarMenu)
-
-                selectionController.setMenuMaps(forwardIdMap, groupMetadata)
-
-                StackHeaderToolbarMenuApplicator.rebuildToolbarMenu(
-                    appBar.toolbar,
-                    provider.toolbarMenu,
-                    forwardIdMap,
-                    reverseIdMap,
-                    forwardGroupIdMap,
-                    groupDividerEnabled = provider.toolbarMenuGroupDividerEnabled,
-                    onItemClicked = { id, menuItem ->
-                        if (menuItem.isCheckable) {
-                            selectionController.applyGroupItemStateChange(appBar.toolbar, id)?.let { groupId ->
-                                emitGroupSelection(appBar.toolbar, groupId)
-                            }
-                        } else {
-                            currentDelegate?.onMenuItemClicked(id)
-                        }
-                    },
-                )
-
+                provider.toolbarMenuController.attach(appBar.toolbar)
                 provider.clearInvalidationFlags(StackHeaderInvalidationFlags.TOOLBAR_MENU)
             }
 
@@ -359,17 +293,6 @@ internal class StackHeaderCoordinatorLayout(
 
     // endregion
 
-    // region Group selection
-
-    private fun emitGroupSelection(
-        toolbar: MaterialToolbar,
-        groupId: String,
-    ) {
-        currentDelegate?.onGroupSelectionChanged(groupId, selectionController.collectSelectedIds(toolbar, groupId))
-    }
-
-    // endregion
-
     // region Header lifecycle
 
     private fun resetHeader() {
@@ -380,7 +303,7 @@ internal class StackHeaderCoordinatorLayout(
         appBarLayout = null
         // A rebuilt header starts fully expanded; drop any stale collapsed state from the old one.
         isAppBarFullyCollapsed = false
-        selectionController.clear()
+        currentProvider?.toolbarMenuController?.detach()
     }
 
     private fun removeHeader() {
@@ -478,8 +401,4 @@ internal class StackHeaderCoordinatorLayout(
     }
 
     // endregion
-
-    companion object {
-        private const val TAG = "StackHeaderCoordinatorLayout"
-    }
 }

@@ -66,6 +66,7 @@ function ColorSchemePickers() {
 
 function buildToolbarMenu(
   onGroupChange: (groupId: string, selectedIds: string[]) => void,
+  textActionTitle: string,
 ): StackHeaderToolbarMenuBaseAndroid {
   return {
     groups: [
@@ -83,7 +84,7 @@ function buildToolbarMenu(
       {
         type: 'menuItem',
         id: 'textAction',
-        title: 'Text',
+        title: textActionTitle,
         showAsAction: 'always',
         onPress: () => {},
       },
@@ -132,6 +133,8 @@ function ConfigScreen() {
   const { push, setRouteOptions, routeKey } = useStackNavigationContext();
 
   const [headerType, setHeaderType] = useState<StackHeaderTypeAndroid>('small');
+  const [headerHidden, setHeaderHidden] = useState(false);
+  const [menuPropVersion, setMenuPropVersion] = useState(1);
   const [lastSelection, setLastSelection] = useState<string | null>(null);
 
   const headerConfigRef = useRef<StackHeaderConfigRef>(null);
@@ -149,16 +152,27 @@ function ConfigScreen() {
       headerConfig: {
         title: 'Config',
         subtitle: 'Color scheme test',
+        hidden: headerHidden,
         android: {
           type: headerType,
           scrollFlagScroll: true,
           scrollFlagExitUntilCollapsed: true,
-          toolbarMenu: buildToolbarMenu(handleGroupChange),
+          toolbarMenu: buildToolbarMenu(
+            handleGroupChange,
+            menuPropVersion === 1 ? 'Text' : `Text v${menuPropVersion}`,
+          ),
         },
       },
       headerConfigRef,
     });
-  }, [setRouteOptions, routeKey, headerType, handleGroupChange]);
+  }, [
+    setRouteOptions,
+    routeKey,
+    headerType,
+    headerHidden,
+    menuPropVersion,
+    handleGroupChange,
+  ]);
 
   const loadRemoteIcon = useCallback(() => {
     iconSeedRef.current += 1;
@@ -170,6 +184,13 @@ function ConfigScreen() {
           uri: `https://picsum.photos/seed/rns-color-scheme-${iconSeedRef.current}/128`,
         },
       },
+    });
+  }, []);
+
+  const checkFilterB = useCallback(() => {
+    headerConfigRef.current?.android?.updateToolbarMenuElements({
+      id: 'filterB',
+      options: { checked: true },
     });
   }, []);
 
@@ -208,11 +229,25 @@ function ConfigScreen() {
 
           <view style={{ marginBottom: '20px', gap: '6px' }}>
             <Heading label="Toolbar menu (Android)" />
-            <Note text="Change checkbox/radio selection in the overflow menu, load a remote icon, then change the color scheme and observe what the toolbar menu keeps." />
+            <Note text="Change checkbox/radio selection in the overflow menu, load a remote icon, then rebuild the header (color scheme, header type, hide/show) and observe that the toolbar menu keeps its state. Only the toolbarMenu prop change button resets it." />
             <Note text={`Last selection: ${lastSelection ?? 'none yet'}`} />
             <SettingsButton
               label="Load remote icon (imperative)"
               onTap={loadRemoteIcon}
+            />
+            <SettingsButton
+              label="Check Filter B (imperative)"
+              onTap={checkFilterB}
+            />
+            <SettingsButton
+              label={`Change toolbarMenu prop (v${menuPropVersion} → v${
+                menuPropVersion + 1
+              })`}
+              onTap={() => setMenuPropVersion((version) => version + 1)}
+            />
+            <SettingsButton
+              label={headerHidden ? 'Show header' : 'Hide header'}
+              onTap={() => setHeaderHidden((hidden) => !hidden)}
             />
           </view>
 
