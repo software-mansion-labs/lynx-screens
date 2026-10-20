@@ -4,13 +4,9 @@ import {
   useImperativeHandle,
   useMemo,
   useRef,
-  type Ref,
 } from '@lynx-js/react';
 import type { BaseEventOrig, EventHandler, NodesRef } from '@lynx-js/types';
-import type {
-  StackHeaderConfigProps,
-  StackHeaderConfigRef,
-} from './StackHeaderConfig.types.js';
+import type { StackHeaderConfigProps } from './StackHeaderConfig.types.js';
 import type {
   StackHeaderAppearanceIOS,
   StackHeaderInlineCustomItemIOS,
@@ -33,8 +29,8 @@ import type { StackHeaderItemSpacerPlacement } from './ios/StackHeaderItemSpacer
 import { StackHeaderItemSpacer } from './ios/StackHeaderItemSpacer.ios.js';
 import { StackHeaderItem } from './ios/StackHeaderItem.ios.js';
 
-type PlatformInnerProps = StackHeaderConfigProps & {
-  forwardedRef: Ref<StackHeaderConfigRef>;
+type PlatformInnerProps = Omit<StackHeaderConfigProps, 'ref'> & {
+  forwardedRef: StackHeaderConfigProps['ref'];
 };
 
 export const StackHeaderConfigIOS = (props: PlatformInnerProps) => {
