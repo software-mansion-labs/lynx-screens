@@ -1,4 +1,9 @@
-import { useCallback, useLayoutEffect, useMemo, useState } from '@lynx-js/react';
+import {
+  useCallback,
+  useLayoutEffect,
+  useMemo,
+  useState,
+} from '@lynx-js/react';
 import type {
   StackHeaderConfigProps,
   StackHeaderMenuIOS,
@@ -166,6 +171,15 @@ export default function App(props: { onRender?: () => void }) {
         {
           name: 'Home',
           Component: ConfigScreen,
+          // Initial header config (default state, no-op callbacks) so the
+          // screen mounts its header in the same commit as the screen - the
+          // setRouteOptions layout effect lands in a later native update on
+          // Lynx, so the nested stack would otherwise start with a hidden
+          // navigation bar and animate it in during the push. The screen's
+          // effect replaces it with the live config right after mount.
+          options: {
+            headerConfig: buildHeaderConfig(DEFAULT_ITEMS, () => {}),
+          },
         },
       ]}
     />
