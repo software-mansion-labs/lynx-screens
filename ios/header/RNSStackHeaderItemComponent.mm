@@ -45,6 +45,7 @@
     [self setMenuRepresentationProp:nil];
     _placement = RNSHeaderItemPlacementTrailing;
     _didSetHeaderItemPlacement = NO;
+    _disabled = NO;
     _respondsToOnPress = NO;
     _hidesSharedBackground = NO;
     _visibilityPriority = RNSHeaderItemVisibilityPriorityStandard;
@@ -317,6 +318,16 @@ LYNX_PROP_SETTER("icon", setIcon, NSDictionary *) {
     }
     [self setIconProp:[RNSStackHeaderIconMapper iconFromDictionary:value]];
     _needsUpdate = YES;
+}
+
+LYNX_PROP_SETTER("disabled", setDisabled, BOOL) {
+    if (requestReset) {
+        value = NO;
+    }
+    if (_disabled != value) {
+        _disabled = value;
+        _needsUpdate = YES;
+    }
 }
 
 LYNX_PROP_SETTER("respondsToOnPress", setRespondsToOnPress, BOOL) {

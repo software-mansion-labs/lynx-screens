@@ -52,6 +52,7 @@ export interface NativeProps {
   icon?: StackHeaderIconIOSAttr | undefined;
   menu?: StackHeaderMenuAttr | undefined;
   menuRepresentation?: StackHeaderMenuAttr | undefined;
+  disabled?: boolean | undefined;
   respondsToOnPress?: boolean | undefined;
   bindOnHeaderItemPress?:
     | Lynx.EventHandler<Lynx.BaseEventOrig<Record<string, never>>>
