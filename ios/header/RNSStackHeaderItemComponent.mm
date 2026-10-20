@@ -8,6 +8,8 @@
 #import <Lynx/LynxLog.h>
 #import <Lynx/LynxPropsProcessor.h>
 
+#import "RNSDefines.h"
+
 #include <cmath>
 
 @LynxElement("ls-stack-header-item-ios")
@@ -44,6 +46,7 @@
     _didSetHeaderItemPlacement = NO;
     _respondsToOnPress = NO;
     _hidesSharedBackground = NO;
+    _visibilityPriority = RNSHeaderItemVisibilityPriorityStandard;
     _needsUpdate = NO;
     _menuDidChange = NO;
 }
@@ -249,6 +252,34 @@ LYNX_PROP_SETTER("hidesSharedBackground", setHidesSharedBackground, BOOL) {
     if (_hidesSharedBackground != value) {
         _hidesSharedBackground = value;
         _needsUpdate = YES;
+    }
+}
+
+// Adaptation: RNS converts the codegen enum in RNSConversions-Stack; on Lynx
+// the string value is mapped here.
+LYNX_PROP_SETTER("visibilityPriority", setVisibilityPriority, NSString *) {
+    RNSHeaderItemVisibilityPriority visibilityPriority;
+    if (requestReset || value == nil || [value isEqualToString:@"standard"]) {
+        visibilityPriority = RNSHeaderItemVisibilityPriorityStandard;
+    } else if ([value isEqualToString:@"low"]) {
+        visibilityPriority = RNSHeaderItemVisibilityPriorityLow;
+    } else if ([value isEqualToString:@"high"]) {
+        visibilityPriority = RNSHeaderItemVisibilityPriorityHigh;
+    } else {
+        LLogError(@"[RNScreens] Invalid StackHeaderItem visibilityPriority: %@", value);
+        visibilityPriority = RNSHeaderItemVisibilityPriorityStandard;
+    }
+
+    if (_visibilityPriority != visibilityPriority) {
+        _visibilityPriority = visibilityPriority;
+// tvOS and visionOS are excluded on purpose: `visibilityPriority` exists there, but the only
+// supported value is `standard`, which is already the default.
+#if RNS_IPHONE_OS_VERSION_AVAILABLE(27_0) && !TARGET_OS_TV && !TARGET_OS_VISION
+        // The item is rebuilt only on iOS 27+, where the priority is actually applied.
+        if (@available(iOS 27.0, *)) {
+            _needsUpdate = YES;
+        }
+#endif // RNS_IPHONE_OS_VERSION_AVAILABLE(27_0) && !TARGET_OS_TV && !TARGET_OS_VISION
     }
 }
 

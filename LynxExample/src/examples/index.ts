@@ -34,6 +34,7 @@ export { default as TestStackHeaderItemIdentifierIOS } from './TestStackHeaderIt
 export { default as TestStackHeaderMenuOptionsIOS } from './TestStackHeaderMenuOptionsIOS';
 export { default as TestStackHeaderSubviewOnpressIOS } from './TestStackHeaderSubviewOnpressIOS';
 export { default as TestStackHeaderSelectiveUpdatesIOS } from './TestStackHeaderSelectiveUpdatesIOS';
+export { default as TestStackHeaderItemVisibilityPriorityIOS } from './TestStackHeaderItemVisibilityPriorityIOS';
 export { default as TestPreventNativeDismissSingleStack } from './TestPreventNativeDismissSingleStack';
 export { default as TestFormSheet } from './TestFormSheet';
 export { default as TestFormSheetImplicitAnimationIOS } from './TestFormSheetImplicitAnimationIOS';

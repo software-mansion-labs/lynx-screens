@@ -1,6 +1,7 @@
 import type { ReactElement } from '@lynx-js/react';
 import type { PlatformIconIOS } from '../../../shared/types.js';
 import type { StackHeaderMenuIOS } from './StackHeaderMenu.ios.types.js';
+import type { StackHeaderItemVisibilityPriorityIOS } from '../StackHeaderConfig.ios.types.js';
 
 export type StackHeaderItemPlacement =
   | 'leading'
@@ -14,6 +15,7 @@ export type StackHeaderItemProps = {
   itemId?: string | undefined;
   identifier?: string | undefined;
   hidesSharedBackground?: boolean | undefined;
+  visibilityPriority?: StackHeaderItemVisibilityPriorityIOS | undefined;
   title?: string | undefined;
   icon?: PlatformIconIOS | undefined;
   render?: (() => ReactElement) | undefined;

@@ -8,6 +8,7 @@ export const StackHeaderItem = ({
   itemId,
   identifier,
   hidesSharedBackground,
+  visibilityPriority,
   title,
   icon,
   render,
@@ -30,6 +31,7 @@ export const StackHeaderItem = ({
       itemId={itemId}
       identifier={identifier}
       hidesSharedBackground={hidesSharedBackground}
+      visibilityPriority={visibilityPriority}
       title={title}
       icon={icon}
       menu={menu && (parseMenuElementToAttr(menu) as StackHeaderMenuAttr)}
